@@ -1,5 +1,5 @@
 # Gymeri
->A platform for finding gyms and personal trainers in your city. Launching in Lutsk, Ukraine.
+> A platform for finding gyms and personal trainers in your city. Launching in Lutsk, Ukraine.
  
 ## About
  
@@ -17,39 +17,30 @@ The system is a **modular monolith** on the backend and a server-rendered web ap
 - **Backend:** a single Django service. Its internal modules are Django apps with clear boundaries, so an app can be extracted into a separate service later if needed.
 - **Frontend:** a Next.js (React + TypeScript) application. Catalog pages are rendered on the server, so gym and trainer pages are indexable by search engines.
 ```
-browser ── Vercel (CDN / edge) ┐
-                               ▼
-┌────────────────────────────────────────────────────────────┐
-│ frontend   Next.js (App Router, TypeScript strict)         │
-│ server-rendered catalog pages, presentation only           │
-└────────────────────────────────────────────────────────────┘
-                               │
-                               │  REST /api/v1
-                               ▼
-┌────────────────────────────────────────────────────────────┐
-│ backend   Django + Django REST Framework                   │
-│ modular monolith of domain apps:                           │
-│ accounts · gyms · trainers · requests · exercises          │
-│ (+ config)                                                 │
-└────────────────────────────────────────────────────────────┘
-          │                    │                    │
-          ▼                    ▼                    ▼
-     PostgreSQL          S3-compatible       Scheduled jobs
-       (Neon)               storage        (reminders, later)
-     migrations         (photos, files)     Telegram / email
+┌─────────┐   ┌──────────────┐       ┌──────────────┐
+│         │   │   Frontend   │       │   Backend    │
+│ Browser │──►│   Next.js    │─REST─►│ Django + DRF │
+│         │   │    Vercel    │       │    Render    │
+└─────────┘   └──────────────┘       └──────────────┘
+                                             ▲
+                                             │
+                                             ▼
+                                      ┌────────────┐
+                                      │ PostgreSQL │
+                                      │    Neon    │
+                                      └────────────┘
  
-Sentry + structured JSON logs: monitoring of the whole stack
+CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel and Render
 ```
  
 | # | Component | Technology | Role | Talks to |
 |---|---|---|---|---|
 | 1 | Browser | Any modern browser | User interface | Frontend |
 | 2 | Frontend | Next.js, React, TypeScript | Renders pages, calls the API | Backend via REST (`/api/v1`) |
-| 3 | Backend | Django (modular monolith) | Business logic, auth, API | Database, file storage |
+| 3 | Backend | Django (modular monolith) | Business logic, auth, API | Database |
 | 4 | Database | PostgreSQL | Persistent data | Backend only |
-| 5 | File storage | S3-compatible | Photos and files | Backend (signed URLs) |
  
-Request flow: `Browser → Frontend → Backend → Database / File storage`.
+Request flow: `Browser → Frontend → Backend → Database`.
  
 The frontend is a presentation layer only. All business logic and data access live in the Django backend.
  
