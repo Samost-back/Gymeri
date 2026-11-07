@@ -8,7 +8,8 @@
 - База: PostgreSQL
 - Frontend: Next.js (App Router), TypeScript strict, pnpm
 - Файли: Django `STORAGES` (локально диск, у prod S3)
-  Архітектура й хостинг: `README.md`.
+
+Архітектура й хостинг: `README.md`.
 
 ## Курсова з ООП (тимчасово)
 
