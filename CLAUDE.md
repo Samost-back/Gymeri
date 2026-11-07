@@ -34,7 +34,7 @@ make lint
 
 ## Архітектура
 
-Модульний моноліт: один Django backend (apps: `accounts`, `gyms`, `trainers`, `requests`, `exercises`), Next.js frontend, PostgreSQL. Джерело істини це код.
+Модульний моноліт: один Django backend (apps: `accounts`, `gyms`, `trainers`, `leads`, `exercises`), Next.js frontend, PostgreSQL. Джерело істини це код.
 
 Кожен app: `models.py`, `services.py`, `serializers.py`, `views.py`, `urls.py`, `migrations/`, `tests/`.
 Потік запиту: `views / serializers -> services -> models`.

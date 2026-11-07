@@ -61,7 +61,7 @@ CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel
 | `accounts` | Реєстрація, вхід, ролі |
 | `gyms` | Зали, мережі, варіанти цін |
 | `trainers` | Профілі тренерів і спеціалізації |
-| `requests` | Заявки клієнтів тренерам |
+| `leads` | Заявки клієнтів тренерам |
 | `exercises` | Довідник вправ |
 
 Apps спілкуються через свої services, а не звертаються напряму до моделей і таблиць один одного.
@@ -106,7 +106,7 @@ Frontend працює на Vercel; backend, база й сховище файл�
 │   │   ├── accounts/
 │   │   ├── gyms/
 │   │   ├── trainers/
-│   │   ├── requests/
+│   │   ├── leads/
 │   │   └── exercises/    # each app: models, services, serializers,
 │   │                     # views, urls, migrations/, tests/
 │   └── manage.py
