@@ -15,35 +15,41 @@ Core features: a catalog of gyms with prices and map locations, trainer profiles
 The system is a **modular monolith** on the backend and a server-rendered web app on the frontend, backed by one PostgreSQL database.
  
 - **Backend:** a single Django service. Its internal modules are Django apps with clear boundaries, so an app can be extracted into a separate service later if needed.
-- **Frontend:** a Next.js (React + TypeScript) application. Catalog pages are rendered on the server, so gym and trainer pages are indexable by search engines.
+- **Frontend:** a Next.js (React + TypeScript) application. Public catalog pages are rendered on the server, so gym and trainer pages are indexable by search engines.
 ```
 ┌─────────┐   ┌──────────────┐       ┌──────────────┐
-│         │   │   Frontend   │       │   Backend    │
-│ Browser │──►│   Next.js    │─REST─►│ Django + DRF │
-│         │   │    Vercel    │       │    Render    │
-└─────────┘   └──────────────┘       └──────────────┘
+│         │   │   Frontend   │       │   Backend    │      ┌────────────┐
+│ Browser │──►│   Next.js    │─REST─►│ Django + DRF │─────►│   Files    │
+│         │   │    Vercel    │       │ ECS Fargate  │      │ Amazon S3  │
+└─────────┘   └──────────────┘       └──────────────┘      └────────────┘
                                              ▲
                                              │
                                              ▼
                                       ┌────────────┐
                                       │ PostgreSQL │
-                                      │    Neon    │
+                                      │ Amazon RDS │
                                       └────────────┘
  
-CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel and Render
+CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel and AWS
 ```
  
 | # | Component | Technology | Role | Talks to |
 |---|---|---|---|---|
 | 1 | Browser | Any modern browser | User interface | Frontend |
 | 2 | Frontend | Next.js, React, TypeScript | Renders pages, calls the API | Backend via REST (`/api/v1`) |
-| 3 | Backend | Django (modular monolith) | Business logic, auth, API | Database |
-| 4 | Database | PostgreSQL | Persistent data | Backend only |
+| 3 | Backend | Django (modular monolith) | Business logic, auth, API | Database, file storage |
+| 4 | Database | PostgreSQL (Amazon RDS) | Persistent data | Backend only |
+| 5 | File storage | Amazon S3 | Photos and files | Backend (signed URLs) |
  
-Request flow: `Browser → Frontend → Backend → Database`.
+Request flow: `Browser → Frontend → Backend → Database / File storage`.
  
-The frontend is a presentation layer only. All business logic and data access live in the Django backend.
+### Principles
  
+- **Business logic lives in Django.** The frontend is a presentation layer and does not duplicate rules or data access.
+- **One origin for the user.** The browser talks to a single domain (see [Hosting and networking](#hosting-and-networking)).
+- **Configuration through environment variables.** No secrets in code or in Git.
+- **Schema changes only through migrations.**
+- **Stateless backend.** Files go to S3, not to the local disk.
 ### Backend apps
  
 | App | Responsibility |
@@ -72,9 +78,19 @@ views / serializers  ->  services  ->  models (ORM)  ->  database
 | Backend | Python 3.11+, Django, Django REST Framework |
 | Database | PostgreSQL, Django migrations |
 | Frontend | Next.js (App Router), React, TypeScript |
+| Files | Amazon S3 (private bucket, signed URLs) |
 | Testing and quality | pytest, pytest-django, ruff; ESLint for the frontend |
-| CI | GitHub Actions |
-| Hosting | Vercel (frontend), Render (backend), Neon (database) |
+| CI/CD | GitHub, GitHub Actions |
+| Hosting | Vercel (frontend); AWS: ECS Fargate (backend), RDS (database), S3 (files) |
+ 
+## Hosting and networking
+ 
+The frontend runs on Vercel; the backend, database, and file storage run on AWS. The two sides communicate over HTTPS.
+ 
+- **Early stage:** the Next.js app proxies `/api/*` to the backend, so the browser sees a single origin and no CORS or third-party cookie issues arise.
+- **Production:** a custom domain with `site.com` (frontend) and `api.site.com` (backend). Session cookies are scoped to the parent domain, and the backend allows only the frontend origin (CORS and CSRF trusted origins).
+- **Secrets** are stored in the environment variables of each platform. Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser.
+Note: Vercel's free Hobby plan is limited to personal, non-commercial use. Move to a paid plan before monetizing the project.
  
 ## Repository structure
  
