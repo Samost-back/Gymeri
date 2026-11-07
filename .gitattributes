@@ -1,0 +1,3 @@
+# Store text files with LF so Windows and Unix checkouts stay identical
+# and shell scripts run inside Docker containers.
+* text=auto eol=lf
