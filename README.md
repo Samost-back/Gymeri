@@ -52,7 +52,7 @@ CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel
 - **Одне джерело (origin) для користувача.** Браузер працює з одним доменом (див. [Хостинг і мережа](#хостинг-і-мережа)).
 - **Конфігурація через змінні середовища.** Жодних секретів у коді чи в Git.
 - **Схема бази змінюється лише через міграції.**
-- **Stateless backend.** Файли йдуть у S3, а не на локальний диск.
+- **Stateless backend.** Файли зберігаються через Django `STORAGES`: локально на диск, у prod в S3. Backend у prod не покладається на локальний диск.
 
 ### Backend apps
 
@@ -120,21 +120,22 @@ Frontend працює на Vercel; backend, база й сховище файл�
 
 ## Як запустити
 
-Потрібно: Python 3.11+, Node.js 20+, pnpm, PostgreSQL.
+Локальна розробка йде через Docker, точка входу це `Makefile`. Python і PostgreSQL ставити не потрібно, вони працюють у контейнерах.
+
+Потрібно: Docker Desktop, `make`, Node.js 20+, pnpm.
 
 ### Backend
 
 ```bash
-cp .env.example .env              # set DATABASE_URL and secrets
-cd backend
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+cp .env.example .env    # fill in secrets
+make up                 # start PostgreSQL and backend
+make migrate
+docker compose exec backend python manage.py createsuperuser
 ```
 
-Django admin доступна за адресою `/admin/`, через неї ведеться каталог залів і тренерів.
+Backend доступний на `http://localhost:8000`. Django admin доступна за адресою `/admin/`, через неї ведеться каталог залів і тренерів.
+
+Зупинити: `make down`.
 
 ### Frontend
 
@@ -144,18 +145,27 @@ pnpm install
 pnpm dev
 ```
 
+### Тести й lint
+
+```bash
+make test
+make lint
+```
+
 ## Міграції бази даних
 
 Моделі є джерелом істини. Міграції генеруються з них, нумеруються окремо для кожного app і комітяться в репозиторій.
 
 ```bash
-python manage.py makemigrations   # creates 0001_initial.py, 0002_..., ...
-python manage.py migrate          # applies them
+make makemigrations     # creates 0001_initial.py, 0002_..., ...
+make migrate            # applies them
 ```
 
 Файли міграцій лежать у папці `migrations/` кожного app. Переглядай згенеровані файли перед комітом і не редагуй уже застосовані міграції.
 
 ## Як долучитися
+
+Правила коду, комітів, гілок і pull requests описані в [CLAUDE.md](CLAUDE.md).
 
 1. Створи гілку від `main`.
 2. Тримай зміни сфокусованими; додавай або оновлюй тести.
