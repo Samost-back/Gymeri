@@ -91,7 +91,6 @@ The frontend runs on Vercel; the backend, database, and file storage run on AWS.
 - **Early stage:** the Next.js app proxies `/api/*` to the backend, so the browser sees a single origin and no CORS or third-party cookie issues arise.
 - **Production:** a custom domain with `site.com` (frontend) and `api.site.com` (backend). Session cookies are scoped to the parent domain, and the backend allows only the frontend origin (CORS and CSRF trusted origins).
 - **Secrets** are stored in the environment variables of each platform. Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser.
-Note: Vercel's free Hobby plan is limited to personal, non-commercial use. Move to a paid plan before monetizing the project.
  
 ## Repository structure
  
