@@ -1,22 +1,24 @@
 # Gymeri
- 
-> A platform for finding gyms and personal trainers in your city. Launching in Lutsk, Ukraine.
- 
-## About
- 
-Gymeri helps people choose where and with whom to train. It brings together three groups of users:
- 
-- **Clients** browse gyms and chains, compare prices, and contact trainers.
-- **Trainers** publish a profile and receive requests from clients.
-- **Gyms and chains** maintain pages with addresses, prices, and contacts.
-Core features: a catalog of gyms with prices and map locations, trainer profiles with search and filters, client requests to trainers, an exercise library with technique guides, and role-based accounts.
- 
-## Architecture
- 
-The system is a **modular monolith** on the backend and a server-rendered web app on the frontend, backed by one PostgreSQL database.
- 
-- **Backend:** a single Django service. Its internal modules are Django apps with clear boundaries, so an app can be extracted into a separate service later if needed.
-- **Frontend:** a Next.js (React + TypeScript) application. Public catalog pages are rendered on the server, so gym and trainer pages are indexable by search engines.
+
+> Платформа для пошуку спортзалів і персональних тренерів у твоєму місті. Старт у Луцьку.
+
+## Про проєкт
+
+Gymeri допомагає обрати, де й з ким тренуватися. Платформа об'єднує три групи користувачів:
+
+- **Клієнти** переглядають зали й мережі, порівнюють ціни та звертаються до тренерів.
+- **Тренери** публікують профіль і отримують заявки від клієнтів.
+- **Зали й мережі** ведуть сторінки з адресами, цінами й контактами.
+
+Основні можливості: каталог залів із цінами та розташуванням на мапі, профілі тренерів із пошуком і фільтрами, заявки клієнтів тренерам, довідник вправ із технікою виконання, акаунти з ролями.
+
+## Архітектура
+
+Система складається з **модульного моноліту** на backend і web-застосунку з серверним рендерингом на frontend. Дані зберігаються в одній базі PostgreSQL.
+
+- **Backend:** один Django-сервіс. Його внутрішні модулі це Django apps із чіткими межами, тож за потреби будь-який app можна згодом винести в окремий сервіс.
+- **Frontend:** застосунок на Next.js (React + TypeScript). Публічні сторінки каталогу рендеряться на сервері, тому сторінки залів і тренерів індексуються пошуковими системами.
+
 ```
 ┌─────────┐   ┌──────────────┐       ┌──────────────┐
 │         │   │   Frontend   │       │   Backend    │      ┌────────────┐
@@ -30,70 +32,72 @@ The system is a **modular monolith** on the backend and a server-rendered web ap
                                       │ PostgreSQL │
                                       │ Amazon RDS │
                                       └────────────┘
- 
+
 CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel and AWS
 ```
- 
-| # | Component | Technology | Role | Talks to |
+
+| # | Компонент | Технологія | Роль | З чим взаємодіє |
 |---|---|---|---|---|
-| 1 | Browser | Any modern browser | User interface | Frontend |
-| 2 | Frontend | Next.js, React, TypeScript | Renders pages, calls the API | Backend via REST (`/api/v1`) |
-| 3 | Backend | Django (modular monolith) | Business logic, auth, API | Database, file storage |
-| 4 | Database | PostgreSQL (Amazon RDS) | Persistent data | Backend only |
-| 5 | File storage | Amazon S3 | Photos and files | Backend (signed URLs) |
- 
-Request flow: `Browser → Frontend → Backend → Database / File storage`.
- 
-### Principles
- 
-- **Business logic lives in Django.** The frontend is a presentation layer and does not duplicate rules or data access.
-- **One origin for the user.** The browser talks to a single domain (see [Hosting and networking](#hosting-and-networking)).
-- **Configuration through environment variables.** No secrets in code or in Git.
-- **Schema changes only through migrations.**
-- **Stateless backend.** Files go to S3, not to the local disk.
+| 1 | Browser | Будь-який сучасний браузер | Інтерфейс користувача | Frontend |
+| 2 | Frontend | Next.js, React, TypeScript | Рендерить сторінки, викликає API | Backend через REST (`/api/v1`) |
+| 3 | Backend | Django (модульний моноліт) | Бізнес-логіка, автентифікація, API | База даних, сховище файлів |
+| 4 | Database | PostgreSQL (Amazon RDS) | Постійні дані | Лише backend |
+| 5 | File storage | Amazon S3 | Фото й файли | Backend (signed URLs) |
+
+Потік запиту: `Browser → Frontend → Backend → Database / File storage`.
+
+### Принципи
+
+- **Бізнес-логіка живе в Django.** Frontend це шар відображення, він не дублює правила й не звертається до даних напряму.
+- **Одне джерело (origin) для користувача.** Браузер працює з одним доменом (див. [Хостинг і мережа](#хостинг-і-мережа)).
+- **Конфігурація через змінні середовища.** Жодних секретів у коді чи в Git.
+- **Схема бази змінюється лише через міграції.**
+- **Stateless backend.** Файли йдуть у S3, а не на локальний диск.
+
 ### Backend apps
- 
-| App | Responsibility |
+
+| App | Відповідальність |
 |---|---|
-| `accounts` | Registration, login, roles |
-| `gyms` | Gyms, chains, price options |
-| `trainers` | Trainer profiles and specializations |
-| `requests` | Client requests to trainers |
-| `exercises` | Exercise library |
- 
-Apps communicate through their services, not by reaching into each other's models and tables.
- 
-### Backend layers
- 
+| `accounts` | Реєстрація, вхід, ролі |
+| `gyms` | Зали, мережі, варіанти цін |
+| `trainers` | Профілі тренерів і спеціалізації |
+| `requests` | Заявки клієнтів тренерам |
+| `exercises` | Довідник вправ |
+
+Apps спілкуються через свої services, а не звертаються напряму до моделей і таблиць один одного.
+
+### Шари backend
+
 ```
 views / serializers  ->  services  ->  models (ORM)  ->  database
 ```
- 
-- **Views and serializers** handle HTTP, validation, and serialization, and delegate to services.
-- **Services** contain business logic and access rules.
-- **Models** describe the data and simple entity rules.
-## Tech stack
- 
-| Layer | Technology |
+
+- **Views і serializers** обробляють HTTP, валідацію й серіалізацію та делегують роботу services.
+- **Services** містять бізнес-логіку й правила доступу.
+- **Models** описують дані й прості правила сутностей.
+
+## Стек технологій
+
+| Шар | Технологія |
 |---|---|
 | Backend | Python 3.11+, Django, Django REST Framework |
-| Database | PostgreSQL, Django migrations |
+| Database | PostgreSQL, міграції Django |
 | Frontend | Next.js (App Router), React, TypeScript |
-| Files | Amazon S3 (private bucket, signed URLs) |
-| Testing and quality | pytest, pytest-django, ruff; ESLint for the frontend |
+| Files | Amazon S3 (приватний bucket, signed URLs) |
+| Тести й якість коду | pytest, pytest-django, ruff; ESLint для frontend |
 | CI/CD | GitHub, GitHub Actions |
-| Hosting | Vercel (frontend); AWS: ECS Fargate (backend), RDS (database), S3 (files) |
- 
-## Hosting and networking
- 
-The frontend runs on Vercel; the backend, database, and file storage run on AWS. The two sides communicate over HTTPS.
- 
-- **Early stage:** the Next.js app proxies `/api/*` to the backend, so the browser sees a single origin and no CORS or third-party cookie issues arise.
-- **Production:** a custom domain with `site.com` (frontend) and `api.site.com` (backend). Session cookies are scoped to the parent domain, and the backend allows only the frontend origin (CORS and CSRF trusted origins).
-- **Secrets** are stored in the environment variables of each platform. Only variables prefixed with `NEXT_PUBLIC_` are exposed to the browser.
- 
-## Repository structure
- 
+| Хостинг | Vercel (frontend); AWS: ECS Fargate (backend), RDS (база), S3 (файли) |
+
+## Хостинг і мережа
+
+Frontend працює на Vercel; backend, база й сховище файлів на AWS. Сторони спілкуються через HTTPS.
+
+- **Рання стадія:** Next.js проксує `/api/*` на backend, тож браузер бачить одне джерело (origin), і проблем із CORS чи сторонніми cookie не виникає.
+- **Production:** власний домен, `site.com` для frontend і `api.site.com` для backend. Session cookies прив'язані до батьківського домену, а backend дозволяє запити лише з домену frontend (CORS і CSRF trusted origins).
+- **Секрети** зберігаються в змінних середовища кожної платформи. До браузера потрапляють лише змінні з префіксом `NEXT_PUBLIC_`.
+
+## Структура репозиторію
+
 ```
 .
 ├── backend/
@@ -113,13 +117,13 @@ The frontend runs on Vercel; the backend, database, and file storage run on AWS.
 ├── .env.example
 └── README.md
 ```
- 
-## Getting started
- 
-Requirements: Python 3.11+, Node.js 20+, pnpm, PostgreSQL.
- 
+
+## Як запустити
+
+Потрібно: Python 3.11+, Node.js 20+, pnpm, PostgreSQL.
+
 ### Backend
- 
+
 ```bash
 cp .env.example .env              # set DATABASE_URL and secrets
 cd backend
@@ -129,34 +133,35 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
- 
-The Django admin is available at `/admin/` and is used to manage the catalog of gyms and trainers.
- 
+
+Django admin доступна за адресою `/admin/`, через неї ведеться каталог залів і тренерів.
+
 ### Frontend
- 
+
 ```bash
 cd frontend
 pnpm install
 pnpm dev
 ```
- 
-## Database migrations
- 
-Models are the source of truth. Migrations are generated from them, numbered per app, and committed to the repository.
- 
+
+## Міграції бази даних
+
+Моделі є джерелом істини. Міграції генеруються з них, нумеруються окремо для кожного app і комітяться в репозиторій.
+
 ```bash
 python manage.py makemigrations   # creates 0001_initial.py, 0002_..., ...
 python manage.py migrate          # applies them
 ```
- 
-Migration files live in each app's `migrations/` folder. Review generated files before committing, and do not edit migrations that have already been applied.
- 
-## Contributing
- 
-1. Create a branch from `main`.
-2. Keep changes focused; add or update tests.
-3. Make sure lint and tests pass.
-4. Open a pull request.
-## License
- 
+
+Файли міграцій лежать у папці `migrations/` кожного app. Переглядай згенеровані файли перед комітом і не редагуй уже застосовані міграції.
+
+## Як долучитися
+
+1. Створи гілку від `main`.
+2. Тримай зміни сфокусованими; додавай або оновлюй тести.
+3. Переконайся, що lint і тести проходять.
+4. Відкрий pull request.
+
+## Ліцензія
+
 TBD
