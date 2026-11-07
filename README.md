@@ -120,32 +120,35 @@ Frontend працює на Vercel; backend, база й сховище файл�
 
 ## Як запустити
 
-Локальна розробка йде через Docker, точка входу це `Makefile`. Python і PostgreSQL ставити не потрібно, вони працюють у контейнерах.
+Локальна розробка йде через Docker, точка входу це `Makefile`. Увесь проєкт (PostgreSQL, backend, frontend) працює в контейнерах, тож Python, Node.js і PostgreSQL ставити не потрібно.
 
-Потрібно: Docker Desktop, `make`, Node.js 20+, pnpm.
+Потрібно: Docker Desktop, `make`.
 
-### Backend
+### Перший запуск
 
 ```bash
 cp .env.example .env    # fill in secrets
-make up                 # start PostgreSQL and backend
+make up                 # start PostgreSQL, backend and frontend
 make migrate
 docker compose exec backend python manage.py createsuperuser
 ```
 
-Backend доступний на `http://localhost:8000`. Django admin доступна за адресою `/admin/`, через неї ведеться каталог залів і тренерів.
+Після запуску:
 
-Зупинити: `make down`.
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:8000/api/v1/`
+- Django admin: `http://localhost:8000/admin/`, через неї ведеться каталог залів і тренерів.
 
-### Frontend
+### Щоденна робота
 
 ```bash
-cd frontend
-pnpm install
-pnpm dev
+make up      # start the whole project
+make down    # stop the whole project
 ```
 
 ### Тести й lint
+
+Тести й lint не залежать від того, чи запущений проєкт через `make up`.
 
 ```bash
 make test
