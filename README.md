@@ -177,4 +177,4 @@ make migrate            # applies them
 
 ## Ліцензія
 
-TBD
+© 2026 Gymeri. All rights reserved.
