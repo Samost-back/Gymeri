@@ -1,0 +1,65 @@
+import type { CatalogStats, GymSummary } from "../model/types";
+
+// Sample data from the design mockup until the gyms API exists.
+export const PLACEHOLDER_GYMS: GymSummary[] = [
+  {
+    slug: "maximus-sport-club",
+    name: "Maximus Sport Club",
+    brandTag: "MXM",
+    highlight: "Топ вибір · Відродження",
+    areaM2: 1800,
+    address: "вул. Електроапаратна, 3 (р-н Відродження)",
+    hoursSummary: "07:00 – 22:30 (Сб–Нд 08:00 – 21:00)",
+    locationsCount: 2,
+    districts: ["Відродження", "Центр"],
+    imageUrl: "/images/gyms/maximus-sport-club.png",
+    imageAlt: "Зона вільних ваг зі штангами та гантелями",
+  },
+  {
+    slug: "sport-life-lutsk",
+    name: "Sport Life (Луцьк)",
+    brandTag: "SL",
+    highlight: "Аква-комплекс · Центр",
+    areaM2: 3200,
+    address: "пр-т Василя Мойсея, 7-А (ТРЦ Промінь)",
+    hoursSummary: "07:00 – 23:00 щоденно",
+    locationsCount: 1,
+    districts: ["Центр"],
+    imageUrl: "/images/gyms/sport-life-lutsk.png",
+    imageAlt: "Критий басейн із доріжками для плавання",
+  },
+  {
+    slug: "inter-atletica-gym",
+    name: "Inter Atletica Gym",
+    brandTag: "Inter Atletica",
+    highlight: "Хардкор силовий · 33-й кв.",
+    tag: "IA / Sport",
+    areaM2: 1200,
+    address: "вул. Конякіна, 14 (район 33-й / Північний)",
+    hoursSummary: "07:30 – 22:00 (Сб 09:00 – 20:00)",
+    locationsCount: 3,
+    districts: ["33-й", "Перемоги", "Завокзальний"],
+    imageUrl: "/images/gyms/inter-atletica-gym.png",
+    imageAlt: "Кросфіт-зона з турніками, гімнастичними кільцями та гирями",
+  },
+  {
+    slug: "limefit-club",
+    name: "LimeFit Club",
+    brandTag: "LimeFit Studio",
+    highlight: "Сучасний простір · Яровиця",
+    tag: "Lime / Fit",
+    areaM2: 950,
+    address: "вул. Яровиця, 4 (ЖК Яровиця / Набережна)",
+    hoursSummary: "08:00 – 22:00 щоденно",
+    locationsCount: 1,
+    districts: ["Яровиця", "Набережна"],
+    imageUrl: "/images/gyms/limefit-club.png",
+    imageAlt: "Кардіозона з біговими доріжками біля панорамних вікон",
+  },
+];
+
+export const PLACEHOLDER_CATALOG_STATS: CatalogStats = {
+  gyms: 7,
+  chains: 4,
+  districts: 7,
+};

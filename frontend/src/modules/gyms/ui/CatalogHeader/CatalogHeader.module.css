@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tag {
+  margin-bottom: var(--space-sm);
+}
+
+.title {
+  composes: headlineLg from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+}
+
+.description {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  max-width: 28rem;
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 768px) {
+  .header {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+}
