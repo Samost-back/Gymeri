@@ -100,22 +100,19 @@ Frontend працює на Vercel; backend, база й сховище файл�
 
 ```
 .
-├── backend/
-│   ├── config/           # settings, urls, wsgi/asgi
-│   ├── apps/
-│   │   ├── accounts/
-│   │   ├── gyms/
-│   │   ├── trainers/
-│   │   ├── leads/
-│   │   └── exercises/    # each app: models, services, serializers,
-│   │                     # views, urls, migrations/, tests/
-│   └── manage.py
-├── frontend/             # Next.js + TypeScript
-│   ├── app/              # routes (App Router)
-│   ├── components/
-│   └── lib/              # API client, shared utilities
-└── README.md
+├── backend/              # Django API
+│   ├── config/           # settings and root urls
+│   ├── apps/             # one app per business module
+│   └── tests/            # mirrors apps/
+└── frontend/             # Next.js app
+    ├── src/
+    │   ├── app/          # routes only
+    │   ├── modules/      # business modules, mirror backend apps
+    │   └── shared/       # code without business knowledge
+    └── tests/            # unit/ mirrors src/, e2e/ for browser flows
 ```
+
+Будова app і модуля та правила між ними описані в [CLAUDE.md](CLAUDE.md).
 
 ## Як запустити
 

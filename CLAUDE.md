@@ -41,7 +41,8 @@ make lint
 
 Модульний моноліт: один Django backend (apps: `accounts`, `gyms`, `trainers`, `leads`, `exercises`), Next.js frontend, PostgreSQL. Джерело істини це код.
 
-Кожен app: `models.py`, `services.py`, `serializers.py`, `views.py`, `urls.py`, `migrations/`, `tests/`.
+Кожен app: `models.py`, `services.py`, `serializers.py`, `views.py`, `urls.py`, `migrations/`.
+Тести окремо від коду й повторюють його структуру: `backend/tests/<app>/`, `frontend/tests/unit/` (як `src/`), `frontend/tests/e2e/`.
 Потік запиту: `views / serializers -> services -> models`.
 
 ## Інваріанти
@@ -56,7 +57,8 @@ make lint
 ## Конвенції
 
 - Backend: type hints у новому коді; доменні виключення піднімаємо в services, у HTTP-помилки перетворюємо в одному місці; endpoints під `/api/v1/`.
-- Frontend: без `any`; публічний каталог (зали, тренери) це server components, client components лише для інтерактивності; усі виклики API через клієнт у `frontend/lib/`.
+- Frontend: без `any`; публічний каталог (зали, тренери) це server components, client components лише для інтерактивності.
+- Структура frontend: `src/app` лише сторінки; `src/modules/<module>` (`ui/`, `api/`, `model/`, `index.ts`) повторює apps backend; `src/shared` спільне без бізнес-знань. Дані модуля отримуємо лише через його `api/`; модуль імпортуємо тільки через `index.ts`; `shared` не залежить від модулів (перевіряє ESLint).
 - Нові залежності додаємо тільки після узгодження.
 - Важливі рішення (архітектура, схема бази, контракт API, нові залежності, перейменування) Claude не приймає сам, а спершу уточнює.
 - Код і коментарі англійською.
