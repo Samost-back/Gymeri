@@ -114,7 +114,6 @@ Frontend працює на Vercel; backend, база й сховище файл�
 │   ├── app/              # routes (App Router)
 │   ├── components/
 │   └── lib/              # API client, shared utilities
-├── .env.example
 └── README.md
 ```
 
@@ -127,7 +126,8 @@ Frontend працює на Vercel; backend, база й сховище файл�
 ### Перший запуск
 
 ```bash
-cp .env.example .env    # fill in secrets
+cp backend/.env.example backend/.env                  # fill in secrets
+cp frontend/.env.local.example frontend/.env.local
 make up                 # start PostgreSQL, backend and frontend
 make migrate
 docker compose exec backend python manage.py createsuperuser
