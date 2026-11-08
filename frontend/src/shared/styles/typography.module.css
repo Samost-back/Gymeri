@@ -1,0 +1,85 @@
+/* Text styles from the design system; components pull them in via `composes`. */
+
+.displayHero {
+  font-family: var(--font-sans);
+  font-size: 80px;
+  line-height: 84px;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+}
+
+.headlineXl {
+  font-family: var(--font-sans);
+  font-size: 48px;
+  line-height: 52px;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.headlineLg {
+  font-family: var(--font-sans);
+  font-size: 32px;
+  line-height: 38px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+.headlineMd {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  line-height: 30px;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.headlineSm {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.bodyLg {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+}
+
+.bodyMd {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 24px;
+}
+
+.bodySm {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+}
+
+.labelSm {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.labelXs {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.buttonText {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
