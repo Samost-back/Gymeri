@@ -4,7 +4,7 @@ import styles from "./SiteFooter.module.css";
 
 const FOOTER_LINKS = [
   { href: "/contacts", label: "Контакти" },
-  { href: "/terms", label: "Публічна оферта" },
+  { href: "/terms", label: "Умови використання" },
   { href: "/privacy", label: "Політика конфіденційності" },
 ];
 
