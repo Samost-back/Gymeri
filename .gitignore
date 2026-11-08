@@ -1,0 +1,32 @@
+# --- OS and editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# --- Environment (secrets stay local; templates are committed) ---
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# --- Frontend (Next.js, pnpm) ---
+node_modules/
+/frontend/.next/
+/frontend/out/
+/frontend/coverage/
+/frontend/next-env.d.ts
+/frontend/.vercel/
+*.tsbuildinfo
+pnpm-debug.log*
+
+# --- Backend (Django, Python) ---
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+/backend/media/
+/backend/staticfiles/
