@@ -1,0 +1,62 @@
+.footer {
+  width: 100%;
+  margin-top: var(--space-2xl);
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-xl);
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  text-align: center;
+}
+
+.name {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.copyright {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+.link {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+  letter-spacing: 0.1em;
+  transition: color var(--transition-fast);
+}
+
+.link:hover {
+  color: var(--color-primary);
+}
+
+@media (min-width: 768px) {
+  .inner {
+    flex-direction: row;
+  }
+
+  .brand {
+    text-align: left;
+  }
+}

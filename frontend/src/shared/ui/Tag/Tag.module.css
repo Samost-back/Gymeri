@@ -1,0 +1,26 @@
+.tag {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: fit-content;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--color-border);
+}
+
+.default {
+  background: rgb(14 14 14 / 0.9);
+  color: var(--color-primary);
+}
+
+.muted {
+  background: rgb(14 14 14 / 0.9);
+  color: var(--color-text-subtle);
+}
+
+.solid {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 700;
+}

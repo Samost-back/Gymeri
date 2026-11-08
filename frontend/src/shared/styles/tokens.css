@@ -1,0 +1,31 @@
+/* Design tokens: the single source for colors, typography and spacing.
+   Breakpoints can't be CSS variables in media queries, so modules use
+   these fixed values: sm 640px, md 768px, lg 1024px. */
+:root {
+  --color-bg: #0e0e0e;
+  --color-surface: #131313;
+  --color-surface-low: #1b1b1b;
+  --color-border: #444748;
+  --color-text: #e2e2e2;
+  --color-text-muted: #c4c7c8;
+  --color-text-subtle: #8e9192;
+  --color-primary: #ffffff;
+  --color-primary-hover: #e4e1e5;
+  --color-on-primary: #0e0e0e;
+
+  --font-sans: var(--font-onest), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --container-max: 80rem;
+  --page-margin: 3rem;
+
+  --transition-fast: 150ms ease;
+}
