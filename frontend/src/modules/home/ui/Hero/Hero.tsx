@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { CatalogStats } from "@/modules/gyms";
 import { pluralize } from "@/shared/lib/format";
 import { Container } from "@/shared/ui";
-import heroImage from "../../assets/hero-strength-zone.png";
+import heroImage from "../../assets/hero.webp";
 import styles from "./Hero.module.css";
 
 type HeroProps = {
