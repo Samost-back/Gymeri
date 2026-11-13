@@ -4,3 +4,7 @@ class GymsError(Exception):
 
 class InvalidSchedule(GymsError):
     pass
+
+
+class InvalidFilter(GymsError):
+    """The client sent search parameters we can't apply."""

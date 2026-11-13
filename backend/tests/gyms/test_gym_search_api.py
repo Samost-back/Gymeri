@@ -1,0 +1,127 @@
+from datetime import datetime
+from decimal import Decimal
+from zoneinfo import ZoneInfo
+
+import pytest
+from rest_framework.test import APIClient
+
+from gyms.models import Amenity, Chain, District, Gym, MembershipPlan, OpeningHours
+from gyms.search import GymSearchCriteria
+from gyms.services import GymSearchService
+
+KYIV = ZoneInfo("Europe/Kyiv")
+
+
+@pytest.fixture
+def catalog() -> dict[str, Gym]:
+    """IA has two gyms in different districts; only the one in the center has a pool."""
+    ia = Chain.objects.create(name="IA", slug="ia")
+    center = District.objects.create(name="Центр", slug="center")
+    north = District.objects.create(name="33-й", slug="33")
+    pool = Amenity.objects.create(name="Басейн", slug="pool")
+    strength = Amenity.objects.create(name="Силовий зал", slug="strength")
+
+    lvivska = Gym.objects.create(
+        chain=ia, district=center, name="Lvivska", slug="lvivska", address="x", is_published=True
+    )
+    lvivska.amenities.set([pool, strength])
+    koniakina = Gym.objects.create(
+        chain=ia, district=north, name="Koniakina", slug="koniakina", address="x", is_published=True
+    )
+    koniakina.amenities.set([strength])
+    for day in range(7):
+        OpeningHours.objects.create(gym=koniakina, weekday=day, opens_at="00:00", closes_at="00:00")
+    OpeningHours.objects.create(gym=lvivska, weekday=0, opens_at="08:00", closes_at="21:00")
+
+    MembershipPlan.objects.create(chain=ia, name="Month", price=Decimal("1350"), duration_days=30)
+    MembershipPlan.objects.create(
+        chain=ia, gym=lvivska, name="Pool month", price=Decimal("900"), duration_days=30
+    )
+    return {"lvivska": lvivska, "koniakina": koniakina}
+
+
+def search_slugs(query: str) -> list[str]:
+    response = APIClient().get(f"/api/v1/gyms/{query}")
+    assert response.status_code == 200, response.json()
+    return [gym["slug"] for gym in response.json()]
+
+
+@pytest.mark.django_db
+def test_gym_must_have_all_requested_amenities(catalog):
+    assert search_slugs("?amenity=strength&amenity=pool") == ["lvivska"]
+
+
+@pytest.mark.django_db
+def test_filter_by_district(catalog):
+    assert search_slugs("?district=33") == ["koniakina"]
+
+
+@pytest.mark.django_db
+def test_filter_by_chain(catalog):
+    other = Chain.objects.create(name="Other", slug="other")
+    Gym.objects.create(
+        chain=other,
+        district=catalog["lvivska"].district,
+        name="Other gym",
+        slug="other-gym",
+        address="x",
+        is_published=True,
+    )
+
+    assert search_slugs("?chain=other") == ["other-gym"]
+    assert search_slugs("?chain=ia") == ["koniakina", "lvivska"]
+
+
+@pytest.mark.django_db
+def test_round_the_clock_filter_uses_schedule(catalog):
+    assert search_slugs("?round_the_clock=true") == ["koniakina"]
+
+
+@pytest.mark.django_db
+def test_open_now_depends_on_current_time(catalog):
+    criteria = GymSearchCriteria(open_now=True)
+    monday_night = datetime(2026, 11, 16, 23, 0, tzinfo=KYIV)
+
+    found = GymSearchService().search(criteria, now=monday_night)
+
+    assert [gym.slug for gym in found] == ["koniakina"]
+
+
+@pytest.mark.django_db
+def test_gym_price_includes_its_own_plans(catalog):
+    gyms = {gym["slug"]: gym for gym in APIClient().get("/api/v1/gyms/").json()}
+
+    assert gyms["lvivska"]["price_from"] == "900.00"
+    assert gyms["koniakina"]["price_from"] == "1350.00"
+
+
+@pytest.mark.django_db
+def test_unpublished_gym_is_not_found(catalog):
+    catalog["lvivska"].is_published = False
+    catalog["lvivska"].save()
+
+    assert search_slugs("") == ["koniakina"]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "query",
+    ["?district=nowhere", "?amenity=sauna", "?sort=rating"],
+    ids=["unknown district", "unknown amenity", "unknown sort"],
+)
+def test_invalid_filter_returns_bad_request(catalog, query):
+    response = APIClient().get(f"/api/v1/gyms/{query}")
+
+    assert response.status_code == 400
+    assert "detail" in response.json()
+
+
+@pytest.mark.django_db
+def test_filter_options_list_only_values_of_published_gyms(catalog):
+    catalog["lvivska"].is_published = False
+    catalog["lvivska"].save()
+
+    options = APIClient().get("/api/v1/catalog/filters/").json()
+
+    assert [d["slug"] for d in options["districts"]] == ["33"]
+    assert [a["slug"] for a in options["amenities"]] == ["strength"]
