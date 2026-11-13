@@ -12,3 +12,7 @@ export function pluralize(count: number, forms: PluralForms): string {
 export function formatArea(squareMeters: number): string {
   return `${new Intl.NumberFormat("uk-UA").format(squareMeters)} м²`;
 }
+
+export function formatPrice(hryvnias: number): string {
+  return `${new Intl.NumberFormat("uk-UA").format(hryvnias)} грн`;
+}

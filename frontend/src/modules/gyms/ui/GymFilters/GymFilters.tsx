@@ -1,17 +1,30 @@
 import { Chip, Icon, type IconName } from "@/shared/ui";
+import { gymsHref } from "../../model/search-params";
+import { SORT_OPTIONS, type FilterOptions, type GymSearchParams } from "../../model/types";
 import styles from "./GymFilters.module.css";
+import { SortSelect } from "./SortSelect";
 
-const DISTRICTS = ["Всі райони", "Центр", "Соборності / 33-й", "Перемоги", "Відродження"];
+// Icons are presentation, so they live here and not in the backend; unknown amenities get a check.
+const AMENITY_ICONS: Record<string, IconName> = {
+  strength: "fitness_center",
+  pool: "pool",
+};
 
-const FEATURES: { label: string; icon: IconName }[] = [
-  { label: "Силовий зал", icon: "fitness_center" },
-  { label: "Кросфіт зона", icon: "timer" },
-  { label: "Басейн / СПА", icon: "pool" },
-  { label: "24/7 режим", icon: "schedule" },
-];
+type GymFiltersProps = {
+  options: FilterOptions;
+  params: GymSearchParams;
+  showSort?: boolean;
+};
 
-// Static for now: filtering happens on the backend once the search API exists.
-export function GymFilters() {
+function toggle(values: string[], value: string): string[] {
+  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+}
+
+export function GymFilters({ options, params, showSort = false }: GymFiltersProps) {
+  const sortHrefs = Object.fromEntries(
+    SORT_OPTIONS.map((option) => [option.code, gymsHref({ ...params, sort: option.code })]),
+  );
+
   return (
     <section className={styles.panel} aria-label="Фільтри залів">
       <div className={styles.topRow}>
@@ -19,28 +32,22 @@ export function GymFilters() {
           <Icon name="tune" size={16} className={styles.headingIcon} />
           Фільтрація та параметри відбору
         </div>
-
-        <div className={styles.sort}>
-          <label htmlFor="gym-sort" className={styles.sortLabel}>
-            Сортування:
-          </label>
-          <div className={styles.selectWrap}>
-            <select id="gym-sort" className={styles.select} defaultValue="name">
-              <option value="name">За назвою</option>
-              <option value="price">Спочатку дешевші</option>
-              <option value="locations">За кількістю локацій</option>
-            </select>
-            <Icon name="expand_more" size={16} className={styles.selectIcon} />
-          </div>
-        </div>
+        {showSort && <SortSelect value={params.sort} hrefs={sortHrefs} />}
       </div>
 
       <div className={styles.group}>
         <span className={styles.groupLabel}>[Район]</span>
         <div className={styles.chips}>
-          {DISTRICTS.map((district, index) => (
-            <Chip key={district} active={index === 0}>
-              {district}
+          <Chip href={gymsHref({ ...params, district: undefined })} active={!params.district}>
+            Всі райони
+          </Chip>
+          {options.districts.map((district) => (
+            <Chip
+              key={district.slug}
+              href={gymsHref({ ...params, district: district.slug })}
+              active={params.district === district.slug}
+            >
+              {district.name}
             </Chip>
           ))}
         </div>
@@ -49,11 +56,30 @@ export function GymFilters() {
       <div className={styles.group}>
         <span className={styles.groupLabel}>[Опції]</span>
         <div className={styles.chips}>
-          {FEATURES.map((feature) => (
-            <Chip key={feature.label} icon={feature.icon}>
-              {feature.label}
+          {options.amenities.map((amenity) => (
+            <Chip
+              key={amenity.slug}
+              icon={AMENITY_ICONS[amenity.slug] ?? "check"}
+              href={gymsHref({ ...params, amenities: toggle(params.amenities, amenity.slug) })}
+              active={params.amenities.includes(amenity.slug)}
+            >
+              {amenity.name}
             </Chip>
           ))}
+          <Chip
+            icon="schedule"
+            href={gymsHref({ ...params, roundTheClock: !params.roundTheClock })}
+            active={params.roundTheClock}
+          >
+            24/7 режим
+          </Chip>
+          <Chip
+            icon="timer"
+            href={gymsHref({ ...params, openNow: !params.openNow })}
+            active={params.openNow}
+          >
+            Відкрито зараз
+          </Chip>
         </div>
       </div>
     </section>

@@ -1,5 +1,6 @@
-export { getCatalogStats, getGyms } from "./api/gyms";
-export type { CatalogStats, GymSummary } from "./model/types";
+export { getCatalogStats } from "./api/gyms";
+export type { CatalogStats } from "./model/types";
 export { CatalogHeader } from "./ui/CatalogHeader/CatalogHeader";
-export { GymCard } from "./ui/GymCard/GymCard";
-export { GymFilters } from "./ui/GymFilters/GymFilters";
+export { ChainList } from "./ui/ChainList";
+export { GymSearchResults } from "./ui/GymSearchResults";
+export { HomeFilters } from "./ui/HomeFilters";
