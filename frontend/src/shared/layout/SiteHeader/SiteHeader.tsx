@@ -10,7 +10,6 @@ export function SiteHeader() {
       <Container className={styles.inner}>
         <Link href="/" className={styles.brand}>
           GYMERI · LUTSK
-          <span className={styles.badge}>Beta</span>
         </Link>
 
         <SiteNav />
