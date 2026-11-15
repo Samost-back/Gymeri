@@ -1,0 +1,49 @@
+.table {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.head {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  display: none;
+  color: var(--color-text-subtle);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-sm);
+  padding-block: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.before,
+.after {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  display: flex;
+  gap: 0.75rem;
+}
+
+.before {
+  color: var(--color-text-subtle);
+}
+
+.after {
+  color: var(--color-primary);
+}
+
+@media (min-width: 768px) {
+  .head,
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+
+  .head {
+    padding-block: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .row {
+    padding-block: var(--space-lg);
+  }
+}

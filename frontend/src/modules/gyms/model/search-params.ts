@@ -1,6 +1,9 @@
 import type { QueryValue } from "@/shared/lib/api";
 import { SORT_OPTIONS, type GymSearchParams, type SortCode } from "./types";
 
+// Gym search lives in the account page, next to the user's memberships.
+const GYM_SEARCH_PATH = "/account";
+
 type RawSearchParams = Record<string, string | string[] | undefined>;
 
 export const EMPTY_SEARCH: GymSearchParams = {
@@ -52,5 +55,5 @@ export function gymsHref(params: GymSearchParams): string {
     }
   }
   const search = query.toString();
-  return search ? `/gyms?${search}` : "/gyms";
+  return search ? `${GYM_SEARCH_PATH}?${search}` : GYM_SEARCH_PATH;
 }

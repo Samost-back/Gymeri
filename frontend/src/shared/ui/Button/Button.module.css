@@ -40,3 +40,17 @@
 .outline:hover {
   border-color: var(--color-primary);
 }
+
+/* Dark button for light surfaces, e.g. a call-to-action block on white. */
+.inverse {
+  background: var(--color-on-primary);
+  color: var(--color-primary);
+}
+
+.inverse:hover {
+  background: var(--color-surface-low);
+}
+
+.inverse:focus-visible {
+  outline-color: var(--color-on-primary);
+}
