@@ -116,11 +116,23 @@
   color: var(--color-text-muted);
 }
 
+.statsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 72rem;
+}
+
+/* On phones the action comes first; on wide screens it closes the stats row. */
+.cta {
+  order: -1;
+  padding-block: 1rem;
+}
+
 .stats {
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
-  max-width: 56rem;
 }
 
 .stat {
@@ -144,12 +156,6 @@
   font-weight: 700;
 }
 
-@media (min-width: 640px) {
-  .stats {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 @media (min-width: 768px) {
   .title {
     font-size: 80px;
@@ -157,9 +163,25 @@
   }
 }
 
+/* Three stat tiles wrap their labels on tablets, so they go in a row only on wide screens. */
 @media (min-width: 1024px) {
   .hero {
     min-height: 740px;
+  }
+
+  .statsRow {
+    flex-direction: row;
+  }
+
+  .stats {
+    flex: 1;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .cta {
+    order: 0;
+    padding-block: 0;
+    padding-inline: 2rem;
   }
 
   .content {

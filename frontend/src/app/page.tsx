@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import { CatalogHeader, ChainList, HomeFilters } from "@/modules/gyms";
+import { ChainList } from "@/modules/gyms";
 import { Hero } from "@/modules/home";
-import { Container } from "@/shared/ui";
+import { Container, PageHeader } from "@/shared/ui";
 import styles from "./page.module.css";
 
 export default function HomePage() {
@@ -10,14 +10,10 @@ export default function HomePage() {
       <Hero />
       <main className={styles.main} id="catalog">
         <Container>
-          <CatalogHeader
+          <PageHeader
             tag="Реєстр локацій"
             title="Доступні клуби"
-            description="Обирайте спортивний простір за спеціалізацією, обладнанням та тарифами. Фільтри відкривають список конкретних залів."
           />
-          <Suspense>
-            <HomeFilters />
-          </Suspense>
           <Suspense>
             <ChainList />
           </Suspense>
