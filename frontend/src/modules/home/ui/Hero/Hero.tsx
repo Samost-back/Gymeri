@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Suspense } from "react";
-import { Container } from "@/shared/ui";
-import heroImage from "../../assets/hero.webp";
+import heroImage from "@/shared/assets/gym-photo.webp";
+import { ButtonLink, Container, Icon } from "@/shared/ui";
 import styles from "./Hero.module.css";
 import { HeroStats, HeroStatsList } from "./HeroStats";
 
@@ -40,9 +40,15 @@ export function Hero() {
           абонементи в єдиному каталозі без посередників.
         </p>
 
-        <Suspense fallback={<HeroStatsList />}>
-          <HeroStats />
-        </Suspense>
+        <div className={styles.statsRow}>
+          <Suspense fallback={<HeroStatsList />}>
+            <HeroStats />
+          </Suspense>
+          <ButtonLink href="/account" className={styles.cta}>
+            Знайти зал
+            <Icon name="arrow_forward" size={18} />
+          </ButtonLink>
+        </div>
       </Container>
     </section>
   );

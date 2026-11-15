@@ -1,0 +1,97 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-border);
+  transition: border-color var(--transition-fast);
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.date {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.day {
+  font-family: var(--font-mono);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.month {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.title {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+.excerpt {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+}
+
+.place {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: auto;
+  color: var(--color-text-subtle);
+}
+
+/* The lead story: date column on the left and a bigger title. */
+.featured {
+  border-color: var(--color-border-strong);
+}
+
+@media (min-width: 768px) {
+  .featured {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl);
+  }
+
+  .featured .date {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: 0 var(--space-xl) 0 0;
+    border-bottom: 0;
+    border-right: 1px solid var(--color-border);
+  }
+
+  .featured .day {
+    font-size: 96px;
+  }
+
+  .featured .title {
+    font-size: 32px;
+    line-height: 38px;
+    letter-spacing: -0.02em;
+  }
+
+  .featured .excerpt {
+    max-width: 36rem;
+    font-size: 18px;
+    line-height: 28px;
+  }
+}

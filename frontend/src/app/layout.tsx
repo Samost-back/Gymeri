@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   description: "Пошук спортзалів і відстеження абонементів у Луцьку.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
     <html lang="uk" className={`${onest.variable} ${jetbrainsMono.variable}`}>
       <head>
@@ -30,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <SiteHeader />
         {children}
+        {modal}
         <SiteFooter />
       </body>
     </html>
