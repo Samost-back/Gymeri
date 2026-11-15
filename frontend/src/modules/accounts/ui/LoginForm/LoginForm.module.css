@@ -1,0 +1,116 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-right: var(--space-2xl);
+}
+
+.title {
+  composes: headlineLg from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.subtitle {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.label {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.hint {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+  opacity: 0.6;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-inline: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  transition: border-color var(--transition-fast);
+}
+
+.control:focus-within {
+  border-color: var(--color-primary);
+}
+
+.controlIcon {
+  color: var(--color-text-subtle);
+}
+
+.input {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  flex: 1;
+  min-width: 0;
+  height: 3rem;
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+}
+
+.input::placeholder {
+  color: var(--color-text-subtle);
+  opacity: 0.6;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.submit {
+  margin-top: var(--space-sm);
+  padding-block: 1rem;
+}
+
+.notice {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: flex;
+  gap: var(--space-sm);
+  padding: 0.75rem var(--space-md);
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.footer {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+  text-align: center;
+}
+
+.footerSoon {
+  color: var(--color-text-muted);
+}

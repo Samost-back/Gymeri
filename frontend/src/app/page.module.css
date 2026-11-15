@@ -20,3 +20,8 @@
     gap: var(--space-3xl);
   }
 }
+
+.narrow {
+  max-width: 30rem;
+  padding-block: var(--space-xl);
+}
