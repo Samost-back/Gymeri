@@ -19,3 +19,18 @@ export function formatArea(squareMeters: number): string {
 export function formatPrice(hryvnias: number): string {
   return `${new Intl.NumberFormat("uk-UA").format(hryvnias)} грн`;
 }
+
+const longDate = new Intl.DateTimeFormat("uk-UA", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+// Split for layouts with a big day number; the full date gives the genitive month ("18 квітня").
+export function formatDateParts(isoDate: string): { day: string; monthYear: string } {
+  const parts = longDate.formatToParts(new Date(isoDate));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? "";
+  return { day: part("day"), monthYear: `${part("month")} ${part("year")}` };
+}
