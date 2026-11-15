@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { ComponentProps } from "react";
+import { cx } from "../../lib/classNames";
 import styles from "./Button.module.css";
 
 type Variant = "primary" | "outline";
 
 function classes(variant: Variant, className?: string): string {
-  return [styles.button, styles[variant], className].filter(Boolean).join(" ");
+  return cx(styles.button, styles[variant], className);
 }
 
 type ButtonProps = ComponentProps<"button"> & { variant?: Variant };

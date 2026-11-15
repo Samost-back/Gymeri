@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { cx } from "../../lib/classNames";
 import { Icon, type IconName } from "../Icon/Icon";
 import styles from "./Chip.module.css";
 
@@ -12,7 +13,7 @@ type ChipProps = {
 };
 
 export function Chip({ children, active = false, icon, href }: ChipProps) {
-  const className = [styles.chip, active && styles.active].filter(Boolean).join(" ");
+  const className = cx(styles.chip, active && styles.active);
   const content = (
     <>
       {icon && <Icon name={icon} size={14} />}
