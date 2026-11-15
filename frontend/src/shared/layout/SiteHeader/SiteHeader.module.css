@@ -79,24 +79,86 @@
 }
 
 .login {
+  display: none;
   padding-block: 0.625rem;
   text-transform: none;
+}
+
+.menuButton {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+.menuButton:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.mobileNav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-sm) var(--space-lg) var(--space-lg);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mobileLink {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.mobileLink[aria-current="page"] {
+  color: var(--color-primary);
+}
+
+.mobileLogin {
+  margin-top: var(--space-lg);
 }
 
 @media (min-width: 640px) {
   .badge {
     display: inline-block;
   }
-}
 
-@media (min-width: 768px) {
-  .nav {
-    display: flex;
+  .login {
+    display: inline-flex;
+  }
+
+  .mobileLogin {
+    display: none;
   }
 }
 
+@media (min-width: 768px) {
+  .mobileNav {
+    padding-inline: var(--page-margin);
+  }
+}
+
+/* Below 1024px brand, four tabs and the login button don't fit in one row. */
 @media (min-width: 1024px) {
+  .nav,
   .mapLink {
     display: flex;
+  }
+
+  .menuButton,
+  .mobileNav {
+    display: none;
   }
 }

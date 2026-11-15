@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ButtonLink, Container, Icon } from "@/shared/ui";
+import { MobileMenu } from "./MobileMenu";
 import styles from "./SiteHeader.module.css";
 import { SiteNav } from "./SiteNav";
 
@@ -22,6 +23,7 @@ export function SiteHeader() {
           <ButtonLink href="/login" className={styles.login}>
             Увійти
           </ButtonLink>
+          <MobileMenu />
         </div>
       </Container>
     </header>
