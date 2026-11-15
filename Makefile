@@ -19,6 +19,7 @@ makemigrations:
 
 test:
 	$(BACKEND) pytest
+	cd frontend && pnpm test
 
 lint:
 	$(BACKEND) ruff check .
