@@ -1,3 +1,4 @@
+import { cx } from "../../lib/classNames";
 import styles from "./Icon.module.css";
 
 // Only these glyphs are downloaded from the icon font, see iconFontUrl.
@@ -34,7 +35,7 @@ export function Icon({ name, size = 18, filled = false, className }: IconProps) 
   return (
     <span
       aria-hidden="true"
-      className={[styles.icon, filled && styles.filled, className].filter(Boolean).join(" ")}
+      className={cx(styles.icon, filled && styles.filled, className)}
       style={{ fontSize: size }}
     >
       {name}
