@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "gyms": "Gyms",
+    "account": "My account",
+    "news": "News",
+    "about": "About"
+  },
+  "actions": {
+    "login": "Log in",
+    "findGym": "Find a gym"
+  }
+}
