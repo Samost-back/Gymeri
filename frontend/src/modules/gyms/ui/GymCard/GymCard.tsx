@@ -1,80 +1,57 @@
 import Image from "next/image";
-import { formatArea, pluralize } from "@/shared/lib/format";
-import { Button, ButtonLink, Icon, Tag } from "@/shared/ui";
-import type { GymSummary } from "../../model/types";
+import { formatArea, formatPrice } from "@/shared/lib/format";
+import { Icon, Tag } from "@/shared/ui";
+import type { GymListing } from "../../model/types";
 import styles from "./GymCard.module.css";
 
 type GymCardProps = {
-  gym: GymSummary;
-  position: number;
+  gym: GymListing;
 };
 
-export function GymCard({ gym, position }: GymCardProps) {
-  const locations = pluralize(gym.locationsCount, {
-    one: "локація",
-    few: "локації",
-    many: "локацій",
-  });
-
+export function GymCard({ gym }: GymCardProps) {
   return (
     <article className={styles.card}>
-      <div className={styles.media}>
-        <Image
-          src={gym.imageUrl}
-          alt={gym.imageAlt}
-          fill
-          sizes="(min-width: 1024px) 512px, 100vw"
-          className={styles.image}
-        />
-        <div className={styles.badges}>
-          <Tag>{gym.highlight}</Tag>
-          {gym.tag && <Tag variant="solid">{gym.tag}</Tag>}
+      {gym.photoUrl && (
+        <div className={styles.media}>
+          <Image src={gym.photoUrl} alt={gym.name} fill sizes="(min-width: 1024px) 320px, 100vw" />
         </div>
-      </div>
+      )}
 
       <div className={styles.body}>
-        <div>
-          <div className={styles.titleRow}>
-            <div>
-              <div className={styles.meta}>
-                <span className={styles.brandTag}>{gym.brandTag}</span>
-                <span className={styles.position}>
-                  Фітнес-комплекс №{String(position).padStart(2, "0")}
-                </span>
-              </div>
-              <h3 className={styles.name}>{gym.name}</h3>
-            </div>
-            <span className={styles.area}>{formatArea(gym.areaM2)}</span>
-          </div>
+        <div className={styles.meta}>
+          <span className={styles.chain}>{gym.chainName}</span>
+          <span className={styles.district}>{gym.district}</span>
+          {gym.isOpenNow && <Tag variant="solid">Відкрито зараз</Tag>}
+        </div>
 
-          <div className={styles.details}>
-            <p className={styles.detail}>
-              <Icon name="pin_drop" size={16} className={styles.detailIcon} />
-              {gym.address}
-            </p>
+        <h3 className={styles.name}>{gym.name}</h3>
+        {gym.highlight && <p className={styles.highlight}>{gym.highlight}</p>}
+
+        <div className={styles.details}>
+          <p className={styles.detail}>
+            <Icon name="pin_drop" size={16} className={styles.detailIcon} />
+            {gym.address}
+          </p>
+          {gym.hoursSummary && (
             <p className={styles.detail}>
               <Icon name="schedule" size={16} className={styles.detailIcon} />
               {gym.hoursSummary}
             </p>
-          </div>
+          )}
         </div>
 
         <div className={styles.footer}>
-          <div>
-            <span className={styles.footerLabel}>Присутність бренду</span>
-            <div className={styles.presence}>
-              <Icon name="domain" />
-              <span className={styles.locations}>{locations} в Луцьку</span>
-              <span className={styles.districts}>{gym.districts.join(" · ")}</span>
-            </div>
+          <div className={styles.tags}>
+            {gym.amenities.map((amenity) => (
+              <Tag key={amenity} variant="muted">
+                {amenity}
+              </Tag>
+            ))}
+            {gym.areaM2 !== null && <Tag variant="muted">{formatArea(gym.areaM2)}</Tag>}
           </div>
-
-          <div className={styles.actions}>
-            <Button variant="outline" className={styles.mapButton} aria-label="Показати на карті">
-              <Icon name="map" />
-            </Button>
-            <ButtonLink href={`/gyms/${gym.slug}`}>Детальніше</ButtonLink>
-          </div>
+          {gym.priceFrom !== null && (
+            <span className={styles.price}>від {formatPrice(gym.priceFrom)}/міс</span>
+          )}
         </div>
       </div>
     </article>

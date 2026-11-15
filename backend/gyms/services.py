@@ -1,0 +1,177 @@
+from collections import defaultdict
+from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
+
+from django.db.models import Count, Prefetch, Q, QuerySet
+from django.utils import timezone
+
+from .exceptions import InvalidFilter
+from .models import Amenity, Chain, District, Gym, MembershipPlan
+from .pricing import PlanPrice, PriceList
+from .schedule import TimeInterval, WeeklySchedule
+from .search import GymListing, GymSearchCriteria
+
+
+def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
+    """One query for the active plans of all given chains, grouped into a PriceList per chain."""
+    plans: dict[int, list[PlanPrice]] = defaultdict(list)
+    rows = MembershipPlan.objects.filter(chain__in=chain_ids, is_active=True).values_list(
+        "chain_id", "price", "duration_days", "gym_id"
+    )
+    for chain_id, price, duration_days, gym_id in rows:
+        plans[chain_id].append(PlanPrice(price, duration_days, gym_id))
+    return {chain_id: PriceList(plans[chain_id]) for chain_id in chain_ids}
+
+
+@dataclass(frozen=True)
+class CatalogStats:
+    gyms: int
+    chains: int
+    districts: int
+
+
+@dataclass(frozen=True)
+class FilterOption:
+    slug: str
+    name: str
+
+
+@dataclass(frozen=True)
+class FilterOptions:
+    districts: list[FilterOption]
+    amenities: list[FilterOption]
+
+
+@dataclass(frozen=True)
+class ChainCard:
+    slug: str
+    name: str
+    short_name: str
+    description: str
+    logo_url: str | None
+    locations_count: int
+    districts: list[str]
+    # Cheapest active monthly plan; None when the chain has not published monthly prices.
+    price_from: Decimal | None
+
+
+class CatalogService:
+    """Read side of the public catalog: only published gyms and the chains that own them."""
+
+    def get_stats(self) -> CatalogStats:
+        totals = self._published_gyms().aggregate(
+            gyms=Count("id"),
+            chains=Count("chain", distinct=True),
+            districts=Count("district", distinct=True),
+        )
+        return CatalogStats(**totals)
+
+    def get_filter_options(self) -> FilterOptions:
+        """Only values that lead to at least one published gym, so no filter returns nothing."""
+        return FilterOptions(
+            districts=self._options(District.objects.filter(gyms__is_published=True)),
+            amenities=self._options(Amenity.objects.filter(gyms__is_published=True)),
+        )
+
+    def list_chains(self) -> list[ChainCard]:
+        chains = list(
+            Chain.objects.annotate(locations_count=Count("gyms", filter=Q(gyms__is_published=True)))
+            .filter(locations_count__gt=0)
+            .prefetch_related(
+                Prefetch(
+                    "gyms",
+                    queryset=self._published_gyms().select_related("district"),
+                    to_attr="published_gyms",
+                )
+            )
+        )
+        prices = load_price_lists({chain.pk for chain in chains})
+        return [self._to_card(chain, prices[chain.pk]) for chain in chains]
+
+    @staticmethod
+    def _published_gyms() -> QuerySet[Gym]:
+        return Gym.objects.filter(is_published=True)
+
+    @staticmethod
+    def _options(queryset: QuerySet[District] | QuerySet[Amenity]) -> list[FilterOption]:
+        return [FilterOption(slug=o.slug, name=o.name) for o in queryset.distinct()]
+
+    @staticmethod
+    def _to_card(chain: Chain, prices: PriceList) -> ChainCard:
+        return ChainCard(
+            slug=chain.slug,
+            name=chain.name,
+            short_name=chain.short_name,
+            description=chain.description,
+            logo_url=chain.logo.url if chain.logo else None,
+            locations_count=chain.locations_count,
+            districts=sorted({gym.district.name for gym in chain.published_gyms}),
+            price_from=prices.monthly_from(),
+        )
+
+
+class GymSearchService:
+    """Finds published gyms by criteria: the database narrows, domain objects finish the job."""
+
+    def search(self, criteria: GymSearchCriteria, now: datetime | None = None) -> list[GymListing]:
+        now = timezone.localtime(now)
+        gyms = list(self._filtered_gyms(criteria))
+        prices = load_price_lists({gym.chain_id for gym in gyms})
+        listings = [
+            self._to_listing(gym, prices[gym.chain_id].monthly_from(gym.pk), now) for gym in gyms
+        ]
+        matching = [listing for listing in listings if criteria.matches_schedule(listing)]
+        return criteria.sort.sort(matching)
+
+    def _filtered_gyms(self, criteria: GymSearchCriteria) -> QuerySet[Gym]:
+        self._ensure_exists(District, criteria.district, "district")
+        self._ensure_exists(Chain, criteria.chain, "chain")
+        known = set(
+            Amenity.objects.filter(slug__in=criteria.amenities).values_list("slug", flat=True)
+        )
+        if unknown := criteria.amenities - known:
+            raise InvalidFilter(f"Unknown amenities: {sorted(unknown)}")
+
+        gyms = Gym.objects.filter(is_published=True)
+        if criteria.district:
+            gyms = gyms.filter(district__slug=criteria.district)
+        if criteria.chain:
+            gyms = gyms.filter(chain__slug=criteria.chain)
+        # One filter per amenity: the gym must have all of them, not any.
+        for amenity in criteria.amenities:
+            gyms = gyms.filter(amenities__slug=amenity)
+        return gyms.select_related("chain", "district").prefetch_related(
+            "amenities", "opening_hours", "photos"
+        )
+
+    @staticmethod
+    def _ensure_exists(model: type[District] | type[Chain], slug: str | None, name: str) -> None:
+        if slug and not model.objects.filter(slug=slug).exists():
+            raise InvalidFilter(f"Unknown {name}: {slug}")
+
+    @staticmethod
+    def _to_listing(gym: Gym, price_from: Decimal | None, now: datetime) -> GymListing:
+        schedule = WeeklySchedule(
+            {
+                hours.weekday: TimeInterval(hours.opens_at, hours.closes_at)
+                for hours in gym.opening_hours.all()
+            }
+        )
+        photos = list(gym.photos.all())
+        return GymListing(
+            slug=gym.slug,
+            name=gym.name,
+            chain_slug=gym.chain.slug,
+            chain_name=gym.chain.name,
+            district=gym.district.name,
+            address=gym.address,
+            highlight=gym.highlight,
+            area_m2=gym.area_m2,
+            amenities=[amenity.name for amenity in gym.amenities.all()],
+            hours_summary=schedule.summary(),
+            is_open_now=schedule.is_open_at(now),
+            is_round_the_clock=schedule.is_round_the_clock(),
+            price_from=price_from,
+            photo_url=photos[0].image.url if photos else None,
+        )

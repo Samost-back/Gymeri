@@ -1,21 +1,11 @@
 import Image from "next/image";
-import type { CatalogStats } from "@/modules/gyms";
-import { pluralize } from "@/shared/lib/format";
+import { Suspense } from "react";
 import { Container } from "@/shared/ui";
 import heroImage from "../../assets/hero.webp";
 import styles from "./Hero.module.css";
+import { HeroStats, HeroStatsList } from "./HeroStats";
 
-type HeroProps = {
-  stats: CatalogStats;
-};
-
-export function Hero({ stats }: HeroProps) {
-  const statItems = [
-    { label: "Актуальний каталог", value: pluralize(stats.gyms, { one: "зал", few: "зали", many: "залів" }) },
-    { label: "Локаційна мережа", value: pluralize(stats.chains, { one: "бренд", few: "бренди", many: "брендів" }) },
-    { label: "Охоплення", value: pluralize(stats.districts, { one: "район", few: "райони", many: "районів" }) },
-  ];
-
+export function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.background} aria-hidden="true">
@@ -50,14 +40,9 @@ export function Hero({ stats }: HeroProps) {
           абонементи в єдиному каталозі без посередників.
         </p>
 
-        <dl className={styles.stats}>
-          {statItems.map((item) => (
-            <div key={item.label} className={styles.stat}>
-              <dt className={styles.statLabel}>{item.label}</dt>
-              <dd className={styles.statValue}>{item.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <Suspense fallback={<HeroStatsList />}>
+          <HeroStats />
+        </Suspense>
       </Container>
     </section>
   );

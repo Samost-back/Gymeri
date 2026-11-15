@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17
+    env_file: backend/.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      retries: 15
+
+  backend:
+    build: backend
+    env_file: backend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: node:22-slim
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm install && pnpm dev"
+    environment:
+      BACKEND_URL: http://backend:8000
+      # File change events don't cross the Windows/Docker boundary, so hot reload polls.
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      # Keep Linux node_modules inside the container, separate from the host's Windows ones.
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

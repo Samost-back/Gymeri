@@ -2,6 +2,7 @@ import styles from "./Icon.module.css";
 
 // Only these glyphs are downloaded from the icon font, see iconFontUrl.
 const ICON_NAMES = [
+  "check",
   "domain",
   "expand_more",
   "fitness_center",

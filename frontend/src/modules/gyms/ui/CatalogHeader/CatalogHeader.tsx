@@ -1,19 +1,22 @@
 import { Tag } from "@/shared/ui";
 import styles from "./CatalogHeader.module.css";
 
-export function CatalogHeader() {
+type CatalogHeaderProps = {
+  tag: string;
+  title: string;
+  description: string;
+};
+
+export function CatalogHeader({ tag, title, description }: CatalogHeaderProps) {
   return (
     <header className={styles.header}>
       <div>
         <Tag variant="muted" className={styles.tag}>
-          Реєстр локацій
+          {tag}
         </Tag>
-        <h2 className={styles.title}>Доступні клуби</h2>
+        <h2 className={styles.title}>{title}</h2>
       </div>
-      <p className={styles.description}>
-        Обирайте спортивний простір за спеціалізацією, обладнанням та тарифами разового
-        відвідування.
-      </p>
+      <p className={styles.description}>{description}</p>
     </header>
   );
 }
