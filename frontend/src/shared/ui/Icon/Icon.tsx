@@ -17,6 +17,7 @@ const ICON_NAMES = [
   "pin_drop",
   "pool",
   "schedule",
+  "search",
   "star",
   "timer",
   "tune",

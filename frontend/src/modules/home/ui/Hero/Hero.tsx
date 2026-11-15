@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Suspense } from "react";
+import heroImage from "@/shared/assets/gym-photo.webp";
 import { ButtonLink, Container, Icon } from "@/shared/ui";
-import heroImage from "../../assets/hero.webp";
 import styles from "./Hero.module.css";
 import { HeroStats, HeroStatsList } from "./HeroStats";
 
