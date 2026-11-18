@@ -1,5 +1,5 @@
 import { Chip, Icon, type IconName } from "@/shared/ui";
-import { gymsHref } from "../../model/search-params";
+import { gymsHref } from "../../model/searchParams";
 import { SORT_OPTIONS, type FilterOptions, type GymSearchParams } from "../../model/types";
 import styles from "./GymFilters.module.css";
 import { SortSelect } from "./SortSelect";

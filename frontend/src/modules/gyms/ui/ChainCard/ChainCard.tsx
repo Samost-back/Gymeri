@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { formatPrice, pluralize } from "@/shared/lib/format";
 import { ButtonLink, Icon, Tag } from "@/shared/ui";
-import { EMPTY_SEARCH, gymsHref } from "../../model/search-params";
+import { EMPTY_SEARCH, gymsHref } from "../../model/searchParams";
 import type { ChainCard as ChainCardData } from "../../model/types";
 import styles from "./ChainCard.module.css";
 

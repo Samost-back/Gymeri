@@ -1,9 +1,9 @@
 import { ApiError } from "@/shared/lib/api";
-import { getFilterOptions, searchGyms } from "../api/gyms";
-import { parseSearchParams } from "../model/search-params";
-import { GymCard } from "./GymCard/GymCard";
-import { GymFilters } from "./GymFilters/GymFilters";
-import styles from "./lists.module.css";
+import { getFilterOptions, searchGyms } from "../../api/gyms";
+import { parseSearchParams } from "../../model/searchParams";
+import { GymCard } from "../GymCard/GymCard";
+import { GymFilters } from "../GymFilters/GymFilters";
+import styles from "../lists.module.css";
 
 type GymSearchResultsProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;

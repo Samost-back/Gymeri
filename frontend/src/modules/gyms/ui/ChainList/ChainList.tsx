@@ -1,6 +1,6 @@
-import { getChains } from "../api/gyms";
-import { ChainCard } from "./ChainCard/ChainCard";
-import styles from "./lists.module.css";
+import { getChains } from "../../api/gyms";
+import { ChainCard } from "../ChainCard/ChainCard";
+import styles from "../lists.module.css";
 
 export async function ChainList() {
   const chains = await getChains();
