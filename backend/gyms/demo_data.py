@@ -26,7 +26,7 @@ AMENITIES = {
 
 def standard_hours(sunday: tuple[str, str] | None) -> dict[int, tuple[str, str]]:
     """Mon-Sat 08:00-21:30 is the usual Inter Atletyka schedule; Sunday varies by gym."""
-    hours = {day: ("08:00", "21:30") for day in MON_SAT}
+    hours = dict.fromkeys(MON_SAT, ("08:00", "21:30"))
     if sunday:
         hours[SUNDAY] = sunday
     return hours
@@ -57,7 +57,7 @@ CHAINS = [
                 "Студентський / шкільний безліміт на місяць",
                 "800",
                 30,
-                access={day: (None, "18:00") for day in (0, 2, 4)},
+                access=dict.fromkeys((0, 2, 4), (None, "18:00")),
             ),
             plan("Повний безліміт на місяць у всі зали", "1350", 30),
             plan("Безліміт на місяць у всі зали + басейн", "1750", 30),
@@ -65,7 +65,7 @@ CHAINS = [
                 "Денний абонемент на 3 місяці",
                 "1900",
                 90,
-                access={day: ("12:00", "18:00") for day in range(7)},
+                access=dict.fromkeys(range(7), ("12:00", "18:00")),
             ),
             plan("Ветеранський безліміт на 3 місяці", "1500", 90),
             plan("Річний безліміт", "11800", 365),
@@ -109,7 +109,7 @@ CHAINS = [
                 "phone": "+380950935260",
                 "amenities": ["strength", "pool"],
                 "hours": {
-                    **{day: ("07:30", "21:00") for day in range(5)},
+                    **dict.fromkeys(range(5), ("07:30", "21:00")),
                     5: ("07:30", "20:00"),
                 },
             },

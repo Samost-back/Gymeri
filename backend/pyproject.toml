@@ -13,5 +13,35 @@ target-version = "py313"
 extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
-# E/F: errors, I: import order, UP: modern syntax, B: likely bugs, DJ: Django pitfalls
-select = ["E", "F", "I", "UP", "B", "DJ"]
+select = [
+    "E", "W",  # pycodestyle
+    "F",       # pyflakes: unused names, undefined variables
+    "I",       # import order
+    "N",       # pep8 naming
+    "UP",      # modern syntax for the target Python
+    "B",       # likely bugs
+    "A",       # shadowed builtins
+    "C4",      # cleaner comprehensions
+    "DTZ",     # naive datetimes (Django runs with USE_TZ)
+    "DJ",      # Django pitfalls
+    "S",       # security (bandit)
+    "SIM",     # simplifiable code
+    "RET",     # return consistency
+    "PIE",     # unnecessary code
+    "PT",      # pytest style
+    "PTH",     # pathlib over os.path
+    "PERF",    # performance anti-patterns
+    "T20",     # leftover print()
+    "ERA",     # commented-out code
+    "PL",      # pylint
+    "RUF",     # ruff's own rules
+]
+ignore = [
+    "RUF001", "RUF002", "RUF003",  # Ukrainian text and typographic dashes are intended
+    "RUF012",  # false positive on Django Meta/admin options, which are plain lists by convention
+    "N818",    # domain exceptions are named after the problem (InvalidSchedule), not "...Error"
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests use assert, magic numbers and fixed dummy credentials by design.
+"tests/**" = ["S101", "S105", "S106", "PLR2004"]

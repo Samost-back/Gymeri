@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import date, datetime, time
 
 import pytest
 
@@ -6,16 +6,16 @@ from gyms.exceptions import InvalidSchedule
 from gyms.schedule import TimeInterval, WeeklySchedule
 
 # 2026-11-16 is a Monday.
-MONDAY = datetime(2026, 11, 16)
-TUESDAY = datetime(2026, 11, 17)
+MONDAY = date(2026, 11, 16)
+TUESDAY = date(2026, 11, 17)
 
 
 def interval(opens: str, closes: str) -> TimeInterval:
     return TimeInterval(time.fromisoformat(opens), time.fromisoformat(closes))
 
 
-def at(day: datetime, clock: str) -> datetime:
-    return datetime.combine(day.date(), time.fromisoformat(clock))
+def at(day: date, clock: str) -> datetime:
+    return datetime.combine(day, time.fromisoformat(clock))
 
 
 def test_unknown_weekday_is_rejected():
