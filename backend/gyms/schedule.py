@@ -8,6 +8,7 @@ from types import MappingProxyType
 from .exceptions import InvalidSchedule
 
 WEEKDAY_NAMES = ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд")
+DAYS_IN_WEEK = len(WEEKDAY_NAMES)
 
 
 @dataclass(frozen=True)
@@ -50,7 +51,7 @@ class WeeklySchedule:
     days: Mapping[int, TimeInterval]
 
     def __post_init__(self) -> None:
-        invalid = [day for day in self.days if day not in range(7)]
+        invalid = [day for day in self.days if day not in range(DAYS_IN_WEEK)]
         if invalid:
             raise InvalidSchedule(f"Unknown weekdays: {invalid}")
         # Read-only copy: a frozen dataclass alone would still let the dict be changed.
@@ -58,7 +59,7 @@ class WeeklySchedule:
 
     def is_open_at(self, moment: datetime) -> bool:
         today = self.days.get(moment.weekday())
-        yesterday = self.days.get((moment.weekday() - 1) % 7)
+        yesterday = self.days.get((moment.weekday() - 1) % DAYS_IN_WEEK)
         clock = moment.time()
         return bool(
             (today and today.contains_on_its_day(clock))
@@ -66,7 +67,9 @@ class WeeklySchedule:
         )
 
     def is_round_the_clock(self) -> bool:
-        return len(self.days) == 7 and all(interval.is_full_day for interval in self.days.values())
+        return len(self.days) == DAYS_IN_WEEK and all(
+            interval.is_full_day for interval in self.days.values()
+        )
 
     def summary(self) -> str:
         """Human-readable hours with equal neighbouring days merged: "Пн–Сб 08:00–21:30"."""
@@ -76,7 +79,7 @@ class WeeklySchedule:
             return "Цілодобово"
 
         groups: list[tuple[int, int, TimeInterval | None]] = []
-        for day in range(7):
+        for day in range(DAYS_IN_WEEK):
             interval = self.days.get(day)
             if groups and groups[-1][2] == interval:
                 first, _, _ = groups[-1]

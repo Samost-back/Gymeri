@@ -22,7 +22,9 @@ test:
 	$(BACKEND) pytest
 	cd frontend && pnpm test
 
+# --no-cache: the container runs as root and writes into the mounted backend folder, so on a
+# Linux host a cache would be a root-owned folder the developer can't delete. Dev-only concern.
 lint:
-	$(BACKEND) ruff check .
-	$(BACKEND) ruff format --check .
+	$(BACKEND) ruff check --no-cache .
+	$(BACKEND) ruff format --check --no-cache .
 	cd frontend && pnpm lint && pnpm typecheck
