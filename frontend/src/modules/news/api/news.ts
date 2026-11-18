@@ -1,16 +1,8 @@
 import type { NewsItem } from "../model/types";
 
 // Demo posts until the news backend exists; the page marks them as examples.
+// Ordered by date: the feed opens with the nearest event.
 const DEMO_NEWS: NewsItem[] = [
-  {
-    slug: "spring-run",
-    category: "event",
-    title: "Весняний забіг набережною Стиру",
-    excerpt:
-      "Аматорський старт на 5 і 10 км для будь-якого рівня підготовки. Реєстрація відкриється за місяць до забігу.",
-    date: "2027-04-18",
-    place: "Набережна Стиру",
-  },
   {
     slug: "student-discount",
     category: "discount",
@@ -34,6 +26,15 @@ const DEMO_NEWS: NewsItem[] = [
     excerpt: "Жим лежачи й станова тяга серед аматорів. Для глядачів вхід вільний.",
     date: "2027-02-20",
     place: "Центр",
+  },
+  {
+    slug: "spring-run",
+    category: "event",
+    title: "Весняний забіг набережною Стиру",
+    excerpt:
+      "Аматорський старт на 5 і 10 км для будь-якого рівня підготовки. Реєстрація відкриється за місяць до забігу.",
+    date: "2027-04-18",
+    place: "Набережна Стиру",
   },
 ];
 

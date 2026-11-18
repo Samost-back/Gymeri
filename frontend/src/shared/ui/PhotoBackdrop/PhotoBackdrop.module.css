@@ -1,0 +1,32 @@
+/* Fades out at the bottom, so the block blends into the page instead of ending with a hard line. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 75%, transparent);
+}
+
+/* Same treatment as the home hero, so every page reads as one brand. */
+.image {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.2) brightness(0.8);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+}
+
+/* Darkest on the text side; the photo stays a dark backdrop, not a picture to look at. */
+.side {
+  background: linear-gradient(
+    to right,
+    rgb(var(--color-shade-rgb) / 0.95),
+    rgb(var(--color-shade-rgb) / 0.82) 55%,
+    rgb(var(--color-shade-rgb) / 0.75)
+  );
+}
+
+.even {
+  background: rgb(var(--color-shade-rgb) / 0.65);
+}

@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cx } from "../../lib/classNames";
 import styles from "./Button.module.css";
 
-type Variant = "primary" | "outline" | "inverse";
+type Variant = "primary" | "outline";
 
 function classes(variant: Variant, className?: string): string {
   return cx(styles.button, styles[variant], className);

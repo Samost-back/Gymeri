@@ -19,14 +19,6 @@
 
 @media (min-width: 1024px) {
   .section {
-    grid-template-columns: 4fr 8fr;
-    gap: var(--space-2xl);
-  }
-
-  /* The heading stays in view while its section scrolls past. */
-  .heading {
-    position: sticky;
-    top: calc(5rem + var(--space-xl));
-    align-self: start;
+    gap: var(--space-xl);
   }
 }

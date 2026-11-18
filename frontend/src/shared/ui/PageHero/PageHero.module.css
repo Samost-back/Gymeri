@@ -1,38 +1,14 @@
 .hero {
   position: relative;
-  display: flex;
-  align-items: center;
   overflow: hidden;
-  border-bottom: 1px solid var(--color-border);
 }
 
-/* Blueprint grid fading out to the edges: a quiet texture instead of a photo. */
-.grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--color-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.6;
-  mask-image: radial-gradient(ellipse 80% 70% at 70% 30%, black, transparent 75%);
-}
-
+/* Less padding at the bottom: the page below adds its own, and together they make one gap. */
 .content {
   position: relative;
   display: grid;
   gap: var(--space-xl);
-  padding-block: var(--space-2xl);
-}
-
-.status {
-  composes: labelXs from "@/shared/styles/typography.module.css";
-  display: inline-block;
-  margin-bottom: var(--space-lg);
-  padding: 0.375rem 0.875rem;
-  border: 1px solid var(--color-border-strong);
-  background: rgb(var(--color-bg-rgb) / 0.85);
-  color: var(--color-primary);
+  padding-block: var(--space-2xl) var(--space-lg);
 }
 
 .title {
@@ -55,31 +31,35 @@
   color: var(--color-text-muted);
 }
 
+.action {
+  margin-top: var(--space-lg);
+}
+
+.footer {
+  position: relative;
+  width: 100%;
+  padding-bottom: var(--space-xl);
+}
+
 @media (min-width: 768px) {
   .content {
-    padding-block: var(--space-3xl);
+    padding-block: var(--space-3xl) var(--space-xl);
   }
 
   .title {
-    font-size: 72px;
+    font-size: 64px;
     font-weight: 800;
   }
 }
 
-/* Desktop: the hero fills the first screen below the header, text left and aside right. */
 @media (min-width: 1024px) {
-  .hero {
-    /* Capped so very tall monitors don't get a mostly empty screen. */
-    min-height: min(calc(100svh - 5rem), 52rem);
-  }
-
-  .content {
+  .withAside {
     grid-template-columns: 7fr 5fr;
     align-items: center;
     gap: var(--space-3xl);
   }
 
   .title {
-    font-size: 80px;
+    font-size: 72px;
   }
 }

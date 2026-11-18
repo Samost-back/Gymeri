@@ -8,18 +8,23 @@ export async function NewsFeed() {
 
   return (
     <section>
-      <PageHeader tag="Стрічка" title="Найближче в місті" />
+      <PageHeader title="Найближче в місті" />
       <p className={styles.demoNote}>
         <Icon name="info" size={18} />
         Це приклади оголошень, щоб показати, як виглядатиме стрічка. Справжні новини з’являться
         згодом.
       </p>
       {lead && <NewsCard item={lead} featured />}
-      <div className={styles.grid}>
-        {rest.map((item) => (
-          <NewsCard key={item.slug} item={item} />
-        ))}
-      </div>
+      {rest.length > 0 && (
+        <>
+          <h3 className={styles.agendaTitle}>Далі в календарі</h3>
+          <div className={styles.agenda}>
+            {rest.map((item) => (
+              <NewsCard key={item.slug} item={item} />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

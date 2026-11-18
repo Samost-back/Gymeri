@@ -1,23 +1,38 @@
+/* Default card is an agenda row: date on the left, details on the right.
+   Events read like a schedule, so a list is easier to scan than a grid of tiles. */
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-  padding: var(--space-lg);
-  background: var(--color-surface-low);
-  border: 1px solid var(--color-border);
-  transition: border-color var(--transition-fast);
+  position: relative;
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+/* Accent bar marks the row under the pointer without shifting the layout. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 3px;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform var(--transition-fast);
 }
 
 .card:hover {
-  border-color: var(--color-border-strong);
+  background: var(--color-surface-low);
+}
+
+.card:hover::before {
+  transform: scaleY(1);
 }
 
 .date {
   display: flex;
   align-items: baseline;
   gap: var(--space-sm);
-  padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--color-border);
 }
 
 .day {
@@ -46,6 +61,7 @@
 
 .excerpt {
   composes: bodyMd from "@/shared/styles/typography.module.css";
+  max-width: 44rem;
   color: var(--color-text-muted);
 }
 
@@ -54,25 +70,45 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  margin-top: auto;
   color: var(--color-text-subtle);
 }
 
-/* The lead story: date column on the left and a bigger title. */
+/* The nearest event: a framed block with a big date, set apart from the agenda below. */
 .featured {
-  border-color: var(--color-border-strong);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-border-strong);
+}
+
+.featured::before {
+  display: none;
+}
+
+.featured .date {
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
 }
 
 @media (min-width: 768px) {
-  .featured {
-    display: grid;
-    grid-template-columns: 12rem 1fr;
+  .card {
+    grid-template-columns: 9rem 1fr;
     gap: var(--space-xl);
+    padding-inline: var(--space-lg);
+  }
+
+  .date {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .featured {
+    grid-template-columns: 12rem 1fr;
     padding: var(--space-xl);
   }
 
   .featured .date {
-    flex-direction: column;
     gap: var(--space-sm);
     padding: 0 var(--space-xl) 0 0;
     border-bottom: 0;
@@ -90,8 +126,13 @@
   }
 
   .featured .excerpt {
-    max-width: 36rem;
     font-size: 18px;
     line-height: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card::before {
+    transition: none;
   }
 }

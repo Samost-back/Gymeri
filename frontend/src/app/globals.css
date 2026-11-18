@@ -13,6 +13,7 @@ html {
 }
 
 body {
+  position: relative;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -21,6 +22,24 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Soft ember glow behind the site: one warm color on the graphite.
+   The glow starts below the first screen, so every page opens dark and the color shows up
+   while scrolling; one screen-high tile repeats down the page. Faint, so cards and text keep
+   their contrast. Static and unblurred on purpose: the layer is as tall as the page, and a
+   blur filter or an animation on it costs phones GPU memory and battery. */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 100svh 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background-size: 100% 100svh;
+  background-image:
+    /* Each blob fades out inside its tile, so no edge shows where the layer or a tile starts. */
+    radial-gradient(ellipse 45% 30% at 15% 35%, rgb(255 106 61 / 0.14), transparent),
+    radial-gradient(ellipse 40% 25% at 85% 72%, rgb(255 106 61 / 0.11), transparent);
 }
 
 ::selection {

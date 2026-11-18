@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { CabinetSections, MembershipPreview } from "@/modules/accounts";
 import { GymSearchResults } from "@/modules/gyms";
-import { ButtonLink, Container, EmptyState, Icon, PageHeader } from "@/shared/ui";
-import styles from "../page.module.css";
+import { ButtonLink, Icon, PageHeader, PageHero, PageMain } from "@/shared/ui";
 
 export const metadata: Metadata = {
   title: "Мій кабінет — пошук залів і абонементи · Gymeri",
@@ -11,30 +11,24 @@ export const metadata: Metadata = {
 
 export default function AccountPage({ searchParams }: PageProps<"/account">) {
   return (
-    <main className={styles.main}>
-      <Container className={styles.list}>
+    <>
+      <PageHero
+        title="Мої абонементи"
+        accent="під контролем."
+        lead="Додайте абонементи своїх залів: кабінет рахуватиме дні й тренування, що лишились, і нагадає, коли час продовжити."
+        action={
+          <ButtonLink href="/login">
+            <Icon name="login" size={18} />
+            Увійти
+          </ButtonLink>
+        }
+        photoFocus="30% center"
+        aside={<MembershipPreview />}
+        footer={<CabinetSections />}
+      />
+      <PageMain>
         <section>
           <PageHeader
-            tag="Мій кабінет"
-            title="Мої абонементи"
-            description="Залишок днів і відвідувань, заморозка та нагадування про завершення абонемента."
-          />
-          <EmptyState
-            icon="card_membership"
-            title="Відстеження абонементів"
-            description="Увійдіть, щоб додати абонемент свого залу й бачити, скільки днів і тренувань лишилось."
-            action={
-              <ButtonLink href="/login">
-                <Icon name="login" size={18} />
-                Увійти
-              </ButtonLink>
-            }
-          />
-        </section>
-
-        <section>
-          <PageHeader
-            tag="Пошук залів"
             title="Знайти зал"
             description="Конкретні локації з графіком, цінами та опціями. Змініть фільтри, щоб звузити вибір."
           />
@@ -42,7 +36,7 @@ export default function AccountPage({ searchParams }: PageProps<"/account">) {
             <GymSearchResults searchParams={searchParams} />
           </Suspense>
         </section>
-      </Container>
-    </main>
+      </PageMain>
+    </>
   );
 }

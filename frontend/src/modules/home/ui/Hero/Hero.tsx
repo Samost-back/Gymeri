@@ -20,7 +20,6 @@ export function Hero() {
         />
         <div className={styles.fadeBottom} />
         <div className={styles.fadeSides} />
-        <div className={styles.shimmer} />
       </div>
 
       <Container className={styles.content}>
@@ -40,15 +39,14 @@ export function Hero() {
           абонементи в єдиному каталозі без посередників.
         </p>
 
-        <div className={styles.statsRow}>
-          <Suspense fallback={<HeroStatsList />}>
-            <HeroStats />
-          </Suspense>
-          <ButtonLink href="/account" className={styles.cta}>
-            Знайти зал
-            <Icon name="arrow_forward" size={18} />
-          </ButtonLink>
-        </div>
+        <ButtonLink href="/account" className={styles.cta}>
+          Знайти зал
+          <Icon name="arrow_forward" size={18} />
+        </ButtonLink>
+
+        <Suspense fallback={<HeroStatsList />}>
+          <HeroStats />
+        </Suspense>
       </Container>
     </section>
   );

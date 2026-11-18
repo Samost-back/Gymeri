@@ -1,0 +1,80 @@
+.preview {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.caption {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-text-subtle);
+}
+
+.cards {
+  display: grid;
+  gap: var(--space-md);
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border-strong);
+  background: rgb(var(--color-bg-rgb) / 0.8);
+  backdrop-filter: blur(6px);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.gym {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+}
+
+.plan {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.counter {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+  color: var(--color-text-subtle);
+}
+
+.value {
+  font-family: var(--font-mono);
+  color: var(--color-primary);
+}
+
+.bar {
+  height: 4px;
+  background: var(--color-border);
+}
+
+.fill {
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.until {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+/* Side by side on tablets, where the banner has no right column yet. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

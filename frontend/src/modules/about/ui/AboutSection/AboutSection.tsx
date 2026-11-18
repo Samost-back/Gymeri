@@ -8,7 +8,7 @@ type AboutSectionProps = {
   children: ReactNode;
 };
 
-// Every section of the page shares one grid: heading on the left, content on the right.
+// Every section reads top to bottom: heading, then content, on phones and desktops alike.
 export function AboutSection({ tag, title, children }: AboutSectionProps) {
   return (
     <section className={styles.section}>

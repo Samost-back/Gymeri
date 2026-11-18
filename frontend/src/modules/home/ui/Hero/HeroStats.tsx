@@ -19,7 +19,7 @@ export function HeroStatsList({ stats }: { stats?: CatalogStats }) {
     },
     {
       label: "Локаційна мережа",
-      value: value(stats?.chains, { one: "бренд", few: "бренди", many: "брендів" }),
+      value: value(stats?.chains, { one: "мережа", few: "мережі", many: "мереж" }),
     },
     {
       label: "Охоплення",
