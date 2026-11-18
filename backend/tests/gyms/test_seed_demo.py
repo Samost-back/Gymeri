@@ -5,12 +5,16 @@ from gyms.models import Chain, Gym, MembershipPlan, OpeningHours
 
 
 @pytest.mark.django_db
-def test_seed_publishes_only_confirmed_gyms():
+def test_seed_publishes_only_gyms_with_demo_data():
     call_command("seed_demo")
 
     published = Gym.objects.filter(is_published=True)
-    assert published.count() == 5
-    assert set(published.values_list("chain__slug", flat=True)) == {"inter-atletyka"}
+    assert published.count() == 7
+    assert set(published.values_list("chain__slug", flat=True)) == {
+        "inter-atletyka",
+        "lime-fit-club",
+        "sport-life",
+    }
 
 
 @pytest.mark.django_db

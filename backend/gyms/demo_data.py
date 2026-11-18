@@ -134,10 +134,25 @@ CHAINS = [
             },
         ],
     },
-    # Competitors: hidden until their schedules and prices are collected.
+    # Prices and hours of Lime Fit Club and Sport Life are placeholders for the demo:
+    # they are not published anywhere, so call the clubs and replace them before the defence.
     {
         "slug": "lime-fit-club",
         "name": "Lime Fit Club",
+        "short_name": "LF",
+        "description": "Фітнес-клуб у центрі Луцька: тренажерний зал, басейн і групові заняття.",
+        "plans": [
+            plan("Разове відвідування", "250", 1),
+            plan("Безліміт на місяць", "1500", 30),
+            plan(
+                "Ранковий абонемент на місяць",
+                "1100",
+                30,
+                access=dict.fromkeys(range(7), (None, "14:00")),
+            ),
+            plan("Безліміт на 3 місяці", "3900", 90),
+            plan("Річний безліміт", "12900", 365),
+        ],
         "gyms": [
             {
                 "slug": "lime-fit-club-pysarevskoho",
@@ -146,10 +161,15 @@ CHAINS = [
                 "district": "center",
                 "phone": "+380670000325",
                 "amenities": ["strength", "pool"],
-                "is_published": False,
+                "hours": {
+                    **dict.fromkeys(range(5), ("07:00", "22:00")),
+                    5: ("09:00", "20:00"),
+                    6: ("09:00", "20:00"),
+                },
             },
         ],
     },
+    # Other competitors: hidden until their schedules and prices are collected.
     {
         "slug": "mojo-fitness",
         "name": "MOJO FITNESS",
@@ -183,6 +203,21 @@ CHAINS = [
     {
         "slug": "sport-life",
         "name": "Sport Life",
+        "short_name": "SL",
+        "description": "Всеукраїнська мережа фітнес-клубів; у Луцьку з аквазоною на три басейни.",
+        "website": "https://sportlife.ua",
+        "plans": [
+            plan("Гостьовий візит", "350", 1),
+            plan("Безліміт на місяць", "1900", 30),
+            plan(
+                "Денний абонемент на місяць",
+                "1400",
+                30,
+                access=dict.fromkeys(range(7), (None, "17:00")),
+            ),
+            plan("Безліміт на 6 місяців", "8900", 180),
+            plan("Річний безліміт", "15900", 365),
+        ],
         "gyms": [
             {
                 "slug": "sport-life-moiseia",
@@ -190,8 +225,13 @@ CHAINS = [
                 "address": "просп. Василя Мойсея, 7А",
                 "district": "center",
                 "phone": "+380332280493",
+                "highlight": "Аквазона · три басейни",
                 "amenities": ["strength", "pool"],
-                "is_published": False,
+                "hours": {
+                    **dict.fromkeys(range(5), ("07:00", "22:00")),
+                    5: ("08:00", "21:00"),
+                    6: ("09:00", "20:00"),
+                },
             },
         ],
     },
