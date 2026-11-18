@@ -3,7 +3,9 @@ DJANGO_SETTINGS_MODULE = "config.settings"
 pythonpath = ["."]
 testpaths = ["tests"]
 # importlib mode lets tests live in plain folders, without __init__.py files.
-addopts = "--import-mode=importlib"
+# No cache folder: tests run as root in the container over the mounted source, and on a Linux
+# host the cache would be a root-owned folder the developer can't delete.
+addopts = "--import-mode=importlib -p no:cacheprovider"
 
 [tool.ruff]
 line-length = 100
