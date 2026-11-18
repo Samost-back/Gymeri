@@ -80,7 +80,7 @@ views / serializers  ->  services  ->  models (ORM)  ->  database
 
 | Шар | Технологія |
 |---|---|
-| Backend | Python 3.11+, Django, Django REST Framework |
+| Backend | Python 3.13, Django, Django REST Framework |
 | Database | PostgreSQL, міграції Django |
 | Frontend | Next.js (App Router), React, TypeScript |
 | Files | Amazon S3 (приватний bucket, signed URLs) |
@@ -102,14 +102,14 @@ Frontend працює на Vercel; backend, база й сховище файл�
 .
 ├── backend/              # Django API
 │   ├── config/           # settings and root urls
-│   ├── apps/             # one app per business module
-│   └── tests/            # mirrors apps/
+│   ├── gyms/             # one Django app per business module, next to config/
+│   └── tests/            # mirrors the apps: tests/gyms/, ...
 └── frontend/             # Next.js app
     ├── src/
     │   ├── app/          # routes only
     │   ├── modules/      # business modules, mirror backend apps
     │   └── shared/       # code without business knowledge
-    └── tests/            # unit/ mirrors src/, e2e/ for browser flows
+    └── tests/unit/       # mirrors src/
 ```
 
 Будова app і модуля та правила між ними описані в [CLAUDE.md](CLAUDE.md).
