@@ -14,7 +14,8 @@
   position: relative;
   min-height: 300px;
   overflow: hidden;
-  background: var(--color-bg);
+  /* Semi-transparent, so the empty photo slot doesn't read as a black hole on the blobs. */
+  background: rgb(var(--color-shade-rgb) / 0.35);
 }
 
 .image {

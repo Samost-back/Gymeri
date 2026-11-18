@@ -1,7 +1,7 @@
 import { ButtonLink, Icon } from "@/shared/ui";
 import styles from "./AboutCta.module.css";
 
-// Inverted block closes the page with one clear next step.
+// Closing block with one clear next step; dark, so it doesn't glare after the page.
 export function AboutCta() {
   return (
     <section className={styles.cta}>
@@ -9,7 +9,7 @@ export function AboutCta() {
         <h2 className={styles.title}>Знайди свій зал</h2>
         <p className={styles.text}>Район, опції, графік і ціни. Займе хвилину.</p>
       </div>
-      <ButtonLink href="/account" variant="inverse" className={styles.button}>
+      <ButtonLink href="/account" className={styles.button}>
         Перейти до пошуку
         <Icon name="arrow_forward" size={18} />
       </ButtonLink>

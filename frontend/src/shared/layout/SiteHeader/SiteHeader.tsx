@@ -15,10 +15,11 @@ export function SiteHeader() {
         <SiteNav />
 
         <div className={styles.actions}>
-          <Link href="/#catalog" className={styles.mapLink}>
+          {/* Plain text, not a link, until the map page exists. */}
+          <span className={styles.mapSoon}>
             <Icon name="location_on" size={16} />
             Карта
-          </Link>
+          </span>
           <ButtonLink href="/login" className={styles.login}>
             Увійти
           </ButtonLink>

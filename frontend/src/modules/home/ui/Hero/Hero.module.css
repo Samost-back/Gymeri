@@ -5,26 +5,27 @@
   width: 100%;
   min-height: 620px;
   overflow: hidden;
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
 }
 
+/* The photo fades out at the bottom, so the hero melts into the page and the glow that starts
+   right below it, instead of ending with a flat dark band and a hard line. */
 .background {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 65%, transparent);
 }
 
 .image {
   object-fit: cover;
-  filter: grayscale(1) contrast(1.25) brightness(0.9);
+  /* Kept dark, like the inner page banners, so the white title carries the screen. */
+  filter: grayscale(1) contrast(1.25) brightness(0.6);
   animation: ken-burns 22s ease-in-out infinite alternate;
   will-change: transform;
 }
 
 .fadeBottom,
-.fadeSides,
-.shimmer {
+.fadeSides {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -32,7 +33,7 @@
 
 .fadeBottom {
   background:
-    linear-gradient(to top, var(--color-bg), rgb(var(--color-bg-rgb) / 0.75), transparent),
+    linear-gradient(to top, rgb(var(--color-bg-rgb) / 0.75), transparent),
     rgb(0 0 0 / 0.4);
 }
 
@@ -43,11 +44,6 @@
     rgb(var(--color-bg-rgb) / 0.4),
     rgb(var(--color-bg-rgb) / 0.8)
   );
-}
-
-.shimmer {
-  background: radial-gradient(ellipse 70% 50% at 50% 30%, rgb(255 255 255 / 0.08), transparent 70%);
-  animation: shimmer 8s ease-in-out infinite alternate;
 }
 
 .content {
@@ -112,24 +108,19 @@
 .subtitle {
   composes: bodyLg from "@/shared/styles/typography.module.css";
   max-width: 42rem;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
   color: var(--color-text-muted);
 }
 
-.statsRow {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-width: 72rem;
-}
-
-/* On phones the action comes first; on wide screens it closes the stats row. */
+/* Full width on phones, where it is easiest to hit with a thumb. */
 .cta {
-  order: -1;
+  margin-bottom: var(--space-xl);
   padding-block: 1rem;
+  padding-inline: 2rem;
 }
 
 .stats {
+  max-width: 72rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 0.75rem;
@@ -161,27 +152,21 @@
     font-size: 80px;
     font-weight: 800;
   }
+
+  .cta {
+    align-self: flex-start;
+  }
 }
 
 /* Three stat tiles wrap their labels on tablets, so they go in a row only on wide screens. */
 @media (min-width: 1024px) {
   .hero {
-    min-height: 740px;
-  }
-
-  .statsRow {
-    flex-direction: row;
+    /* Fills the first screen (viewport minus the 5rem sticky header), like the inner pages. */
+    min-height: max(740px, calc(100svh - 5rem));
   }
 
   .stats {
-    flex: 1;
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .cta {
-    order: 0;
-    padding-block: 0;
-    padding-inline: 2rem;
   }
 
   .content {
@@ -191,7 +176,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .image,
-  .shimmer,
   .pulse::after {
     animation: none;
   }
@@ -208,18 +192,7 @@
   }
 }
 
-@keyframes shimmer {
-  0%,
-  100% {
-    opacity: 0.18;
-    transform: translateY(0);
-  }
 
-  50% {
-    opacity: 0.32;
-    transform: translateY(-4px);
-  }
-}
 
 @keyframes ping {
   75%,

@@ -1,33 +1,55 @@
 import type { ReactNode } from "react";
+import { cx } from "../../lib/classNames";
 import { Container } from "../Container/Container";
+import { PhotoBackdrop } from "../PhotoBackdrop/PhotoBackdrop";
 import styles from "./PageHero.module.css";
 
 type PageHeroProps = {
-  status: string;
   title: string;
-  accent: string;
+  // Second, lighter line of the title.
+  accent?: string;
   lead: string;
-  // Right column on wide screens (a photo, a list); below the text on phones.
+  // Button under the lead, e.g. the page's main action.
+  action?: ReactNode;
+  // Part of the backdrop photo to show, so neighbouring pages don't look identical.
+  photoFocus?: string;
+  // Right column on wide screens (e.g. a list); below the text on phones.
   aside?: ReactNode;
+  // Full-width row pinned to the bottom of the banner, e.g. key figures.
+  footer?: ReactNode;
 };
 
-// Opening screen of secondary pages; the home page has its own photo hero.
-export function PageHero({ status, title, accent, lead, aside }: PageHeroProps) {
+// Opening banner of inner pages: one height and shade everywhere, lower than the home hero,
+// so the page content starts on the first screen.
+export function PageHero({
+  title,
+  accent,
+  lead,
+  action,
+  photoFocus,
+  aside,
+  footer,
+}: PageHeroProps) {
   return (
     <section className={styles.hero}>
-      <div className={styles.grid} aria-hidden="true" />
-      <Container className={styles.content}>
+      <PhotoBackdrop focus={photoFocus} />
+      <Container className={cx(styles.content, aside != null && styles.withAside)}>
         <div>
-          <span className={styles.status}>{status}</span>
           <h1 className={styles.title}>
             {title}
-            <br />
-            <span className={styles.titleAccent}>{accent}</span>
+            {accent && (
+              <>
+                <br />
+                <span className={styles.titleAccent}>{accent}</span>
+              </>
+            )}
           </h1>
           <p className={styles.lead}>{lead}</p>
+          {action && <div className={styles.action}>{action}</div>}
         </div>
         {aside}
       </Container>
+      {footer && <Container className={styles.footer}>{footer}</Container>}
     </section>
   );
 }

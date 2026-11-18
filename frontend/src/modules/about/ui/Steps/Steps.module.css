@@ -51,3 +51,29 @@
     line-height: 48px;
   }
 }
+
+/* Wide screens: the steps sit side by side and fill the row, so the section doesn't leave
+   the right half of the page empty. */
+@media (min-width: 1024px) {
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .step {
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-lg);
+    border-bottom: none;
+  }
+
+  .step:first-child {
+    padding-left: 0;
+  }
+
+  .step + .step {
+    border-left: 1px solid var(--color-border);
+  }
+}

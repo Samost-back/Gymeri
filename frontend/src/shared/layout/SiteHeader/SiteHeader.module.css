@@ -54,19 +54,12 @@
   gap: var(--space-md);
 }
 
-.mapLink {
+.mapSoon {
   composes: labelSm from "@/shared/styles/typography.module.css";
   display: none;
   align-items: center;
   gap: 0.375rem;
-  padding: var(--space-sm) 0.75rem;
-  border: 1px solid var(--color-border-strong);
-  color: var(--color-text-muted);
-  transition: color var(--transition-fast);
-}
-
-.mapLink:hover {
-  color: var(--color-primary);
+  color: var(--color-text-subtle);
 }
 
 .login {
@@ -140,7 +133,7 @@
 /* Below 1024px brand, four tabs and the login button don't fit in one row. */
 @media (min-width: 1024px) {
   .nav,
-  .mapLink {
+  .mapSoon {
     display: flex;
   }
 

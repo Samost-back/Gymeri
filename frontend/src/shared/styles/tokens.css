@@ -5,6 +5,8 @@
   --color-bg: #232326;
   /* Same as --color-bg, for semi-transparent overlays: rgb(var(--color-bg-rgb) / 0.8). */
   --color-bg-rgb: 35 35 38;
+  /* Darker than the page: shades photos so white text stays readable without washing them out. */
+  --color-shade-rgb: 14 14 16;
   /* Header sits a step darker than the page so the page itself reads lighter. */
   --color-surface: #1c1c1f;
   --color-surface-low: #2c2c30;

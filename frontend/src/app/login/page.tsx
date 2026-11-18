@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/modules/accounts";
-import { Container } from "@/shared/ui";
-import styles from "../page.module.css";
+import { PhotoBackdrop } from "@/shared/ui";
+import styles from "./page.module.css";
 
 export const metadata: Metadata = {
   title: "Вхід · Gymeri",
@@ -12,9 +12,10 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <main className={styles.main}>
-      <Container className={styles.narrow}>
+      <PhotoBackdrop focus="60% center" shade="even" />
+      <div className={styles.panel}>
         <LoginForm />
-      </Container>
+      </div>
     </main>
   );
 }
