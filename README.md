@@ -109,7 +109,7 @@ Frontend працює на Vercel; backend, база й сховище файл�
     │   ├── app/          # routes only
     │   ├── modules/      # business modules, mirror backend apps
     │   └── shared/       # code without business knowledge
-    └── tests/            # unit/ mirrors src/, e2e/ for browser flows
+    └── tests/unit/       # mirrors src/
 ```
 
 Будова app і модуля та правила між ними описані в [CLAUDE.md](CLAUDE.md).
