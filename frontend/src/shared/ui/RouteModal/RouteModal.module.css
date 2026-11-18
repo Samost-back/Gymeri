@@ -19,11 +19,6 @@
   animation: rise 200ms ease-out;
 }
 
-/* Keep the page underneath from scrolling while the dialog is open. */
-:global(html):has(.dialog[open]) {
-  overflow: hidden;
-}
-
 .panel {
   position: relative;
   padding: var(--space-xl) var(--space-lg) var(--space-lg);

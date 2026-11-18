@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef } from "react";
+import { lockScroll } from "../../lib/scrollLock";
 import { Icon } from "../Icon/Icon";
 import styles from "./RouteModal.module.css";
 
@@ -18,9 +19,19 @@ export function RouteModal({ label, children }: RouteModalProps) {
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (dialog && !dialog.open) {
+    if (!dialog) {
+      return;
+    }
+    if (!dialog.open) {
       dialog.showModal();
     }
+    // Lock page scroll here, not in CSS: after router.back() Next.js keeps the dialog in the DOM
+    // hidden, so a style keyed on it would keep the page frozen. Cleanup runs when it hides.
+    const unlockScroll = lockScroll(document.documentElement);
+    return () => {
+      unlockScroll();
+      dialog.close();
+    };
   }, []);
 
   const close = () => router.back();
