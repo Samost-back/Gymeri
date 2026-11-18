@@ -1,4 +1,4 @@
 export { getCatalogStats } from "./api/gyms";
 export type { CatalogStats } from "./model/types";
-export { ChainList } from "./ui/ChainList";
-export { GymSearchResults } from "./ui/GymSearchResults";
+export { ChainList } from "./ui/ChainList/ChainList";
+export { GymSearchResults } from "./ui/GymSearchResults/GymSearchResults";

@@ -1,5 +1,5 @@
 import { apiGet } from "@/shared/lib/api";
-import { toQuery } from "../model/search-params";
+import { toQuery } from "../model/searchParams";
 import type {
   CatalogStats,
   ChainCard,

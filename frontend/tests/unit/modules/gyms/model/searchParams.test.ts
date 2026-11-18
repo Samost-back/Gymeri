@@ -4,7 +4,7 @@ import {
   gymsHref,
   parseSearchParams,
   toQuery,
-} from "@/modules/gyms/model/search-params";
+} from "@/modules/gyms/model/searchParams";
 
 describe("parseSearchParams", () => {
   it("reads every filter from the URL", () => {
