@@ -140,8 +140,6 @@ docker compose exec backend python manage.py createsuperuser
 
 ```bash
 make up      # start the whole project in the background
-make logs    # follow logs (Ctrl+C closes the view, containers keep running)
-make ps      # container status
 make down    # stop the whole project
 ```
 
