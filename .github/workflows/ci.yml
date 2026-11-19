@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to the same branch cancels the outdated run, so minutes aren't spent on old commits.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Checks only read the code; without this the token gets write access by default.
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_DB: gymeri
+          POSTGRES_USER: gymeri
+          POSTGRES_PASSWORD: gymeri
+        ports:
+          - 5432:5432
+        # Steps start only after PostgreSQL accepts connections, otherwise pytest fails on connect.
+        options: >-
+          --health-cmd "pg_isready -U gymeri -d gymeri"
+          --health-interval 2s
+          --health-retries 15
+
+    # Throwaway values for the CI database; real secrets never live in the repository.
+    env:
+      DJANGO_SECRET_KEY: ci-only-secret
+      POSTGRES_DB: gymeri
+      POSTGRES_USER: gymeri
+      POSTGRES_PASSWORD: gymeri
+      POSTGRES_HOST: localhost
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Format
+        run: ruff format --check .
+
+      # Fails when models.py changed but the migration was not created.
+      - name: Missing migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        run: pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Takes the pnpm version from packageManager in package.json, so CI matches local.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      # next-env.d.ts is gitignored, and without it tsc can't resolve CSS module imports.
+      - name: Typecheck
+        run: |
+          pnpm exec next typegen
+          pnpm typecheck
+
+      - name: Tests
+        run: pnpm test
