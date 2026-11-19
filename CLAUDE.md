@@ -29,7 +29,7 @@
 Точка входу це Makefile. Локальна розробка йде через Docker: `make up` піднімає весь проєкт (PostgreSQL, backend, frontend), `make down` зупиняє.
 
 ```
-make up | down
+make up | down | logs | ps
 make migrate | makemigrations
 make test
 make lint

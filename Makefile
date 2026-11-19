@@ -1,13 +1,21 @@
 BACKEND = docker compose run --rm backend
 
-.PHONY: up down migrate makemigrations seed test lint
+.PHONY: up down logs ps migrate makemigrations seed test lint
 
+# -d runs containers in the background and frees the terminal; logs are in `make logs`.
 # -V drops the old node_modules volume, so dependencies always match the rebuilt image.
 up:
-	docker compose up --build -V
+	docker compose up --build -d -V
 
 down:
 	docker compose down
+
+# Follows all services; Ctrl+C stops only the log view, the containers keep running.
+logs:
+	docker compose logs -f --tail=100
+
+ps:
+	docker compose ps
 
 migrate:
 	$(BACKEND) python manage.py migrate
