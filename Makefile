@@ -4,8 +4,9 @@ BACKEND = docker compose run --rm backend
 
 # -d runs containers in the background and frees the terminal; logs are in `make logs`.
 # -V drops the old node_modules volume, so dependencies always match the rebuilt image.
+# --quiet-build/--quiet-pull hide image build and download progress; build errors still show.
 up:
-	docker compose up --build -d -V
+	docker compose up --build -d -V --quiet-build --quiet-pull
 
 down:
 	docker compose down
