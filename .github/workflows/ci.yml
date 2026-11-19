@@ -14,14 +14,75 @@ concurrency:
 permissions:
   contents: read
 
+# Throwaway values for the CI database; real secrets never live in the repository.
+env:
+  DJANGO_SECRET_KEY: ci-only-secret
+  POSTGRES_DB: gymeri
+  POSTGRES_USER: gymeri
+  POSTGRES_PASSWORD: gymeri
+  POSTGRES_HOST: localhost
+
+# One job per check, so the PR shows exactly which one failed. Setup steps live in
+# .github/actions to avoid repeating them in every job.
 jobs:
-  backend:
+  backend-lint:
+    name: "Backend: lint (ruff check)"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
       run:
         working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-backend
+      - run: ruff check .
 
+  backend-format:
+    name: "Backend: format (ruff format)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-backend
+      - run: ruff format --check .
+
+  backend-migrations:
+    name: "Backend: no missing migrations"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    # makemigrations checks the migration history against a live database.
+    services:
+      db:
+        image: postgres:17
+        env:
+          POSTGRES_DB: gymeri
+          POSTGRES_USER: gymeri
+          POSTGRES_PASSWORD: gymeri
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U gymeri -d gymeri"
+          --health-interval 2s
+          --health-retries 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-backend
+      # Fails when models.py changed but the migration was not created.
+      - run: python manage.py makemigrations --check --dry-run
+
+  backend-tests:
+    name: "Backend: tests (pytest)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
     services:
       db:
         image: postgres:17
@@ -36,70 +97,45 @@ jobs:
           --health-cmd "pg_isready -U gymeri -d gymeri"
           --health-interval 2s
           --health-retries 15
-
-    # Throwaway values for the CI database; real secrets never live in the repository.
-    env:
-      DJANGO_SECRET_KEY: ci-only-secret
-      POSTGRES_DB: gymeri
-      POSTGRES_USER: gymeri
-      POSTGRES_PASSWORD: gymeri
-      POSTGRES_HOST: localhost
-
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-backend
+      - run: pytest
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: pip
-          cache-dependency-path: backend/requirements*.txt
-
-      - run: pip install -r requirements-dev.txt
-
-      - name: Lint
-        run: ruff check .
-
-      - name: Format
-        run: ruff format --check .
-
-      # Fails when models.py changed but the migration was not created.
-      - name: Missing migrations
-        run: python manage.py makemigrations --check --dry-run
-
-      - name: Tests
-        run: pytest
-
-  frontend:
+  frontend-lint:
+    name: "Frontend: lint (eslint)"
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
-
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-frontend
+      - run: pnpm lint
 
-      # Takes the pnpm version from packageManager in package.json, so CI matches local.
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: frontend/package.json
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
-
-      - run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
+  frontend-typecheck:
+    name: "Frontend: typecheck (tsc)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-frontend
       # next-env.d.ts is gitignored, and without it tsc can't resolve CSS module imports.
-      - name: Typecheck
-        run: |
-          pnpm exec next typegen
-          pnpm typecheck
+      - run: pnpm exec next typegen
+      - run: pnpm typecheck
 
-      - name: Tests
-        run: pnpm test
+  frontend-tests:
+    name: "Frontend: tests (vitest)"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-frontend
+      - run: pnpm test
