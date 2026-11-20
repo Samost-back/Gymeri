@@ -55,11 +55,14 @@
   gap: var(--space-md);
 }
 
+/* Looks like an outline button next to "Увійти", but muted: the map page doesn't exist yet. */
 .mapSoon {
   composes: labelSm from "@/shared/styles/typography.module.css";
   display: none;
   align-items: center;
   gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--color-border-strong);
   color: var(--color-text-subtle);
 }
 
@@ -111,8 +114,27 @@
   color: var(--color-primary);
 }
 
-.mobileLogin {
+/* Map and login share one row; when login moves to the header (640px+), the map takes it all. */
+.mobileActions {
+  display: flex;
+  gap: var(--space-sm);
   margin-top: var(--space-lg);
+}
+
+.mobileActions > * {
+  flex: 1;
+}
+
+/* Looks like an outline button, but muted: the map page doesn't exist yet. */
+.mobileMap {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-subtle);
 }
 
 @media (min-width: 640px) {
