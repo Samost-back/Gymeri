@@ -1,4 +1,4 @@
-import { Icon, PageHeader } from "@/shared/ui";
+import { PageHeader } from "@/shared/ui";
 import { getNews } from "../../api/news";
 import { NewsCard } from "../NewsCard/NewsCard";
 import styles from "./NewsFeed.module.css";
@@ -9,11 +9,6 @@ export async function NewsFeed() {
   return (
     <section>
       <PageHeader title="Найближче в місті" />
-      <p className={styles.demoNote}>
-        <Icon name="info" size={18} />
-        Це приклади оголошень, щоб показати, як виглядатиме стрічка. Справжні новини з’являться
-        згодом.
-      </p>
       {lead && <NewsCard item={lead} featured />}
       {rest.length > 0 && (
         <>
