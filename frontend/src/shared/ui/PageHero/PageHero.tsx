@@ -15,8 +15,6 @@ type PageHeroProps = {
   photoFocus?: string;
   // Right column on wide screens (e.g. a list); below the text on phones.
   aside?: ReactNode;
-  // Full-width row pinned to the bottom of the banner, e.g. key figures.
-  footer?: ReactNode;
 };
 
 // Opening banner of inner pages: one height and shade everywhere, lower than the home hero,
@@ -28,7 +26,6 @@ export function PageHero({
   action,
   photoFocus,
   aside,
-  footer,
 }: PageHeroProps) {
   return (
     <section className={styles.hero}>
@@ -49,7 +46,6 @@ export function PageHero({
         </div>
         {aside}
       </Container>
-      {footer && <Container className={styles.footer}>{footer}</Container>}
     </section>
   );
 }
