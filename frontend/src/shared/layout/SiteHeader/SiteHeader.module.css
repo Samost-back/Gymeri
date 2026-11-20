@@ -11,11 +11,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 5rem;
+  height: var(--header-height);
 }
 
 .brand {
   composes: headlineMd from "@/shared/styles/typography.module.css";
+  font-size: 20px;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
@@ -71,8 +72,8 @@
 .menuButton {
   display: grid;
   place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   background: transparent;
   border: 1px solid var(--color-border-strong);
   color: var(--color-primary);
@@ -125,6 +126,10 @@
 }
 
 @media (min-width: 768px) {
+  .brand {
+    font-size: 24px;
+  }
+
   .mobileNav {
     padding-inline: var(--page-margin);
   }
