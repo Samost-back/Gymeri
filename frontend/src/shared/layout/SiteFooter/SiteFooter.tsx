@@ -1,29 +1,81 @@
-import Link from "next/link";
-import { Container } from "@/shared/ui";
+import type { ReactNode } from "react";
+import { Container, Icon } from "@/shared/ui";
 import styles from "./SiteFooter.module.css";
 
-const FOOTER_LINKS = [
-  { href: "/contacts", label: "Контакти" },
-  { href: "/terms", label: "Умови використання" },
-  { href: "/privacy", label: "Політика конфіденційності" },
+// Placeholders until the real contacts are agreed; everything the footer shows comes from here.
+const CONTACTS = {
+  email: "hello@gymeri.example",
+  phone: "+380 00 000 00 00",
+  instagram: "gymeri.lutsk",
+};
+
+// The icon font has no brand logos, so Instagram's glyph is inline.
+function InstagramIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+const CONTACT_LINKS: { href: string; label: string; icon: ReactNode; external?: boolean }[] = [
+  { href: `mailto:${CONTACTS.email}`, label: CONTACTS.email, icon: <Icon name="mail" size={18} /> },
+  {
+    href: `tel:${CONTACTS.phone.replaceAll(" ", "")}`,
+    label: CONTACTS.phone,
+    icon: <Icon name="call" size={18} />,
+  },
+  {
+    href: `https://instagram.com/${CONTACTS.instagram}`,
+    label: `@${CONTACTS.instagram}`,
+    icon: <InstagramIcon />,
+    external: true,
+  },
 ];
 
 export function SiteFooter() {
   return (
     <footer className={styles.footer}>
-      <Container className={styles.inner}>
-        <div className={styles.brand}>
-          <span className={styles.name}>GYMERI · LUTSK</span>
-          <span className={styles.copyright}>© 2026 Gymeri. Усі права захищені.</span>
+      <Container>
+        <div className={styles.top}>
+          <div className={styles.brand}>
+            <span className={styles.name}>GYMERI · LUTSK</span>
+            <span className={styles.city}>
+              <Icon name="location_on" size={16} />
+              Луцьк, Україна
+            </span>
+          </div>
+
+          <nav aria-label="Контакти">
+            <ul className={styles.contactList}>
+              {CONTACT_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className={styles.contact}
+                    {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
+                  >
+                    <span className={styles.contactIcon}>{link.icon}</span>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        <nav className={styles.links} aria-label="Додаткові посилання">
-          {FOOTER_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className={styles.link}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className={styles.bottom}>
+          <span>© 2026 Gymeri. Усі права захищені.</span>
+          {/* "#" scrolls to the top of the page without leaving it. */}
+          <a href="#" className={styles.toTop}>
+            Нагору
+            <span className={styles.toTopIcon}>
+              <Icon name="arrow_upward" size={16} />
+            </span>
+          </a>
+        </div>
       </Container>
     </footer>
   );
