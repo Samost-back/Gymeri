@@ -3,7 +3,11 @@
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 620px;
+  /* Fills the first screen below the sticky header, so the next section doesn't peek in.
+     dvh, not svh: svh is the height with the browser bar shown, so once the bar hides
+     the screen grows past the hero and the catalog heading shows at the bottom. */
+  min-height: calc(100vh - var(--header-height));
+  min-height: calc(100dvh - var(--header-height));
   overflow: hidden;
 }
 
@@ -37,12 +41,13 @@
     rgb(0 0 0 / 0.4);
 }
 
+/* Near-black, not the graphite page color: graphite over the photo washes it out to grey. */
 .fadeSides {
   background: linear-gradient(
     to right,
-    rgb(var(--color-bg-rgb) / 0.9),
-    rgb(var(--color-bg-rgb) / 0.4),
-    rgb(var(--color-bg-rgb) / 0.8)
+    rgb(14 14 14 / 0.9),
+    rgb(14 14 14 / 0.4),
+    rgb(14 14 14 / 0.8)
   );
 }
 
@@ -147,6 +152,71 @@
   font-weight: 700;
 }
 
+/* Phones. Kept after the base rules: same specificity, so an earlier block would lose to them.
+   The hero fills the screen: auto margins center the headline block in the free space and pin
+   the stats and the button to the bottom, where the thumb is. */
+@media (max-width: 767px) {
+  .content {
+    align-self: stretch;
+    padding-block: var(--space-lg);
+  }
+
+  .status {
+    margin-top: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  /* Large enough to fill the screen, capped by width so "тренувальне" fits on 320px phones. */
+  .title {
+    margin-bottom: var(--space-xl);
+    font-size: min(44px, 12.5vw);
+  }
+
+  /* The headline and the button say enough on a small screen. */
+  .subtitle {
+    display: none;
+  }
+
+  /* One strip of three columns, like on desktop, instead of three stacked rows. */
+  .stats {
+    order: 1;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: auto;
+    margin-bottom: var(--space-md);
+    background: rgb(var(--color-bg-rgb) / 0.7);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  /* The value goes on top: it is what the eye catches; the label only explains it. */
+  .stat {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    padding: var(--space-sm) 0.625rem;
+    background: none;
+    border: 0;
+  }
+
+  .stat + .stat {
+    border-left: 1px solid var(--color-border-strong);
+  }
+
+  /* Sized so "5 районів" stays on one line in a third of a 360px screen. */
+  .statValue {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Visual order only, so the button ends up last, closest to the thumb. */
+  .cta {
+    order: 2;
+    margin-bottom: 0;
+    padding-block: 0.875rem;
+  }
+}
+
 @media (min-width: 768px) {
   .title {
     font-size: 80px;
@@ -161,8 +231,7 @@
 /* Three stat tiles wrap their labels on tablets, so they go in a row only on wide screens. */
 @media (min-width: 1024px) {
   .hero {
-    /* Fills the first screen (viewport minus the 5rem sticky header), like the inner pages. */
-    min-height: max(740px, calc(100svh - 5rem));
+    min-height: max(740px, calc(100dvh - var(--header-height)));
   }
 
   .stats {
@@ -191,8 +260,6 @@
     transform: scale(1.04) translate(-1%, -1.2%);
   }
 }
-
-
 
 @keyframes ping {
   75%,

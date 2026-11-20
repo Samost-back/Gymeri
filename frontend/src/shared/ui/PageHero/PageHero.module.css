@@ -63,3 +63,10 @@
     font-size: 72px;
   }
 }
+
+/* Phones: the aside sits right under the text, so the full column gap reads as a break. */
+@media (max-width: 767px) {
+  .withAside {
+    gap: var(--space-lg);
+  }
+}
