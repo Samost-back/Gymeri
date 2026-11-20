@@ -22,6 +22,7 @@ export default function AccountPage({ searchParams }: PageProps<"/account">) {
           </ButtonLink>
         }
         photoFocus="30% center"
+        compact
       />
       <PageMain>
         <section>
