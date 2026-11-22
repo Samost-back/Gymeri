@@ -32,6 +32,7 @@ def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
                 discounts=tuple(
                     make_discount(d.kind, d.value, d.ends_on) for d in plan.discounts.all()
                 ),
+                name=plan.name,
             )
         )
     return {chain_id: PriceList(plans[chain_id]) for chain_id in chain_ids}
@@ -228,7 +229,7 @@ class GymSearchService:
             audiences=tuple(
                 Label(slug, audience_names[slug]) for slug in sorted(prices.audiences(gym.pk))
             ),
-            has_discount=prices.has_discount(today, gym.pk),
+            discount=prices.best_offer(today, gym.pk),
             hours_summary=schedule.summary(),
             is_open_now=schedule.is_open_at(now),
             is_round_the_clock=schedule.is_round_the_clock(),

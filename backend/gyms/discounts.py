@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
+from typing import ClassVar
 
 from .exceptions import InvalidDiscount
 
@@ -19,6 +20,13 @@ class Discount(ABC):
     """
 
     ends_on: date
+    # The code stored in the database and sent to clients, e.g. "percent".
+    kind: ClassVar[str]
+
+    @property
+    @abstractmethod
+    def value(self) -> Decimal:
+        """The number a person reads: the percent or the amount off."""
 
     def is_active(self, on: date) -> bool:
         return on <= self.ends_on
@@ -30,7 +38,12 @@ class Discount(ABC):
 
 @dataclass(frozen=True)
 class PercentDiscount(Discount):
+    kind: ClassVar[str] = "percent"
     percent: Decimal
+
+    @property
+    def value(self) -> Decimal:
+        return self.percent
 
     def __post_init__(self) -> None:
         if not 0 < self.percent <= FULL_PERCENT:
@@ -43,7 +56,12 @@ class PercentDiscount(Discount):
 
 @dataclass(frozen=True)
 class FixedDiscount(Discount):
+    kind: ClassVar[str] = "fixed"
     amount: Decimal
+
+    @property
+    def value(self) -> Decimal:
+        return self.amount
 
     def __post_init__(self) -> None:
         if self.amount <= 0:
@@ -57,8 +75,7 @@ class FixedDiscount(Discount):
 
 
 DISCOUNT_KINDS: dict[str, type[PercentDiscount] | type[FixedDiscount]] = {
-    "percent": PercentDiscount,
-    "fixed": FixedDiscount,
+    discount_class.kind: discount_class for discount_class in (PercentDiscount, FixedDiscount)
 }
 
 

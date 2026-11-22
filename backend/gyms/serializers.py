@@ -30,6 +30,15 @@ class FilterOptionsSerializer(serializers.Serializer):
     audiences = FilterOptionSerializer(many=True)
 
 
+class DiscountOfferSerializer(serializers.Serializer):
+    plan_name = serializers.CharField()
+    kind = serializers.CharField(source="discount.kind")
+    value = serializers.DecimalField(max_digits=8, decimal_places=2, source="discount.value")
+    ends_on = serializers.DateField(source="discount.ends_on")
+    full_price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    price = serializers.DecimalField(max_digits=8, decimal_places=2)
+
+
 class GymListingSerializer(serializers.Serializer):
     slug = serializers.CharField()
     name = serializers.CharField()
@@ -42,7 +51,7 @@ class GymListingSerializer(serializers.Serializer):
     # Objects, not names: the client highlights the types a user filtered by, by slug.
     types = FilterOptionSerializer(many=True)
     audiences = FilterOptionSerializer(many=True)
-    has_discount = serializers.BooleanField()
+    discount = DiscountOfferSerializer(allow_null=True)
     hours_summary = serializers.CharField()
     is_open_now = serializers.BooleanField()
     is_round_the_clock = serializers.BooleanField()

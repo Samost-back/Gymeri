@@ -7,6 +7,7 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal
 
 from .exceptions import InvalidFilter
+from .pricing import DiscountOffer
 
 
 @dataclass(frozen=True)
@@ -32,7 +33,8 @@ class GymListing:
     types: tuple[Label, ...]
     # Groups with a plan of their own in this gym, e.g. students.
     audiences: tuple[Label, ...]
-    has_discount: bool
+    # The promotion with the biggest saving right now, or None.
+    discount: DiscountOffer | None
     hours_summary: str
     is_open_now: bool
     is_round_the_clock: bool
@@ -107,7 +109,7 @@ class AudienceFilter(GymFilter):
 
 class DiscountFilter(GymFilter):
     def accepts(self, gym: GymListing) -> bool:
-        return gym.has_discount
+        return gym.discount is not None
 
 
 class OpenNowFilter(GymFilter):

@@ -3,14 +3,17 @@ from decimal import Decimal
 
 import pytest
 from django.contrib import admin
+from rest_framework.test import APIClient
 
 from gyms.admin import DiscountInline
 from gyms.discounts import FixedDiscount, PercentDiscount, make_discount
 from gyms.exceptions import InvalidDiscount
-from gyms.models import Chain, MembershipPlan
+from gyms.models import Chain, Discount, Gym, MembershipPlan, Street
 from gyms.services import PlanPricingService
 
 ENDS = date(2026, 12, 1)
+# Far enough ahead that the offer is still active whenever the tests run.
+FAR_FUTURE = date(2099, 1, 1)
 
 
 def test_percent_discount_rounds_to_kopecks():
@@ -74,3 +77,40 @@ def test_admin_refuses_a_fixed_discount_bigger_than_the_price(rf, admin_user):
 
     assert not formset.is_valid()
     assert formset.errors[0]["value"] == ["A discount of 1500 doesn't fit the price 1000."]
+
+
+def published_gym(chain: Chain, street: Street, slug: str) -> Gym:
+    return Gym.objects.create(
+        chain=chain,
+        street=street,
+        name=slug,
+        slug=slug,
+        building="1",
+        is_published=True,
+        latitude=Decimal("50.75"),
+        longitude=Decimal("25.33"),
+    )
+
+
+@pytest.mark.django_db
+def test_gym_listing_describes_its_best_discount():
+    street = Street.objects.create(name="просп. Волі", slug="voli")
+    on_sale = Chain.objects.create(name="IA", slug="ia")
+    published_gym(on_sale, street, "on-sale")
+    published_gym(Chain.objects.create(name="Other", slug="other"), street, "full-price")
+    plan = MembershipPlan.objects.create(
+        chain=on_sale, name="Month", price=Decimal("1000"), duration_days=30
+    )
+    Discount.objects.create(plan=plan, kind="percent", value=Decimal("15"), ends_on=FAR_FUTURE)
+
+    gyms = {gym["slug"]: gym for gym in APIClient().get("/api/v1/gyms/").json()}
+
+    assert gyms["on-sale"]["discount"] == {
+        "plan_name": "Month",
+        "kind": "percent",
+        "value": "15.00",
+        "ends_on": FAR_FUTURE.isoformat(),
+        "full_price": "1000.00",
+        "price": "850.00",
+    }
+    assert gyms["full-price"]["discount"] is None

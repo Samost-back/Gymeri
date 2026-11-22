@@ -12,6 +12,20 @@ MONTH_DAYS = 30
 
 
 @dataclass(frozen=True)
+class DiscountOffer:
+    """A promotion as a buyer sees it: which plan, how much off, the price before and after."""
+
+    plan_name: str
+    discount: Discount
+    full_price: Decimal
+    price: Decimal
+
+    @property
+    def saving(self) -> Decimal:
+        return self.full_price - self.price
+
+
+@dataclass(frozen=True)
 class PlanPrice:
     price: Decimal
     duration_days: int
@@ -20,30 +34,32 @@ class PlanPrice:
     # Who may buy it, e.g. {"students"}; empty means everyone.
     audiences: frozenset[str] = field(default_factory=frozenset)
     discounts: tuple[Discount, ...] = ()
+    name: str = ""
 
     @property
     def is_for_everyone(self) -> bool:
         return not self.audiences
 
-    def has_discount_on(self, day: date) -> bool:
-        return bool(self._discounted_prices(day))
-
-    def price_on(self, day: date) -> Decimal:
-        """The price a buyer pays that day: the best active discount, or the full price."""
-        return min(self._discounted_prices(day), default=self.price)
-
-    def _discounted_prices(self, day: date) -> list[Decimal]:
-        prices = []
+    def best_offer_on(self, day: date) -> DiscountOffer | None:
+        """The active discount that saves the most that day, or None."""
+        offers = []
         for discount in self.discounts:
             if not discount.is_active(day):
                 continue
             # The admin checks a discount against the price, but the price may drop later;
             # a discount that no longer fits is skipped instead of breaking the catalog.
             try:
-                prices.append(discount.apply(self.price))
+                offers.append(
+                    DiscountOffer(self.name, discount, self.price, discount.apply(self.price))
+                )
             except InvalidDiscount:
                 continue
-        return prices
+        return max(offers, key=lambda offer: offer.saving, default=None)
+
+    def price_on(self, day: date) -> Decimal:
+        """The price a buyer pays that day: with the best active discount, or the full price."""
+        offer = self.best_offer_on(day)
+        return offer.price if offer else self.price
 
 
 class PriceList:
@@ -62,8 +78,10 @@ class PriceList:
         ]
         return min(prices, default=None)
 
-    def has_discount(self, day: date, gym_id: int | None = None) -> bool:
-        return any(plan.has_discount_on(day) for plan in self._sold_in(gym_id))
+    def best_offer(self, day: date, gym_id: int | None = None) -> DiscountOffer | None:
+        """The promotion worth showing on a card: the biggest saving among the gym's plans."""
+        offers = [offer for plan in self._sold_in(gym_id) if (offer := plan.best_offer_on(day))]
+        return max(offers, key=lambda offer: offer.saving, default=None)
 
     def audiences(self, gym_id: int | None = None) -> frozenset[str]:
         """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""

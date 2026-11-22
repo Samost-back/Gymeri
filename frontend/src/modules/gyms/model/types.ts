@@ -27,6 +27,16 @@ export type ChainCard = {
   priceFrom: number | null;
 };
 
+export type DiscountOffer = {
+  planName: string;
+  kind: "percent" | "fixed";
+  value: number;
+  // ISO date, the last day the price holds.
+  endsOn: string;
+  fullPrice: number;
+  price: number;
+};
+
 export type GymListing = {
   slug: string;
   name: string;
@@ -39,7 +49,8 @@ export type GymListing = {
   types: FilterOption[];
   // Groups with a plan of their own here, e.g. students.
   audiences: FilterOption[];
-  hasDiscount: boolean;
+  // The promotion with the biggest saving right now.
+  discount: DiscountOffer | null;
   hoursSummary: string;
   isOpenNow: boolean;
   isRoundTheClock: boolean;

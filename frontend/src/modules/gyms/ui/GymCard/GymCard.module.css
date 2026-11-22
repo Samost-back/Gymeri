@@ -72,6 +72,11 @@
   color: var(--color-text-muted);
 }
 
+/* The promo line reads white, so it stands out from the plain facts above it. */
+.offer {
+  color: var(--color-primary);
+}
+
 .detailIcon {
   color: var(--color-text-subtle);
 }

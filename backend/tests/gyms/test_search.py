@@ -1,9 +1,16 @@
+from datetime import date
 from decimal import Decimal
 
 import pytest
 
+from gyms.discounts import PercentDiscount
 from gyms.exceptions import InvalidFilter
+from gyms.pricing import DiscountOffer
 from gyms.search import GymListing, GymSearchCriteria, Label, SortByArea, SortByPrice
+
+OFFER = DiscountOffer(
+    "Month", PercentDiscount(date(2026, 12, 31), Decimal("10")), Decimal("1000"), Decimal("900")
+)
 
 
 def listing(
@@ -24,7 +31,7 @@ def listing(
         area_m2=area,
         types=tuple(Label(slug, slug) for slug in types),
         audiences=(),
-        has_discount=discount,
+        discount=OFFER if discount else None,
         hours_summary="",
         is_open_now=False,
         is_round_the_clock=False,

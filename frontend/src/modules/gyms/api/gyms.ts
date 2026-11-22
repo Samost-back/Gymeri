@@ -33,7 +33,14 @@ type GymListingDto = {
   area_m2: number | null;
   types: FilterOption[];
   audiences: FilterOption[];
-  has_discount: boolean;
+  discount: {
+    plan_name: string;
+    kind: "percent" | "fixed";
+    value: string;
+    ends_on: string;
+    full_price: string;
+    price: string;
+  } | null;
   hours_summary: string;
   is_open_now: boolean;
   is_round_the_clock: boolean;
@@ -92,7 +99,14 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     areaM2: gym.area_m2,
     types: gym.types,
     audiences: gym.audiences,
-    hasDiscount: gym.has_discount,
+    discount: gym.discount && {
+      planName: gym.discount.plan_name,
+      kind: gym.discount.kind,
+      value: Number(gym.discount.value),
+      endsOn: gym.discount.ends_on,
+      fullPrice: Number(gym.discount.full_price),
+      price: Number(gym.discount.price),
+    },
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,
     isRoundTheClock: gym.is_round_the_clock,

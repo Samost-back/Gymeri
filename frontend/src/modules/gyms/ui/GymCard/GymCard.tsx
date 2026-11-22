@@ -1,8 +1,10 @@
 import Image from "next/image";
+import { cx } from "@/shared/lib/classNames";
 import { formatArea, formatPrice } from "@/shared/lib/format";
 import { Icon, Tag } from "@/shared/ui";
 import type { GymListing } from "../../model/types";
 import styles from "./GymCard.module.css";
+import { discountAmount, discountText } from "./discountLabels";
 
 type GymCardProps = {
   gym: GymListing;
@@ -23,10 +25,10 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
         <div className={styles.meta}>
           <span className={styles.chain}>{gym.chainName}</span>
           {gym.isOpenNow && <Tag variant="solid">Відкрито зараз</Tag>}
-          {gym.hasDiscount && (
+          {gym.discount && (
             <Tag variant="solid">
               <Icon name="percent" size={14} />
-              Знижка
+              {discountAmount(gym.discount)}
             </Tag>
           )}
         </div>
@@ -48,7 +50,14 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
           {gym.audiences.length > 0 && (
             <p className={styles.detail}>
               <Icon name="school" size={16} className={styles.detailIcon} />
-              Абонементи для: {gym.audiences.map((audience) => audience.name).join(", ")}
+              Пільгові абонементи:{" "}
+              {gym.audiences.map((audience) => audience.name.toLowerCase()).join(", ")}
+            </p>
+          )}
+          {gym.discount && (
+            <p className={cx(styles.detail, styles.offer)}>
+              <Icon name="percent" size={16} className={styles.detailIcon} />
+              Акція {discountText(gym.discount)}
             </p>
           )}
         </div>
