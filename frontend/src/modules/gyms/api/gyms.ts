@@ -5,6 +5,7 @@ import type {
   ChainCard,
   FilterOptions,
   GymListing,
+  GymMapPoint,
   GymSearchParams,
 } from "../model/types";
 
@@ -35,6 +36,16 @@ type GymListingDto = {
   is_round_the_clock: boolean;
   price_from: string | null;
   photo_url: string | null;
+};
+
+type GymMapPointDto = {
+  slug: string;
+  name: string;
+  chain_name: string;
+  website: string;
+  address: string;
+  latitude: number;
+  longitude: number;
 };
 
 function toPrice(value: string | null): number | null {
@@ -80,5 +91,18 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     isRoundTheClock: gym.is_round_the_clock,
     priceFrom: toPrice(gym.price_from),
     photoUrl: gym.photo_url,
+  }));
+}
+
+export async function getMapPoints(): Promise<GymMapPoint[]> {
+  const points = await apiGet<GymMapPointDto[]>("gyms/map/");
+  return points.map((point) => ({
+    slug: point.slug,
+    name: point.name,
+    chainName: point.chain_name,
+    website: point.website,
+    address: point.address,
+    latitude: point.latitude,
+    longitude: point.longitude,
   }));
 }
