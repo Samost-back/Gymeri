@@ -1,5 +1,5 @@
 import { PageHero } from "@/shared/ui";
-import { CatalogNumbers } from "../CatalogNumbers/CatalogNumbers";
+import { Roadmap } from "../Roadmap/Roadmap";
 
 export function AboutHero() {
   return (
@@ -8,7 +8,7 @@ export function AboutHero() {
       accent="має бути просто."
       lead="Ми збираємо спортзали Луцька в один каталог: адреси, графік роботи, опції й ціни абонементів. Без пошуку по соцмережах і дзвінків адміністратору."
       photoFocus="70% center"
-      aside={<CatalogNumbers />}
+      aside={<Roadmap />}
     />
   );
 }
