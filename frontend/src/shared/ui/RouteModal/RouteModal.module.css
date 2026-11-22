@@ -55,6 +55,35 @@
   }
 }
 
+/* The same centred dialog, sized for content that needs room, like a map. */
+.wide {
+  max-width: 72rem;
+  /* Phones: shorter than the screen, so it still reads as a window over the page. */
+  height: 70dvh;
+  max-height: 52rem;
+  overflow: hidden;
+  /* Lifts the big panel off the blurred page; on the dialog, since its overflow would clip
+     a shadow on the panel inside. */
+  box-shadow: 0 24px 64px rgb(var(--color-shade-rgb) / 0.7);
+}
+
+.wide .panel {
+  height: 100%;
+  padding: 0;
+}
+
+/* Centred on the content's 80px header row, not over the map. */
+.wide .close {
+  top: 1.25rem;
+  right: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .wide {
+    height: calc(100dvh - 2 * var(--space-md));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .dialog[open] {
     animation: none;
