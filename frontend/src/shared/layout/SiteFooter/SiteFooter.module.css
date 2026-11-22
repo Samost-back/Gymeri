@@ -114,8 +114,8 @@
 .toTopIcon {
   display: grid;
   place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 1px solid var(--color-border-strong);
   transition:
     background-color var(--transition-fast),
@@ -155,8 +155,7 @@
   }
 
   /* Here the whole text row is tappable, so the icons shrink to match it. */
-  .contactIcon,
-  .toTopIcon {
+  .contactIcon {
     width: 2.25rem;
     height: 2.25rem;
   }
