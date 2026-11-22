@@ -11,7 +11,7 @@ def test_seed_publishes_only_gyms_with_demo_data():
     published = Gym.objects.filter(is_published=True)
     assert published.count() == 7
     assert set(published.values_list("chain__slug", flat=True)) == {
-        "inter-atletyka",
+        "interatletika",
         "lime-fit-club",
         "sport-life",
     }

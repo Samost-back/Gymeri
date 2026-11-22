@@ -50,6 +50,7 @@ class MapPointSerializer(serializers.Serializer):
     name = serializers.CharField()
     chain_name = serializers.CharField()
     website = serializers.CharField()
+    instagram_url = serializers.CharField()
     address = serializers.CharField()
     # Plain numbers, not decimal strings: map libraries take floats.
     latitude = serializers.FloatField(source="location.latitude")

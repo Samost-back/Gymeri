@@ -63,8 +63,9 @@ export type GymMapPoint = {
   slug: string;
   name: string;
   chainName: string;
-  // The chain's website; empty when it has none.
+  // The chain's links; each is empty when the chain has none.
   website: string;
+  instagramUrl: string;
   address: string;
   latitude: number;
   longitude: number;
