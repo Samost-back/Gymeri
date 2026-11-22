@@ -43,3 +43,14 @@ class GymListingSerializer(serializers.Serializer):
     is_round_the_clock = serializers.BooleanField()
     price_from = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True)
     photo_url = serializers.CharField(allow_null=True)
+
+
+class MapPointSerializer(serializers.Serializer):
+    slug = serializers.CharField()
+    name = serializers.CharField()
+    chain_name = serializers.CharField()
+    website = serializers.CharField()
+    address = serializers.CharField()
+    # Plain numbers, not decimal strings: map libraries take floats.
+    latitude = serializers.FloatField(source="location.latitude")
+    longitude = serializers.FloatField(source="location.longitude")
