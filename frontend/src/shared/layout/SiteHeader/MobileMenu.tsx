@@ -54,10 +54,17 @@ export function MobileMenu() {
               <Icon name="arrow_forward" size={18} />
             </Link>
           ))}
-          <ButtonLink href="/login" className={styles.mobileLogin} onClick={close}>
-            <Icon name="login" size={18} />
-            Увійти
-          </ButtonLink>
+          <div className={styles.mobileActions}>
+            {/* Plain text, not a link, until the map page exists; same as in the desktop header. */}
+            <span className={styles.mobileMap}>
+              <Icon name="location_on" size={18} />
+              Карта
+            </span>
+            <ButtonLink href="/login" className={styles.mobileLogin} onClick={close}>
+              <Icon name="login" size={18} />
+              Увійти
+            </ButtonLink>
+          </div>
         </nav>
       )}
     </>

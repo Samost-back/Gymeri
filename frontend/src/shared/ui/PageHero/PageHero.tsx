@@ -15,8 +15,8 @@ type PageHeroProps = {
   photoFocus?: string;
   // Right column on wide screens (e.g. a list); below the text on phones.
   aside?: ReactNode;
-  // Full-width row pinned to the bottom of the banner, e.g. key figures.
-  footer?: ReactNode;
+  // Lower banner for pages whose main content (e.g. a search) should start on the first screen.
+  compact?: boolean;
 };
 
 // Opening banner of inner pages: one height and shade everywhere, lower than the home hero,
@@ -28,10 +28,10 @@ export function PageHero({
   action,
   photoFocus,
   aside,
-  footer,
+  compact = false,
 }: PageHeroProps) {
   return (
-    <section className={styles.hero}>
+    <section className={cx(styles.hero, compact && styles.compact)}>
       <PhotoBackdrop focus={photoFocus} />
       <Container className={cx(styles.content, aside != null && styles.withAside)}>
         <div>
@@ -49,7 +49,6 @@ export function PageHero({
         </div>
         {aside}
       </Container>
-      {footer && <Container className={styles.footer}>{footer}</Container>}
     </section>
   );
 }

@@ -35,12 +35,6 @@
   margin-top: var(--space-lg);
 }
 
-.footer {
-  position: relative;
-  width: 100%;
-  padding-bottom: var(--space-xl);
-}
-
 @media (min-width: 768px) {
   .content {
     padding-block: var(--space-3xl) var(--space-xl);
@@ -49,6 +43,18 @@
   .title {
     font-size: 64px;
     font-weight: 800;
+  }
+}
+
+/* Two classes, so it wins over the plain .title sizes above and below whatever the order. */
+@media (min-width: 768px) {
+  .compact .content {
+    padding-block: 5rem 0;
+  }
+
+  .compact .title {
+    margin-bottom: var(--space-lg);
+    font-size: 56px;
   }
 }
 
@@ -61,5 +67,12 @@
 
   .title {
     font-size: 72px;
+  }
+}
+
+/* Phones: the aside sits right under the text, so the full column gap reads as a break. */
+@media (max-width: 767px) {
+  .withAside {
+    gap: var(--space-lg);
   }
 }

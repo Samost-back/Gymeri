@@ -35,4 +35,14 @@
   --page-margin: 3rem;
 
   --transition-fast: 150ms ease;
+
+  /* Sticky header height; full-screen sections subtract it to end exactly at the screen bottom.
+     Shorter on phones, to leave more of the small screen for content. */
+  --header-height: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 5rem;
+  }
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { CabinetSections, MembershipPreview } from "@/modules/accounts";
 import { GymSearchResults } from "@/modules/gyms";
 import { ButtonLink, Icon, PageHeader, PageHero, PageMain } from "@/shared/ui";
 
@@ -23,8 +22,7 @@ export default function AccountPage({ searchParams }: PageProps<"/account">) {
           </ButtonLink>
         }
         photoFocus="30% center"
-        aside={<MembershipPreview />}
-        footer={<CabinetSections />}
+        compact
       />
       <PageMain>
         <section>
