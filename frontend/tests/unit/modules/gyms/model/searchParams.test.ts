@@ -9,7 +9,7 @@ import {
 describe("parseSearchParams", () => {
   it("reads every filter from the URL", () => {
     const params = parseSearchParams({
-      district: "center",
+      street: "voli",
       chain: "ia",
       amenity: ["pool", "strength"],
       open_now: "true",
@@ -18,7 +18,7 @@ describe("parseSearchParams", () => {
     });
 
     expect(params).toEqual({
-      district: "center",
+      street: "voli",
       chain: "ia",
       amenities: ["pool", "strength"],
       openNow: true,
@@ -43,7 +43,7 @@ describe("parseSearchParams", () => {
 describe("toQuery", () => {
   it("leaves defaults out, so the backend gets only active filters", () => {
     expect(toQuery(EMPTY_SEARCH)).toEqual({
-      district: undefined,
+      street: undefined,
       chain: undefined,
       amenity: [],
       open_now: undefined,
@@ -59,9 +59,9 @@ describe("gymsHref", () => {
   });
 
   it("repeats the amenity key for each selected amenity", () => {
-    const href = gymsHref({ ...EMPTY_SEARCH, district: "center", amenities: ["pool", "sauna"] });
+    const href = gymsHref({ ...EMPTY_SEARCH, street: "voli", amenities: ["pool", "sauna"] });
 
-    expect(href).toBe("/account?district=center&amenity=pool&amenity=sauna");
+    expect(href).toBe("/account?street=voli&amenity=pool&amenity=sauna");
   });
 
   it("builds a link that parses back to the same filters", () => {

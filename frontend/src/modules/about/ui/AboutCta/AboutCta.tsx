@@ -7,7 +7,7 @@ export function AboutCta() {
     <section className={styles.cta}>
       <div>
         <h2 className={styles.title}>Знайди свій зал</h2>
-        <p className={styles.text}>Район, опції, графік і ціни. Займе хвилину.</p>
+        <p className={styles.text}>Вулиця, опції, графік і ціни. Займе хвилину.</p>
       </div>
       <ButtonLink href="/account" className={styles.button}>
         Перейти до пошуку

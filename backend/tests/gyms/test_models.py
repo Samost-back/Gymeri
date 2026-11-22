@@ -4,15 +4,15 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 
-from gyms.models import Chain, District, Gym, MembershipPlan, OpeningHours, PlanAccessWindow
+from gyms.models import Chain, Gym, MembershipPlan, OpeningHours, PlanAccessWindow, Street
 
 
 @pytest.fixture
 def gym() -> Gym:
     chain = Chain.objects.create(name="Interatletyka", slug="interatletyka")
-    district = District.objects.create(name="Center", slug="center")
+    street = Street.objects.create(name="просп. Волі", slug="voli")
     return Gym.objects.create(
-        chain=chain, district=district, name="Interatletyka Center", slug="ia-center", address="x"
+        chain=chain, street=street, name="Interatletyka Center", slug="ia-center", building="1"
     )
 
 

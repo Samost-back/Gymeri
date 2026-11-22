@@ -1,7 +1,7 @@
 export type CatalogStats = {
   gyms: number;
   chains: number;
-  districts: number;
+  streets: number;
 };
 
 export type FilterOption = {
@@ -10,7 +10,7 @@ export type FilterOption = {
 };
 
 export type FilterOptions = {
-  districts: FilterOption[];
+  streets: FilterOption[];
   amenities: FilterOption[];
 };
 
@@ -21,7 +21,7 @@ export type ChainCard = {
   description: string;
   logoUrl: string | null;
   locationsCount: number;
-  districts: string[];
+  streets: string[];
   priceFrom: number | null;
 };
 
@@ -30,7 +30,7 @@ export type GymListing = {
   name: string;
   chainSlug: string;
   chainName: string;
-  district: string;
+  street: string;
   address: string;
   highlight: string;
   areaM2: number | null;
@@ -51,7 +51,7 @@ export const SORT_OPTIONS = [
 export type SortCode = (typeof SORT_OPTIONS)[number]["code"];
 
 export type GymSearchParams = {
-  district?: string;
+  street?: string;
   chain?: string;
   amenities: string[];
   openNow: boolean;

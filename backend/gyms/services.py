@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from .exceptions import GymNotPublishable, InvalidFilter
 from .geo import GeoPoint
-from .models import Amenity, Chain, District, Gym, MembershipPlan
+from .models import Amenity, Chain, Gym, MembershipPlan, Street
 from .pricing import PlanPrice, PriceList
 from .schedule import TimeInterval, WeeklySchedule
 from .search import GymListing, GymSearchCriteria
@@ -29,7 +29,7 @@ def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
 class CatalogStats:
     gyms: int
     chains: int
-    districts: int
+    streets: int
 
 
 @dataclass(frozen=True)
@@ -40,7 +40,7 @@ class FilterOption:
 
 @dataclass(frozen=True)
 class FilterOptions:
-    districts: list[FilterOption]
+    streets: list[FilterOption]
     amenities: list[FilterOption]
 
 
@@ -52,7 +52,7 @@ class ChainCard:
     description: str
     logo_url: str | None
     locations_count: int
-    districts: list[str]
+    streets: list[str]
     # Cheapest active monthly plan; None when the chain has not published monthly prices.
     price_from: Decimal | None
 
@@ -76,14 +76,14 @@ class CatalogService:
         totals = self._published_gyms().aggregate(
             gyms=Count("id"),
             chains=Count("chain", distinct=True),
-            districts=Count("district", distinct=True),
+            streets=Count("street", distinct=True),
         )
         return CatalogStats(**totals)
 
     def get_filter_options(self) -> FilterOptions:
         """Only values that lead to at least one published gym, so no filter returns nothing."""
         return FilterOptions(
-            districts=self._options(District.objects.filter(gyms__is_published=True)),
+            streets=self._options(Street.objects.filter(gyms__is_published=True)),
             amenities=self._options(Amenity.objects.filter(gyms__is_published=True)),
         )
 
@@ -94,7 +94,7 @@ class CatalogService:
             .prefetch_related(
                 Prefetch(
                     "gyms",
-                    queryset=self._published_gyms().select_related("district"),
+                    queryset=self._published_gyms().select_related("street"),
                     to_attr="published_gyms",
                 )
             )
@@ -104,7 +104,7 @@ class CatalogService:
 
     def list_map_points(self) -> list[MapPoint]:
         # The published_gym_has_location constraint guarantees every one of them has a point.
-        gyms = self._published_gyms().select_related("chain")
+        gyms = self._published_gyms().select_related("chain", "street")
         return [
             MapPoint(
                 slug=gym.slug,
@@ -123,7 +123,7 @@ class CatalogService:
         return Gym.objects.filter(is_published=True)
 
     @staticmethod
-    def _options(queryset: QuerySet[District] | QuerySet[Amenity]) -> list[FilterOption]:
+    def _options(queryset: QuerySet[Street] | QuerySet[Amenity]) -> list[FilterOption]:
         return [FilterOption(slug=o.slug, name=o.name) for o in queryset.distinct()]
 
     @staticmethod
@@ -135,7 +135,7 @@ class CatalogService:
             description=chain.description,
             logo_url=chain.logo.url if chain.logo else None,
             locations_count=chain.locations_count,
-            districts=sorted({gym.district.name for gym in chain.published_gyms}),
+            streets=sorted({gym.street.name for gym in chain.published_gyms}),
             price_from=prices.monthly_from(),
         )
 
@@ -154,7 +154,7 @@ class GymSearchService:
         return criteria.sort.sort(matching)
 
     def _filtered_gyms(self, criteria: GymSearchCriteria) -> QuerySet[Gym]:
-        self._ensure_exists(District, criteria.district, "district")
+        self._ensure_exists(Street, criteria.street, "street")
         self._ensure_exists(Chain, criteria.chain, "chain")
         known = set(
             Amenity.objects.filter(slug__in=criteria.amenities).values_list("slug", flat=True)
@@ -163,19 +163,19 @@ class GymSearchService:
             raise InvalidFilter(f"Unknown amenities: {sorted(unknown)}")
 
         gyms = Gym.objects.filter(is_published=True)
-        if criteria.district:
-            gyms = gyms.filter(district__slug=criteria.district)
+        if criteria.street:
+            gyms = gyms.filter(street__slug=criteria.street)
         if criteria.chain:
             gyms = gyms.filter(chain__slug=criteria.chain)
         # One filter per amenity: the gym must have all of them, not any.
         for amenity in criteria.amenities:
             gyms = gyms.filter(amenities__slug=amenity)
-        return gyms.select_related("chain", "district").prefetch_related(
+        return gyms.select_related("chain", "street").prefetch_related(
             "amenities", "opening_hours", "photos"
         )
 
     @staticmethod
-    def _ensure_exists(model: type[District] | type[Chain], slug: str | None, name: str) -> None:
+    def _ensure_exists(model: type[Street] | type[Chain], slug: str | None, name: str) -> None:
         if slug and not model.objects.filter(slug=slug).exists():
             raise InvalidFilter(f"Unknown {name}: {slug}")
 
@@ -193,7 +193,7 @@ class GymSearchService:
             name=gym.name,
             chain_slug=gym.chain.slug,
             chain_name=gym.chain.name,
-            district=gym.district.name,
+            street=gym.street.name,
             address=gym.address,
             highlight=gym.highlight,
             area_m2=gym.area_m2,

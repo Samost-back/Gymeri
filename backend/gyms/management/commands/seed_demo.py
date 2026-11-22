@@ -5,11 +5,11 @@ from gyms import demo_data
 from gyms.models import (
     Amenity,
     Chain,
-    District,
     Gym,
     MembershipPlan,
     OpeningHours,
     PlanAccessWindow,
+    Street,
 )
 
 
@@ -18,9 +18,11 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options) -> None:
-        districts = {
-            key: District.objects.update_or_create(slug=key, defaults={"name": name})[0]
-            for key, name in demo_data.DISTRICTS.items()
+        # Matched by name: the 0004 migration created streets from old addresses with
+        # placeholder slugs, and this gives them the real ones.
+        streets = {
+            key: Street.objects.update_or_create(name=name, defaults={"slug": key})[0]
+            for key, name in demo_data.STREETS.items()
         }
         amenities = {
             key: Amenity.objects.update_or_create(slug=key, defaults={"name": name})[0]
@@ -38,7 +40,7 @@ class Command(BaseCommand):
             for plan_data in plans:
                 self._save_plan(chain, plan_data)
             for gym_data in gyms:
-                self._save_gym(chain, gym_data, districts, amenities)
+                self._save_gym(chain, gym_data, streets, amenities)
 
         self.stdout.write(self.style.SUCCESS("Demo data loaded."))
 
@@ -58,13 +60,13 @@ class Command(BaseCommand):
         self,
         chain: Chain,
         gym_data: dict,
-        districts: dict[str, District],
+        streets: dict[str, Street],
         amenities: dict[str, Amenity],
     ) -> None:
         fields = {**gym_data}
         hours = fields.pop("hours", {})
         amenity_keys = fields.pop("amenities", [])
-        fields["district"] = districts[fields["district"]]
+        fields["street"] = streets[fields["street"]]
         fields.setdefault("is_published", True)
 
         gym, _ = Gym.objects.update_or_create(

@@ -36,18 +36,18 @@ export function GymFilters({ options, params, showSort = false }: GymFiltersProp
       </div>
 
       <div className={styles.group}>
-        <span className={styles.groupLabel}>[Район]</span>
+        <span className={styles.groupLabel}>[Вулиця]</span>
         <div className={styles.chips}>
-          <Chip href={gymsHref({ ...params, district: undefined })} active={!params.district}>
-            Всі райони
+          <Chip href={gymsHref({ ...params, street: undefined })} active={!params.street}>
+            Всі вулиці
           </Chip>
-          {options.districts.map((district) => (
+          {options.streets.map((street) => (
             <Chip
-              key={district.slug}
-              href={gymsHref({ ...params, district: district.slug })}
-              active={params.district === district.slug}
+              key={street.slug}
+              href={gymsHref({ ...params, street: street.slug })}
+              active={params.street === street.slug}
             >
-              {district.name}
+              {street.name}
             </Chip>
           ))}
         </div>

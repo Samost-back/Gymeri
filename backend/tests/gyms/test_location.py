@@ -6,7 +6,7 @@ from django.db import IntegrityError
 
 from gyms.exceptions import GymNotPublishable, InvalidLocation
 from gyms.geo import GeoPoint
-from gyms.models import Chain, District, Gym
+from gyms.models import Chain, Gym, Street
 from gyms.services import GymPublishingService
 
 
@@ -44,22 +44,22 @@ def chain() -> Chain:
 
 
 @pytest.fixture
-def district() -> District:
-    return District.objects.create(name="Центр", slug="center")
+def street() -> Street:
+    return Street.objects.create(name="просп. Волі", slug="voli")
 
 
 @pytest.mark.django_db
-def test_admin_refuses_to_publish_a_gym_without_location(chain, district, rf, admin_user):
+def test_admin_refuses_to_publish_a_gym_without_location(chain, street, rf, admin_user):
     request = rf.get("/")
     request.user = admin_user
     form_class = admin.site.get_model_admin(Gym).get_form(request)
     form = form_class(
         data={
             "chain": chain.pk,
-            "district": district.pk,
+            "street": street.pk,
             "name": "New",
             "slug": "new",
-            "address": "x",
+            "building": "1",
             "is_published": True,
         }
     )
@@ -69,9 +69,9 @@ def test_admin_refuses_to_publish_a_gym_without_location(chain, district, rf, ad
 
 
 @pytest.mark.django_db
-def test_database_refuses_a_published_gym_without_location(chain, district):
+def test_database_refuses_a_published_gym_without_location(chain, street):
     # Seeds and the shell skip the admin form; the constraint still holds there.
     with pytest.raises(IntegrityError):
         Gym.objects.create(
-            chain=chain, district=district, name="New", slug="new", address="x", is_published=True
+            chain=chain, street=street, name="New", slug="new", building="1", is_published=True
         )

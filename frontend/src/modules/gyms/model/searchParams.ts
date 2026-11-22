@@ -25,7 +25,7 @@ function isSortCode(value: string | undefined): value is SortCode {
 export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
   const sort = first(raw.sort);
   return {
-    district: first(raw.district),
+    street: first(raw.street),
     chain: first(raw.chain),
     amenities: [raw.amenity ?? []].flat(),
     openNow: first(raw.open_now) === "true",
@@ -36,7 +36,7 @@ export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
 
 export function toQuery(params: GymSearchParams): Record<string, QueryValue> {
   return {
-    district: params.district,
+    street: params.street,
     chain: params.chain,
     amenity: params.amenities,
     open_now: params.openNow ? "true" : undefined,

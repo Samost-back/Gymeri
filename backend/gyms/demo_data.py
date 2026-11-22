@@ -1,9 +1,8 @@
 """Demo dataset for the coursework defence: Interatletika gyms in Lutsk plus competitors.
 
 Source: interatletika.lutsk.ua and public listings, November 2026.
-Districts are approximate and need checking before the defence.
-Coordinates come from OpenStreetMap building matches. Pysarevskoho Street, Lime Fit Club's
-address, is now Olimpiiska Street, so its point is Olimpiiska, 3.
+Coordinates come from OpenStreetMap building matches. Lime Fit Club's street was renamed
+from Pysarevskoho to Olimpiiska, so it is listed under the new name.
 """
 
 from decimal import Decimal
@@ -11,13 +10,18 @@ from decimal import Decimal
 MON_SAT = range(6)
 SUNDAY = 6
 
-DISTRICTS = {
-    "center": "Центр",
-    "33": "33-й мікрорайон",
-    "40": "40-й мікрорайон",
-    "south": "Південний",
-    "lviv-road": "Львівська / ЛНТУ",
-    "vidrodzhennia": "Відродження",
+STREETS = {
+    "yaremchuka": "вул. Назарія Яремчука",
+    "koniakina": "вул. Конякіна",
+    "dubnivska": "вул. Дубнівська",
+    "lvivska": "вул. Львівська",
+    "voli": "просп. Волі",
+    "sobornosti": "просп. Соборності",
+    "olimpiiska": "вул. Олімпійська",
+    "kovelska": "вул. Ковельська",
+    "lesi-ukrainky": "вул. Лесі Українки",
+    "moiseia": "просп. Василя Мойсея",
+    "elektroaparatna": "вул. Електроапаратна",
 }
 
 AMENITIES = {
@@ -86,9 +90,9 @@ CHAINS = [
                 "slug": "interatletika-yaremchuka",
                 "name": "Interatletika на Яремчука",
                 "highlight": "ТЦ «Глобус»",
-                "address": "вул. Назарія Яремчука, 11",
+                "street": "yaremchuka",
+                "building": "11",
                 **location("50.769619", "25.370824"),
-                "district": "40",
                 "phone": "+380990888031",
                 "amenities": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
@@ -96,9 +100,9 @@ CHAINS = [
             {
                 "slug": "interatletika-koniakina",
                 "name": "Interatletika на Конякіна",
-                "address": "вул. Конякіна, 14",
+                "street": "koniakina",
+                "building": "14",
                 **location("50.774899", "25.361431"),
-                "district": "33",
                 "phone": "+380332719793",
                 "amenities": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
@@ -106,9 +110,9 @@ CHAINS = [
             {
                 "slug": "interatletika-dubnivska",
                 "name": "Interatletika на Дубнівській",
-                "address": "вул. Дубнівська, 15",
+                "street": "dubnivska",
+                "building": "15",
                 **location("50.741603", "25.359210"),
-                "district": "south",
                 "phone": "+380990888192",
                 "amenities": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
@@ -117,9 +121,9 @@ CHAINS = [
                 "slug": "interatletika-lvivska",
                 "name": "Interatletika на Львівській",
                 "highlight": "Спорткомплекс ЛНТУ · басейн",
-                "address": "вул. Львівська, 75",
+                "street": "lvivska",
+                "building": "75",
                 **location("50.725652", "25.297581"),
-                "district": "lviv-road",
                 "phone": "+380950935260",
                 "amenities": ["strength", "pool"],
                 "hours": {
@@ -131,9 +135,9 @@ CHAINS = [
                 "slug": "interatletika-voli",
                 "name": "Interatletika на Волі",
                 "highlight": "ТЦ «Гранд Волинь»",
-                "address": "просп. Волі, 42",
+                "street": "voli",
+                "building": "42",
                 **location("50.745126", "25.339579"),
-                "district": "center",
                 "phone": "+380994052626",
                 "amenities": ["strength"],
                 "hours": standard_hours(sunday=("10:00", "20:00")),
@@ -142,9 +146,9 @@ CHAINS = [
                 # Hidden until its phone and schedule are confirmed.
                 "slug": "interatletika-sobornosti",
                 "name": "Interatletika на Соборності",
-                "address": "просп. Соборності, 30",
+                "street": "sobornosti",
+                "building": "30",
                 **location("50.759921", "25.362440"),
-                "district": "33",
                 "amenities": ["strength"],
                 "is_published": False,
             },
@@ -171,11 +175,11 @@ CHAINS = [
         ],
         "gyms": [
             {
-                "slug": "lime-fit-club-pysarevskoho",
+                "slug": "lime-fit-club-olimpiiska",
                 "name": "Lime Fit Club",
-                "address": "вул. Писаревського, 3",
+                "street": "olimpiiska",
+                "building": "3",
                 **location("50.759336", "25.380439"),
-                "district": "center",
                 "phone": "+380670000325",
                 "amenities": ["strength", "pool"],
                 "hours": {
@@ -195,9 +199,9 @@ CHAINS = [
             {
                 "slug": "mojo-fitness-kovelska",
                 "name": "MOJO FITNESS",
-                "address": "вул. Ковельська, 16",
+                "street": "kovelska",
+                "building": "16",
                 **location("50.742592", "25.314395"),
-                "district": "center",
                 "phone": "+380633292886",
                 "amenities": ["strength"],
                 "is_published": False,
@@ -211,9 +215,9 @@ CHAINS = [
             {
                 "slug": "gravity-space-lesi-ukrainky",
                 "name": "Gravity Space",
-                "address": "вул. Лесі Українки, 52",
+                "street": "lesi-ukrainky",
+                "building": "52",
                 **location("50.745284", "25.323897"),
-                "district": "center",
                 "phone": "+380967759988",
                 "amenities": ["strength"],
                 "is_published": False,
@@ -242,9 +246,9 @@ CHAINS = [
             {
                 "slug": "sport-life-moiseia",
                 "name": "Sport Life",
-                "address": "просп. Василя Мойсея, 7А",
+                "street": "moiseia",
+                "building": "7А",
                 **location("50.753962", "25.337427"),
-                "district": "center",
                 "phone": "+380332280493",
                 "highlight": "Аквазона · три басейни",
                 "amenities": ["strength", "pool"],
@@ -264,9 +268,9 @@ CHAINS = [
             {
                 "slug": "maximus-elektroaparatna",
                 "name": "Maximus",
-                "address": "вул. Електроапаратна, 4",
+                "street": "elektroaparatna",
+                "building": "4",
                 **location("50.739928", "25.378323"),
-                "district": "vidrodzhennia",
                 "phone": "+380664669626",
                 "amenities": ["strength", "pool"],
                 "is_published": False,

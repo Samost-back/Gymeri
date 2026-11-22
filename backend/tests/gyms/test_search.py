@@ -12,8 +12,8 @@ def listing(name: str, price: str | None = None, area: int | None = None) -> Gym
         name=name,
         chain_slug="ia",
         chain_name="IA",
-        district="Центр",
-        address="x",
+        street="просп. Волі",
+        address="просп. Волі, 1",
         highlight="",
         area_m2=area,
         amenities=[],
@@ -29,7 +29,7 @@ def test_criteria_default_to_sort_by_name_without_filters():
     criteria = GymSearchCriteria.from_query({}, amenities=[])
 
     assert criteria.sort.code == "name"
-    assert criteria.district is None
+    assert criteria.street is None
     assert not criteria.open_now
 
 

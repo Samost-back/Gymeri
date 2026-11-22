@@ -17,7 +17,7 @@ type ChainCardDto = {
   description: string;
   logo_url: string | null;
   locations_count: number;
-  districts: string[];
+  streets: string[];
   price_from: string | null;
 };
 
@@ -26,7 +26,7 @@ type GymListingDto = {
   name: string;
   chain_slug: string;
   chain_name: string;
-  district: string;
+  street: string;
   address: string;
   highlight: string;
   area_m2: number | null;
@@ -70,7 +70,7 @@ export async function getChains(): Promise<ChainCard[]> {
     description: chain.description,
     logoUrl: chain.logo_url,
     locationsCount: chain.locations_count,
-    districts: chain.districts,
+    streets: chain.streets,
     priceFrom: toPrice(chain.price_from),
   }));
 }
@@ -82,7 +82,7 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     name: gym.name,
     chainSlug: gym.chain_slug,
     chainName: gym.chain_name,
-    district: gym.district,
+    street: gym.street,
     address: gym.address,
     highlight: gym.highlight,
     areaM2: gym.area_m2,

@@ -5,6 +5,15 @@ import { EMPTY_SEARCH, gymsHref } from "../../model/searchParams";
 import type { ChainCard as ChainCardData } from "../../model/types";
 import styles from "./ChainCard.module.css";
 
+// A chain in many places would otherwise list a whole line of streets on a phone.
+const STREETS_SHOWN = 3;
+
+function streetsSummary(streets: string[]): string {
+  const shown = streets.slice(0, STREETS_SHOWN).join(" · ");
+  const rest = streets.length - STREETS_SHOWN;
+  return rest > 0 ? `${shown} та ще ${rest}` : shown;
+}
+
 type ChainCardProps = {
   chain: ChainCardData;
   position: number;
@@ -56,7 +65,7 @@ export function ChainCard({ chain, position }: ChainCardProps) {
             <div className={styles.presence}>
               <Icon name="domain" />
               <span className={styles.locations}>{locations} в Луцьку</span>
-              <span className={styles.districts}>{chain.districts.join(" · ")}</span>
+              <span className={styles.streets}>{streetsSummary(chain.streets)}</span>
             </div>
           </div>
 

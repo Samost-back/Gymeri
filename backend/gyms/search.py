@@ -16,7 +16,7 @@ class GymListing:
     name: str
     chain_slug: str
     chain_name: str
-    district: str
+    street: str
     address: str
     highlight: str
     area_m2: int | None
@@ -71,7 +71,7 @@ FALSE_VALUES = {"false", "0", ""}
 
 @dataclass(frozen=True)
 class GymSearchCriteria:
-    district: str | None = None
+    street: str | None = None
     chain: str | None = None
     amenities: frozenset[str] = field(default_factory=frozenset)
     open_now: bool = False
@@ -85,7 +85,7 @@ class GymSearchCriteria:
         if sort_code not in SORT_STRATEGIES:
             raise InvalidFilter(f"Unknown sort: {sort_code}")
         return cls(
-            district=params.get("district") or None,
+            street=params.get("street") or None,
             chain=params.get("chain") or None,
             amenities=frozenset(amenities),
             open_now=cls._parse_flag(params, "open_now"),

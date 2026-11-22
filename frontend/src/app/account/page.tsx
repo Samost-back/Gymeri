@@ -5,7 +5,7 @@ import { ButtonLink, Icon, PageHeader, PageHero, PageMain } from "@/shared/ui";
 
 export const metadata: Metadata = {
   title: "Мій кабінет — пошук залів і абонементи · Gymeri",
-  description: "Пошук спортзалів Луцька за районом, опціями й графіком та відстеження абонемента.",
+  description: "Пошук спортзалів Луцька за вулицею, опціями й графіком та відстеження абонемента.",
 };
 
 export default function AccountPage({ searchParams }: PageProps<"/account">) {

@@ -45,11 +45,6 @@
   font-weight: 700;
 }
 
-.district {
-  composes: labelXs from "@/shared/styles/typography.module.css";
-  color: var(--color-text-subtle);
-}
-
 .name {
   composes: headlineSm from "@/shared/styles/typography.module.css";
   color: var(--color-primary);

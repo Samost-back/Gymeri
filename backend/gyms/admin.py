@@ -9,17 +9,17 @@ from .exceptions import GymsError
 from .models import (
     Amenity,
     Chain,
-    District,
     Gym,
     GymPhoto,
     MembershipPlan,
     OpeningHours,
     PlanAccessWindow,
+    Street,
 )
 from .services import GymPublishingService
 
 
-@admin.register(District, Amenity)
+@admin.register(Street, Amenity)
 class DictionaryAdmin(admin.ModelAdmin):
     list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
@@ -80,10 +80,10 @@ class GymAdminForm(forms.ModelForm):
 @admin.register(Gym)
 class GymAdmin(admin.ModelAdmin):
     form = GymAdminForm
-    list_display = ["name", "chain", "district", "is_published"]
-    list_filter = ["is_published", "chain", "district"]
-    list_select_related = ["chain", "district"]
-    search_fields = ["name", "address"]
+    list_display = ["name", "chain", "street", "is_published"]
+    list_filter = ["is_published", "chain", "street"]
+    list_select_related = ["chain", "street"]
+    search_fields = ["name", "street__name"]
     prepopulated_fields = {"slug": ["name"]}
     filter_horizontal = ["amenities"]
     inlines = [OpeningHoursInline, GymPhotoInline]

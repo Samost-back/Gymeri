@@ -23,7 +23,7 @@ export function HeroStatsList({ stats }: { stats?: CatalogStats }) {
     },
     {
       label: "Охоплення",
-      value: value(stats?.districts, { one: "район", few: "райони", many: "районів" }),
+      value: value(stats?.streets, { one: "вулиця", few: "вулиці", many: "вулиць" }),
     },
   ];
 

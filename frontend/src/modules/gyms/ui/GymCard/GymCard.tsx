@@ -20,7 +20,6 @@ export function GymCard({ gym }: GymCardProps) {
       <div className={styles.body}>
         <div className={styles.meta}>
           <span className={styles.chain}>{gym.chainName}</span>
-          <span className={styles.district}>{gym.district}</span>
           {gym.isOpenNow && <Tag variant="solid">Відкрито зараз</Tag>}
         </div>
 

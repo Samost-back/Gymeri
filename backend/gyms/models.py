@@ -13,7 +13,10 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class District(models.Model):
+class Street(models.Model):
+    """A street gyms stand on; picked from a list, so one street never shows up twice."""
+
+    # With the type prefix, as people say it: "вул. Конякіна", "просп. Волі".
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
 
@@ -62,13 +65,14 @@ class Gym(TimeStampedModel):
     """One physical location of a chain."""
 
     chain = models.ForeignKey(Chain, on_delete=models.PROTECT, related_name="gyms")
-    district = models.ForeignKey(District, on_delete=models.PROTECT, related_name="gyms")
+    street = models.ForeignKey(Street, on_delete=models.PROTECT, related_name="gyms")
     amenities = models.ManyToManyField(Amenity, blank=True, related_name="gyms")
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=150, unique=True)
     highlight = models.CharField(max_length=100, blank=True)
-    address = models.CharField(max_length=255)
+    # House number with its letter or block, e.g. "7А".
+    building = models.CharField(max_length=20)
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
@@ -111,6 +115,10 @@ class Gym(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def address(self) -> str:
+        return f"{self.street.name}, {self.building}"
 
 
 class OpeningHours(models.Model):
