@@ -33,7 +33,7 @@ AUDIENCES = {
 }
 
 # Gym types users filter by; kept short on purpose, a gym usually has two or three.
-AMENITIES = {
+GYM_TYPES = {
     "strength": "Тренажерний зал",
     "crossfit": "Кросфіт",
     "fitness": "Фітнес",
@@ -122,7 +122,7 @@ CHAINS = [
                 "building": "11",
                 **location("50.769619", "25.370824"),
                 "phone": "+380990888031",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
@@ -132,7 +132,7 @@ CHAINS = [
                 "building": "14",
                 **location("50.774899", "25.361431"),
                 "phone": "+380332719793",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
@@ -142,7 +142,7 @@ CHAINS = [
                 "building": "15",
                 **location("50.741603", "25.359210"),
                 "phone": "+380990888192",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
@@ -153,7 +153,7 @@ CHAINS = [
                 "building": "75",
                 **location("50.725652", "25.297581"),
                 "phone": "+380950935260",
-                "amenities": ["strength", "pool"],
+                "types": ["strength", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:30", "21:00")),
                     5: ("07:30", "20:00"),
@@ -167,7 +167,7 @@ CHAINS = [
                 "building": "42",
                 **location("50.745126", "25.339579"),
                 "phone": "+380994052626",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("10:00", "20:00")),
             },
             {
@@ -177,7 +177,7 @@ CHAINS = [
                 "street": "sobornosti",
                 "building": "30",
                 **location("50.759921", "25.362440"),
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -209,7 +209,7 @@ CHAINS = [
                 "building": "3",
                 **location("50.759336", "25.380439"),
                 "phone": "+380670000325",
-                "amenities": ["strength", "crossfit", "fitness", "pool"],
+                "types": ["strength", "crossfit", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("09:00", "20:00"),
@@ -231,7 +231,7 @@ CHAINS = [
                 "building": "16",
                 **location("50.742592", "25.314395"),
                 "phone": "+380633292886",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -247,7 +247,7 @@ CHAINS = [
                 "building": "52",
                 **location("50.745284", "25.323897"),
                 "phone": "+380967759988",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -279,7 +279,7 @@ CHAINS = [
                 **location("50.753962", "25.337427"),
                 "phone": "+380332280493",
                 "highlight": "Аквазона · три басейни",
-                "amenities": ["strength", "fitness", "pool"],
+                "types": ["strength", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("08:00", "21:00"),
@@ -300,7 +300,7 @@ CHAINS = [
                 "building": "4",
                 **location("50.739928", "25.378323"),
                 "phone": "+380664669626",
-                "amenities": ["strength", "fitness", "pool"],
+                "types": ["strength", "fitness", "pool"],
                 "is_published": False,
             },
         ],

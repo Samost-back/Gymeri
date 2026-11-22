@@ -11,7 +11,7 @@ describe("parseSearchParams", () => {
     const params = parseSearchParams({
       street: "voli",
       chain: "ia",
-      amenity: ["pool", "strength"],
+      type: ["pool", "strength"],
       audience: "students",
       discount: "true",
       open_now: "true",
@@ -22,7 +22,7 @@ describe("parseSearchParams", () => {
     expect(params).toEqual({
       street: "voli",
       chain: "ia",
-      amenities: ["pool", "strength"],
+      types: ["pool", "strength"],
       audience: "students",
       discount: true,
       openNow: true,
@@ -31,8 +31,8 @@ describe("parseSearchParams", () => {
     });
   });
 
-  it("accepts a single amenity as a plain string", () => {
-    expect(parseSearchParams({ amenity: "pool" }).amenities).toEqual(["pool"]);
+  it("accepts a single gym type as a plain string", () => {
+    expect(parseSearchParams({ type: "pool" }).types).toEqual(["pool"]);
   });
 
   it("falls back to sorting by name for an unknown sort", () => {
@@ -49,7 +49,7 @@ describe("toQuery", () => {
     expect(toQuery(EMPTY_SEARCH)).toEqual({
       street: undefined,
       chain: undefined,
-      amenity: [],
+      type: [],
       audience: undefined,
       discount: undefined,
       open_now: undefined,
@@ -64,10 +64,10 @@ describe("gymsHref", () => {
     expect(gymsHref(EMPTY_SEARCH)).toBe("/account");
   });
 
-  it("repeats the amenity key for each selected amenity", () => {
-    const href = gymsHref({ ...EMPTY_SEARCH, street: "voli", amenities: ["pool", "sauna"] });
+  it("repeats the type key for each selected gym type", () => {
+    const href = gymsHref({ ...EMPTY_SEARCH, street: "voli", types: ["pool", "sauna"] });
 
-    expect(href).toBe("/account?street=voli&amenity=pool&amenity=sauna");
+    expect(href).toBe("/account?street=voli&type=pool&type=sauna");
   });
 
   it("builds a link that parses back to the same filters", () => {

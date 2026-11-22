@@ -9,7 +9,7 @@ from django.utils import timezone
 from .discounts import make_discount
 from .exceptions import GymNotPublishable, InvalidDiscount, InvalidFilter
 from .geo import GeoPoint
-from .models import Amenity, Audience, Chain, Gym, MembershipPlan, Street
+from .models import Audience, Chain, Gym, GymType, MembershipPlan, Street
 from .pricing import PlanPrice, PriceList
 from .schedule import TimeInterval, WeeklySchedule
 from .search import GymListing, GymSearchCriteria, Label
@@ -54,7 +54,7 @@ class FilterOption:
 class FilterOptions:
     streets: list[FilterOption]
     chains: list[FilterOption]
-    amenities: list[FilterOption]
+    types: list[FilterOption]
     audiences: list[FilterOption]
 
 
@@ -108,7 +108,7 @@ class CatalogService:
         return FilterOptions(
             streets=self._options(Street.objects.filter(gyms__is_published=True)),
             chains=self._options(Chain.objects.filter(gyms__is_published=True)),
-            amenities=self._options(Amenity.objects.filter(gyms__is_published=True)),
+            types=self._options(GymType.objects.filter(gyms__is_published=True)),
             audiences=self._options(audiences),
         )
 
@@ -179,7 +179,7 @@ class GymSearchService:
         gyms = list(
             Gym.objects.filter(is_published=True)
             .select_related("chain", "street")
-            .prefetch_related("amenities", "opening_hours", "photos")
+            .prefetch_related("types", "opening_hours", "photos")
         )
         prices = load_price_lists({gym.chain_id for gym in gyms})
         audience_names = dict(Audience.objects.values_list("slug", "name"))
@@ -199,11 +199,9 @@ class GymSearchService:
         for model, slug, name in checks:
             if slug and not model.objects.filter(slug=slug).exists():
                 raise InvalidFilter(f"Unknown {name}: {slug}")
-        known = set(
-            Amenity.objects.filter(slug__in=criteria.amenities).values_list("slug", flat=True)
-        )
-        if unknown := criteria.amenities - known:
-            raise InvalidFilter(f"Unknown amenities: {sorted(unknown)}")
+        known = set(GymType.objects.filter(slug__in=criteria.types).values_list("slug", flat=True))
+        if unknown := criteria.types - known:
+            raise InvalidFilter(f"Unknown gym types: {sorted(unknown)}")
 
     @staticmethod
     def _to_listing(
@@ -226,7 +224,7 @@ class GymSearchService:
             address=gym.address,
             highlight=gym.highlight,
             area_m2=gym.area_m2,
-            amenities=tuple(Label(a.slug, a.name) for a in gym.amenities.all()),
+            types=tuple(Label(t.slug, t.name) for t in gym.types.all()),
             audiences=tuple(
                 Label(slug, audience_names[slug]) for slug in sorted(prices.audiences(gym.pk))
             ),

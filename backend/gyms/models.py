@@ -27,7 +27,7 @@ class Street(models.Model):
         return self.name
 
 
-class Amenity(models.Model):
+class GymType(models.Model):
     """A gym type users filter by: gym floor, crossfit, pool... Icons live in the frontend."""
 
     name = models.CharField(max_length=100, unique=True)
@@ -35,7 +35,6 @@ class Amenity(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "amenities"
 
     def __str__(self) -> str:
         return self.name
@@ -79,7 +78,7 @@ class Gym(TimeStampedModel):
 
     chain = models.ForeignKey(Chain, on_delete=models.PROTECT, related_name="gyms")
     street = models.ForeignKey(Street, on_delete=models.PROTECT, related_name="gyms")
-    amenities = models.ManyToManyField(Amenity, blank=True, related_name="gyms")
+    types = models.ManyToManyField(GymType, blank=True, related_name="gyms")
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=150, unique=True)

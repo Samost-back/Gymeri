@@ -29,7 +29,7 @@ export async function GymSearchResults({ searchParams }: GymSearchResultsProps) 
   const cards = (list: GymListing[]) => (
     <div className={styles.list}>
       {list.map((gym) => (
-        <GymCard key={gym.slug} gym={gym} selectedTypes={params.amenities} />
+        <GymCard key={gym.slug} gym={gym} selectedTypes={params.types} />
       ))}
     </div>
   );

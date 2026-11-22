@@ -7,7 +7,7 @@ const GYM_SEARCH_PATH = "/account";
 type RawSearchParams = Record<string, string | string[] | undefined>;
 
 export const EMPTY_SEARCH: GymSearchParams = {
-  amenities: [],
+  types: [],
   discount: false,
   openNow: false,
   roundTheClock: false,
@@ -28,7 +28,7 @@ export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
   return {
     street: first(raw.street),
     chain: first(raw.chain),
-    amenities: [raw.amenity ?? []].flat(),
+    types: [raw.type ?? []].flat(),
     audience: first(raw.audience),
     discount: first(raw.discount) === "true",
     openNow: first(raw.open_now) === "true",
@@ -41,7 +41,7 @@ export function toQuery(params: GymSearchParams): Record<string, QueryValue> {
   return {
     street: params.street,
     chain: params.chain,
-    amenity: params.amenities,
+    type: params.types,
     audience: params.audience,
     discount: params.discount ? "true" : undefined,
     open_now: params.openNow ? "true" : undefined,

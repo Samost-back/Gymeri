@@ -31,7 +31,7 @@ type GymListingDto = {
   address: string;
   highlight: string;
   area_m2: number | null;
-  amenities: FilterOption[];
+  types: FilterOption[];
   audiences: FilterOption[];
   has_discount: boolean;
   hours_summary: string;
@@ -90,7 +90,7 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     address: gym.address,
     highlight: gym.highlight,
     areaM2: gym.area_m2,
-    amenities: gym.amenities,
+    types: gym.types,
     audiences: gym.audiences,
     hasDiscount: gym.has_discount,
     hoursSummary: gym.hours_summary,

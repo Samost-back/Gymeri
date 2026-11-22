@@ -8,12 +8,12 @@ from django.utils import timezone
 
 from .exceptions import GymsError
 from .models import (
-    Amenity,
     Audience,
     Chain,
     Discount,
     Gym,
     GymPhoto,
+    GymType,
     MembershipPlan,
     OpeningHours,
     PlanAccessWindow,
@@ -22,7 +22,7 @@ from .models import (
 from .services import GymPublishingService, PlanPricingService
 
 
-@admin.register(Street, Amenity, Audience)
+@admin.register(Street, GymType, Audience)
 class DictionaryAdmin(admin.ModelAdmin):
     list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
@@ -88,7 +88,7 @@ class GymAdmin(admin.ModelAdmin):
     list_select_related = ["chain", "street"]
     search_fields = ["name", "street__name"]
     prepopulated_fields = {"slug": ["name"]}
-    filter_horizontal = ["amenities"]
+    filter_horizontal = ["types"]
     inlines = [OpeningHoursInline, GymPhotoInline]
 
 

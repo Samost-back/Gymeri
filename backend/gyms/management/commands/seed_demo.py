@@ -6,11 +6,11 @@ from django.utils import timezone
 
 from gyms import demo_data
 from gyms.models import (
-    Amenity,
     Audience,
     Chain,
     Discount,
     Gym,
+    GymType,
     MembershipPlan,
     OpeningHours,
     PlanAccessWindow,
@@ -29,9 +29,9 @@ class Command(BaseCommand):
             key: Street.objects.update_or_create(name=name, defaults={"slug": key})[0]
             for key, name in demo_data.STREETS.items()
         }
-        amenities = {
-            key: Amenity.objects.update_or_create(slug=key, defaults={"name": name})[0]
-            for key, name in demo_data.AMENITIES.items()
+        types = {
+            key: GymType.objects.update_or_create(slug=key, defaults={"name": name})[0]
+            for key, name in demo_data.GYM_TYPES.items()
         }
         audiences = {
             key: Audience.objects.update_or_create(slug=key, defaults={"name": name})[0]
@@ -49,7 +49,7 @@ class Command(BaseCommand):
             for plan_data in plans:
                 self._save_plan(chain, plan_data, audiences)
             for gym_data in gyms:
-                self._save_gym(chain, gym_data, streets, amenities)
+                self._save_gym(chain, gym_data, streets, types)
 
         self.stdout.write(self.style.SUCCESS("Demo data loaded."))
 
@@ -79,18 +79,18 @@ class Command(BaseCommand):
         chain: Chain,
         gym_data: dict,
         streets: dict[str, Street],
-        amenities: dict[str, Amenity],
+        types: dict[str, GymType],
     ) -> None:
         fields = {**gym_data}
         hours = fields.pop("hours", {})
-        amenity_keys = fields.pop("amenities", [])
+        type_keys = fields.pop("types", [])
         fields["street"] = streets[fields["street"]]
         fields.setdefault("is_published", True)
 
         gym, _ = Gym.objects.update_or_create(
             slug=fields.pop("slug"), defaults={"chain": chain, **fields}
         )
-        gym.amenities.set(amenities[key] for key in amenity_keys)
+        gym.types.set(types[key] for key in type_keys)
 
         # Recreate rather than diff: the schedule is tiny and this keeps reruns exact.
         gym.opening_hours.all().delete()

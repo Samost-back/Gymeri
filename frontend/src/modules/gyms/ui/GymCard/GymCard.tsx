@@ -55,13 +55,13 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
 
         <div className={styles.footer}>
           <div className={styles.tags}>
-            {gym.amenities.map((amenity) => (
+            {gym.types.map((gymType) => (
               <Tag
-                key={amenity.slug}
-                variant={selectedTypes.includes(amenity.slug) ? "default" : "muted"}
+                key={gymType.slug}
+                variant={selectedTypes.includes(gymType.slug) ? "default" : "muted"}
               >
-                {selectedTypes.includes(amenity.slug) && <Icon name="check" size={14} />}
-                {amenity.name}
+                {selectedTypes.includes(gymType.slug) && <Icon name="check" size={14} />}
+                {gymType.name}
               </Tag>
             ))}
             {gym.areaM2 !== null && <Tag variant="muted">{formatArea(gym.areaM2)}</Tag>}

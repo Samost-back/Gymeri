@@ -22,7 +22,7 @@ def listing(
         address="просп. Волі, 1",
         highlight="",
         area_m2=area,
-        amenities=tuple(Label(slug, slug) for slug in types),
+        types=tuple(Label(slug, slug) for slug in types),
         audiences=(),
         has_discount=discount,
         hours_summary="",
@@ -34,7 +34,7 @@ def listing(
 
 
 def test_criteria_default_to_sort_by_name_without_filters():
-    criteria = GymSearchCriteria.from_query({}, amenities=[])
+    criteria = GymSearchCriteria.from_query({}, types=[])
 
     assert criteria.sort.code == "name"
     assert criteria.filters() == []
@@ -47,7 +47,7 @@ def test_criteria_default_to_sort_by_name_without_filters():
 )
 def test_invalid_query_is_rejected(params):
     with pytest.raises(InvalidFilter):
-        GymSearchCriteria.from_query(params, amenities=[])
+        GymSearchCriteria.from_query(params, types=[])
 
 
 def test_sort_by_price_puts_gyms_without_price_last():
@@ -69,7 +69,7 @@ def test_full_type_matches_go_first_and_keep_the_sort_order():
         listing("C", types=("gym",)),
         listing("D", types=("pool", "crossfit")),
     ]
-    criteria = GymSearchCriteria(amenities=frozenset({"crossfit", "pool"}))
+    criteria = GymSearchCriteria(types=frozenset({"crossfit", "pool"}))
 
     found = criteria.apply(gyms)
 

@@ -11,7 +11,7 @@ import {
 import styles from "./GymFilters.module.css";
 
 // Icons are presentation, so they live here and not in the backend; unknown types get a check.
-const AMENITY_ICONS: Record<string, IconName> = {
+const TYPE_ICONS: Record<string, IconName> = {
   strength: "fitness_center",
   crossfit: "exercise",
   fitness: "sports_gymnastics",
@@ -50,7 +50,7 @@ function activeFilterCount(params: GymSearchParams): number {
     params.openNow,
     params.roundTheClock,
   ];
-  return singles.filter(Boolean).length + params.amenities.length;
+  return singles.filter(Boolean).length + params.types.length;
 }
 
 export function GymFilters({ options, params, resultCount }: GymFiltersProps) {
@@ -91,14 +91,14 @@ export function GymFilters({ options, params, resultCount }: GymFiltersProps) {
       <div className={styles.group}>
         <span className={styles.groupLabel}>Тип залу</span>
         <div className={styles.chips}>
-          {options.amenities.map((amenity) => (
+          {options.types.map((gymType) => (
             <Chip
-              key={amenity.slug}
-              icon={AMENITY_ICONS[amenity.slug] ?? "check"}
-              href={gymsHref({ ...params, amenities: toggle(params.amenities, amenity.slug) })}
-              active={params.amenities.includes(amenity.slug)}
+              key={gymType.slug}
+              icon={TYPE_ICONS[gymType.slug] ?? "check"}
+              href={gymsHref({ ...params, types: toggle(params.types, gymType.slug) })}
+              active={params.types.includes(gymType.slug)}
             >
-              {amenity.name}
+              {gymType.name}
             </Chip>
           ))}
         </div>

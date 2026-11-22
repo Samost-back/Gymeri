@@ -29,7 +29,7 @@ class GymListing:
     address: str
     highlight: str
     area_m2: int | None
-    amenities: tuple[Label, ...]
+    types: tuple[Label, ...]
     # Groups with a plan of their own in this gym, e.g. students.
     audiences: tuple[Label, ...]
     has_discount: bool
@@ -41,8 +41,8 @@ class GymListing:
     # False when the gym meets only part of a filter, e.g. one of two requested gym types.
     is_full_match: bool = True
 
-    def has_amenity(self, slug: str) -> bool:
-        return any(amenity.slug == slug for amenity in self.amenities)
+    def has_type(self, slug: str) -> bool:
+        return any(gym_type.slug == slug for gym_type in self.types)
 
     def has_audience(self, slug: str) -> bool:
         return any(audience.slug == slug for audience in self.audiences)
@@ -82,17 +82,17 @@ class ChainFilter(GymFilter):
 
 
 @dataclass(frozen=True)
-class AmenityFilter(GymFilter):
+class GymTypeFilter(GymFilter):
     """Gym types like crossfit or pool. A gym with any of them is shown; one with all of
     them is a full match and goes first."""
 
     slugs: frozenset[str]
 
     def accepts(self, gym: GymListing) -> bool:
-        return any(gym.has_amenity(slug) for slug in self.slugs)
+        return any(gym.has_type(slug) for slug in self.slugs)
 
     def is_full_match(self, gym: GymListing) -> bool:
-        return all(gym.has_amenity(slug) for slug in self.slugs)
+        return all(gym.has_type(slug) for slug in self.slugs)
 
 
 @dataclass(frozen=True)
@@ -165,7 +165,7 @@ FALSE_VALUES = {"false", "0", ""}
 class GymSearchCriteria:
     street: str | None = None
     chain: str | None = None
-    amenities: frozenset[str] = field(default_factory=frozenset)
+    types: frozenset[str] = field(default_factory=frozenset)
     audience: str | None = None
     discount: bool = False
     open_now: bool = False
@@ -173,15 +173,15 @@ class GymSearchCriteria:
     sort: SortStrategy = SORT_STRATEGIES["name"]
 
     @classmethod
-    def from_query(cls, params: Mapping[str, str], amenities: list[str]) -> "GymSearchCriteria":
-        """Build criteria from URL query values; `amenities` comes separately as a list."""
+    def from_query(cls, params: Mapping[str, str], types: list[str]) -> "GymSearchCriteria":
+        """Build criteria from URL query values; `types` comes separately as a list."""
         sort_code = params.get("sort", "name")
         if sort_code not in SORT_STRATEGIES:
             raise InvalidFilter(f"Unknown sort: {sort_code}")
         return cls(
             street=params.get("street") or None,
             chain=params.get("chain") or None,
-            amenities=frozenset(amenities),
+            types=frozenset(types),
             audience=params.get("audience") or None,
             discount=cls._parse_flag(params, "discount"),
             open_now=cls._parse_flag(params, "open_now"),
@@ -203,7 +203,7 @@ class GymSearchCriteria:
         candidates: list[GymFilter | None] = [
             StreetFilter(self.street) if self.street else None,
             ChainFilter(self.chain) if self.chain else None,
-            AmenityFilter(self.amenities) if self.amenities else None,
+            GymTypeFilter(self.types) if self.types else None,
             AudienceFilter(self.audience) if self.audience else None,
             DiscountFilter() if self.discount else None,
             OpenNowFilter() if self.open_now else None,

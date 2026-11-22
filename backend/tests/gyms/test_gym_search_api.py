@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from rest_framework.test import APIClient
 
-from gyms.models import Amenity, Audience, Chain, Gym, MembershipPlan, OpeningHours, Street
+from gyms.models import Audience, Chain, Gym, GymType, MembershipPlan, OpeningHours, Street
 from gyms.search import GymSearchCriteria
 from gyms.services import GymSearchService
 
@@ -20,8 +20,8 @@ def catalog() -> dict[str, Gym]:
     ia = Chain.objects.create(name="IA", slug="ia")
     lvivska_street = Street.objects.create(name="вул. Львівська", slug="lvivska")
     koniakina_street = Street.objects.create(name="вул. Конякіна", slug="koniakina")
-    pool = Amenity.objects.create(name="Басейн", slug="pool")
-    strength = Amenity.objects.create(name="Силовий зал", slug="strength")
+    pool = GymType.objects.create(name="Басейн", slug="pool")
+    strength = GymType.objects.create(name="Силовий зал", slug="strength")
 
     lvivska = Gym.objects.create(
         chain=ia,
@@ -32,7 +32,7 @@ def catalog() -> dict[str, Gym]:
         is_published=True,
         **LOCATION,
     )
-    lvivska.amenities.set([pool, strength])
+    lvivska.types.set([pool, strength])
     koniakina = Gym.objects.create(
         chain=ia,
         street=koniakina_street,
@@ -42,7 +42,7 @@ def catalog() -> dict[str, Gym]:
         is_published=True,
         **LOCATION,
     )
-    koniakina.amenities.set([strength])
+    koniakina.types.set([strength])
     for day in range(7):
         OpeningHours.objects.create(gym=koniakina, weekday=day, opens_at="00:00", closes_at="00:00")
     OpeningHours.objects.create(gym=lvivska, weekday=0, opens_at="08:00", closes_at="21:00")
@@ -62,7 +62,7 @@ def search_slugs(query: str) -> list[str]:
 
 @pytest.mark.django_db
 def test_gyms_with_all_requested_types_come_before_partial_matches(catalog):
-    response = APIClient().get("/api/v1/gyms/?amenity=pool&amenity=strength")
+    response = APIClient().get("/api/v1/gyms/?type=pool&type=strength")
 
     assert [(gym["slug"], gym["is_full_match"]) for gym in response.json()] == [
         ("lvivska", True),
@@ -141,8 +141,8 @@ def test_unpublished_gym_is_not_found(catalog):
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "query",
-    ["?street=nowhere", "?amenity=sauna", "?sort=rating"],
-    ids=["unknown street", "unknown amenity", "unknown sort"],
+    ["?street=nowhere", "?type=sauna", "?sort=rating"],
+    ids=["unknown street", "unknown gym type", "unknown sort"],
 )
 def test_invalid_filter_returns_bad_request(catalog, query):
     response = APIClient().get(f"/api/v1/gyms/{query}")
@@ -160,5 +160,5 @@ def test_filter_options_list_only_values_of_published_gyms(catalog):
 
     assert [s["slug"] for s in options["streets"]] == ["koniakina"]
     assert [c["slug"] for c in options["chains"]] == ["ia"]
-    assert [a["slug"] for a in options["amenities"]] == ["strength"]
+    assert [a["slug"] for a in options["types"]] == ["strength"]
     assert options["audiences"] == []

@@ -34,7 +34,7 @@ class FilterOptionsView(APIView):
 class GymListView(APIView):
     def get(self, request: Request) -> Response:
         criteria = GymSearchCriteria.from_query(
-            request.query_params, amenities=request.query_params.getlist("amenity")
+            request.query_params, types=request.query_params.getlist("type")
         )
         gyms = GymSearchService().search(criteria)
         return Response(GymListingSerializer(gyms, many=True).data)
