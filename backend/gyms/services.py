@@ -6,7 +6,8 @@ from decimal import Decimal
 from django.db.models import Count, Prefetch, Q, QuerySet
 from django.utils import timezone
 
-from .exceptions import InvalidFilter
+from .exceptions import GymNotPublishable, InvalidFilter
+from .geo import GeoPoint
 from .models import Amenity, Chain, District, Gym, MembershipPlan
 from .pricing import PlanPrice, PriceList
 from .schedule import TimeInterval, WeeklySchedule
@@ -175,3 +176,14 @@ class GymSearchService:
             price_from=price_from,
             photo_url=photos[0].image.url if photos else None,
         )
+
+
+class GymPublishingService:
+    """Rules a gym must pass before it appears in the public catalog."""
+
+    def validate(
+        self, *, is_published: bool, latitude: Decimal | None, longitude: Decimal | None
+    ) -> None:
+        location = GeoPoint.from_optional(latitude, longitude)
+        if is_published and location is None:
+            raise GymNotPublishable("A published gym needs a map location.")
