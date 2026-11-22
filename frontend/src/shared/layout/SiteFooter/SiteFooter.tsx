@@ -58,7 +58,7 @@ export function SiteFooter() {
                     {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
                   >
                     <span className={styles.contactIcon}>{link.icon}</span>
-                    {link.label}
+                    <span className={styles.contactLabel}>{link.label}</span>
                   </a>
                 </li>
               ))}

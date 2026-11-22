@@ -5,12 +5,13 @@
   border-top: 1px solid var(--color-border);
 }
 
-/* Phones: brand, then contacts, one under the other. */
+/* Phones: contact icons sit on the city's line, so the footer stays short. */
 .top {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-  padding-block: var(--space-xl);
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-xl) var(--space-lg);
 }
 
 .brand {
@@ -37,7 +38,6 @@
 
 .contactList {
   display: flex;
-  flex-direction: column;
   gap: 0.75rem;
   margin: 0;
   padding: 0;
@@ -55,6 +55,16 @@
 
 .contact:hover {
   color: var(--color-primary);
+}
+
+/* Phones show icons only; the text stays readable for screen readers. */
+.contactLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Same square frame for every icon, so the three rows line up. */
@@ -82,7 +92,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
-  padding-block: var(--space-lg);
+  /* Thin on phones, so the copyright row doesn't outweigh the contacts above it. */
+  padding-block: var(--space-sm);
   border-top: 1px solid var(--color-border);
   color: var(--color-text-subtle);
 }
@@ -129,11 +140,25 @@
 /* Tablets and up: brand on the left, contacts on the right. */
 @media (min-width: 768px) {
   .top {
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-2xl);
-    padding-block: var(--space-2xl);
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+
+  .bottom {
+    padding-block: var(--space-lg);
+  }
+
+  .contactList {
+    flex-direction: column;
+  }
+
+  .contactLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
   }
 }
 
