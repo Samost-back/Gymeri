@@ -1,61 +1,182 @@
 .footer {
   width: 100%;
   margin-top: var(--space-2xl);
+  background: var(--color-surface);
   border-top: 1px solid var(--color-border);
 }
 
-.inner {
+/* Phones: contact icons sit on the city's line, so the footer stays short. */
+.top {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-md);
-  padding-block: var(--space-xl);
+  padding-block: var(--space-xl) var(--space-lg);
 }
 
 .brand {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  text-align: center;
+  align-items: flex-start;
+  gap: var(--space-sm);
 }
 
 .name {
   composes: headlineSm from "@/shared/styles/typography.module.css";
   color: var(--color-primary);
   text-transform: uppercase;
+  letter-spacing: -0.025em;
 }
 
-.copyright {
+.city {
   composes: labelSm from "@/shared/styles/typography.module.css";
-  color: var(--color-text-muted);
-  letter-spacing: 0.1em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-text-subtle);
 }
 
-.links {
+.contacts {
+  font-style: normal;
+}
+
+.contactList {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-lg);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.link {
-  composes: labelSm from "@/shared/styles/typography.module.css";
-  color: var(--color-text-muted);
-  letter-spacing: 0.1em;
+.contact {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text);
   transition: color var(--transition-fast);
 }
 
-.link:hover {
+.contact:hover {
   color: var(--color-primary);
 }
 
+/* Phones show icons only; the text stays readable for screen readers. */
+.contactLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Same square frame for every icon, so the contacts line up.
+   44px on phones, the minimum comfortable touch target. */
+.contactIcon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.contact:hover .contactIcon {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.bottom {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  /* Thin on phones, so the copyright row doesn't outweigh the contacts above it. */
+  padding-block: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+}
+
+.toTop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.toTopIcon {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-border-strong);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.toTop:hover {
+  color: var(--color-primary);
+}
+
+/* Fills white and lifts a little, hinting at where it goes. */
+.toTop:hover .toTopIcon {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toTop:hover .toTopIcon {
+    transform: none;
+  }
+}
+
+/* Tablets and up: brand on the left, contacts on the right. */
 @media (min-width: 768px) {
-  .inner {
-    flex-direction: row;
+  .top {
+    align-items: center;
+    gap: var(--space-2xl);
+    padding-block: var(--space-2xl) var(--space-xl);
   }
 
-  .brand {
-    text-align: left;
+  .bottom {
+    padding-block: var(--space-lg);
+  }
+
+  /* Here the whole text row is tappable, so the icons shrink to match it. */
+  .contactIcon {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .contactList {
+    flex-direction: column;
+  }
+
+  .contactLabel {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+
+/* Desktop: wide enough to put the three contacts in one row. */
+@media (min-width: 1024px) {
+  .contactList {
+    flex-direction: row;
+    gap: var(--space-xl);
   }
 }

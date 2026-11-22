@@ -4,6 +4,8 @@ import styles from "./Icon.module.css";
 // Only these glyphs are downloaded from the icon font, see iconFontUrl.
 const ICON_NAMES = [
   "arrow_forward",
+  "arrow_upward",
+  "call",
   "card_membership",
   "check",
   "close",
