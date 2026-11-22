@@ -56,7 +56,11 @@ CHAINS = [
         "name": "Interatletika",
         "short_name": "IA",
         "description": "Мережа тренажерних залів у Луцьку з єдиним абонементом у всі зали.",
-        "website": "https://interatletika.lutsk.ua",
+        # Their site, interatletika.lutsk.ua, serves a certificate for another domain, so
+        # browsers refuse it; Instagram is the working link until they fix it. The empty
+        # website is explicit, so reseeding clears the old link from existing databases.
+        "website": "",
+        "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
             plan("Місячний тест-драйв для новачків", "850", 30),
             plan(
@@ -186,6 +190,7 @@ CHAINS = [
     {
         "slug": "mojo-fitness",
         "name": "MOJO FITNESS",
+        "instagram_url": "https://www.instagram.com/mojofitness_lutsk/",
         "gyms": [
             {
                 "slug": "mojo-fitness-kovelska",
@@ -220,7 +225,7 @@ CHAINS = [
         "name": "Sport Life",
         "short_name": "SL",
         "description": "Всеукраїнська мережа фітнес-клубів; у Луцьку з аквазоною на три басейни.",
-        "website": "https://sportlife.ua",
+        "website": "https://sportlife.ua/uk/clubs/lutsk/",
         "plans": [
             plan("Гостьовий візит", "350", 1),
             plan("Безліміт на місяць", "1900", 30),
@@ -254,6 +259,7 @@ CHAINS = [
     {
         "slug": "maximus",
         "name": "Maximus",
+        "instagram_url": "https://www.instagram.com/maximus_club_lutsk/",
         "gyms": [
             {
                 "slug": "maximus-elektroaparatna",
