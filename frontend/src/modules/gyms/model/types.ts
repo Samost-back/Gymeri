@@ -58,3 +58,14 @@ export type GymSearchParams = {
   roundTheClock: boolean;
   sort: SortCode;
 };
+
+export type GymMapPoint = {
+  slug: string;
+  name: string;
+  chainName: string;
+  // The chain's website; empty when it has none.
+  website: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+};

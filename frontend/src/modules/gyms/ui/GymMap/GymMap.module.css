@@ -1,0 +1,223 @@
+/* Fills the height the modal gives it; the map takes what the header leaves. */
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Right padding keeps the title clear of the modal's close button. */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 4.5rem var(--space-md) var(--space-md);
+}
+
+/* Same icon frame as the side lists of the inner pages. */
+.iconBox {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.title {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.count {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+/* Inset from the panel edges with its own frame, so the map reads as a picture in the panel. */
+.canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 var(--space-md) var(--space-md);
+  overflow: hidden;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+}
+
+.empty {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: var(--space-lg);
+  color: var(--color-text-subtle);
+  text-align: center;
+}
+
+/* leaflet.css loads with the map, after this file, and wins ties in specificity.
+   Pairing .map with .leaflet-container outranks its light defaults: without it the gray
+   background shows while zoomed-out tiles load, and the attribution sits on white. */
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.map:global(.leaflet-container) {
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+}
+
+/* OSM tiles are light; inverting them and turning the hues back gives a dark map
+   that keeps the colors of water and parks. Set per tile, not on the whole tile pane:
+   a filtered pane is repainted on every frame of the zoom animation, which made zoom stutter. */
+.map :global(.leaflet-tile) {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.4);
+}
+
+/* Leaflet's own chrome, restyled to the site's dark, square look. */
+.map :global(.leaflet-bar) {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.map :global(.leaflet-bar a) {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  border-radius: 0;
+  color: var(--color-primary);
+}
+
+.map :global(.leaflet-bar a:hover) {
+  background: var(--color-surface-low);
+}
+
+.map:global(.leaflet-container) :global(.leaflet-control-attribution) {
+  background: rgb(var(--color-bg-rgb) / 0.8);
+  color: var(--color-text-subtle);
+}
+
+.map :global(.leaflet-control-attribution a) {
+  color: var(--color-text-muted);
+}
+
+.map :global(.leaflet-popup-content-wrapper) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  box-shadow: 0 12px 32px rgb(var(--color-shade-rgb) / 0.6);
+  color: var(--color-text);
+}
+
+.map :global(.leaflet-popup-content) {
+  margin: var(--space-md);
+}
+
+.map :global(.leaflet-popup-tip) {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+}
+
+.map :global(.leaflet-popup-close-button) {
+  color: var(--color-text-subtle);
+}
+
+/* White diamond with a dark core: reads on dark tiles and echoes the square UI. */
+.marker span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--color-primary);
+  border: 6px solid var(--color-on-primary);
+  outline: 2px solid var(--color-primary);
+  transform: rotate(45deg) scale(0.75);
+  transition: transform var(--transition-fast);
+}
+
+.marker:hover span {
+  transform: rotate(45deg) scale(0.9);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 13rem;
+}
+
+.chain {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+}
+
+.name {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+.address {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.primaryAction {
+  composes: buttonText from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.625rem 1rem;
+  text-transform: uppercase;
+  transition: background-color var(--transition-fast);
+}
+
+/* Leaflet colors every popup link blue; scoped under .map to win over its selector. */
+.map .primaryAction {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.map .primaryAction:hover {
+  background: var(--color-primary-hover);
+}
+
+.action {
+  composes: buttonText from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  text-transform: uppercase;
+  transition: border-color var(--transition-fast);
+}
+
+.map .action {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+.map .action:hover {
+  border-color: var(--color-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker span {
+    transition: none;
+  }
+}

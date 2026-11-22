@@ -1,7 +1,11 @@
+from typing import Any
+
+from django import forms
 from django.contrib import admin
 from django.db.models import Count, QuerySet
 from django.http import HttpRequest
 
+from .exceptions import GymsError
 from .models import (
     Amenity,
     Chain,
@@ -12,6 +16,7 @@ from .models import (
     OpeningHours,
     PlanAccessWindow,
 )
+from .services import GymPublishingService
 
 
 @admin.register(District, Amenity)
@@ -54,8 +59,27 @@ class GymPhotoInline(admin.TabularInline):
     extra = 0
 
 
+class GymAdminForm(forms.ModelForm):
+    """Model and fields come from GymAdmin, so new Gym fields show up without editing this."""
+
+    def clean(self) -> dict[str, Any]:
+        data = super().clean()
+        try:
+            GymPublishingService().validate(
+                is_published=data.get("is_published", False),
+                latitude=data.get("latitude"),
+                longitude=data.get("longitude"),
+            )
+        except GymsError as error:
+            # On the field, not the form: Django then skips the matching database constraints,
+            # so the user sees this one message instead of it plus a raw constraint name.
+            raise forms.ValidationError({"latitude": str(error)}) from error
+        return data
+
+
 @admin.register(Gym)
 class GymAdmin(admin.ModelAdmin):
+    form = GymAdminForm
     list_display = ["name", "chain", "district", "is_published"]
     list_filter = ["is_published", "chain", "district"]
     list_select_related = ["chain", "district"]

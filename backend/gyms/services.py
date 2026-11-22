@@ -6,7 +6,8 @@ from decimal import Decimal
 from django.db.models import Count, Prefetch, Q, QuerySet
 from django.utils import timezone
 
-from .exceptions import InvalidFilter
+from .exceptions import GymNotPublishable, InvalidFilter
+from .geo import GeoPoint
 from .models import Amenity, Chain, District, Gym, MembershipPlan
 from .pricing import PlanPrice, PriceList
 from .schedule import TimeInterval, WeeklySchedule
@@ -56,6 +57,17 @@ class ChainCard:
     price_from: Decimal | None
 
 
+@dataclass(frozen=True)
+class MapPoint:
+    slug: str
+    name: str
+    chain_name: str
+    # Only chains have a website; empty when the chain has none.
+    website: str
+    address: str
+    location: GeoPoint
+
+
 class CatalogService:
     """Read side of the public catalog: only published gyms and the chains that own them."""
 
@@ -88,6 +100,21 @@ class CatalogService:
         )
         prices = load_price_lists({chain.pk for chain in chains})
         return [self._to_card(chain, prices[chain.pk]) for chain in chains]
+
+    def list_map_points(self) -> list[MapPoint]:
+        # The published_gym_has_location constraint guarantees every one of them has a point.
+        gyms = self._published_gyms().select_related("chain")
+        return [
+            MapPoint(
+                slug=gym.slug,
+                name=gym.name,
+                chain_name=gym.chain.name,
+                website=gym.chain.website,
+                address=gym.address,
+                location=GeoPoint(gym.latitude, gym.longitude),
+            )
+            for gym in gyms
+        ]
 
     @staticmethod
     def _published_gyms() -> QuerySet[Gym]:
@@ -175,3 +202,14 @@ class GymSearchService:
             price_from=price_from,
             photo_url=photos[0].image.url if photos else None,
         )
+
+
+class GymPublishingService:
+    """Rules a gym must pass before it appears in the public catalog."""
+
+    def validate(
+        self, *, is_published: bool, latitude: Decimal | None, longitude: Decimal | None
+    ) -> None:
+        location = GeoPoint.from_optional(latitude, longitude)
+        if is_published and location is None:
+            raise GymNotPublishable("A published gym needs a map location.")

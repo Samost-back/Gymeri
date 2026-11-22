@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef } from "react";
+import { cx } from "../../lib/classNames";
 import { lockScroll } from "../../lib/scrollLock";
 import { Icon } from "../Icon/Icon";
 import styles from "./RouteModal.module.css";
@@ -9,11 +10,16 @@ import styles from "./RouteModal.module.css";
 type RouteModalProps = {
   label: string;
   children: ReactNode;
+  // Wide fills most of the screen, for content that needs room, like a map.
+  size?: "default" | "wide";
+  // Set on a direct visit, where "back" may lead off the site; closing goes here instead.
+  closeHref?: string;
 };
 
 // Modal for an intercepted route: closing goes back, so the page underneath stays as it was.
+// A page can also render it over its own content, closing to closeHref.
 // Native <dialog> gives focus trapping, Escape and the backdrop for free.
-export function RouteModal({ label, children }: RouteModalProps) {
+export function RouteModal({ label, children, size = "default", closeHref }: RouteModalProps) {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -34,13 +40,13 @@ export function RouteModal({ label, children }: RouteModalProps) {
     };
   }, []);
 
-  const close = () => router.back();
+  const close = () => (closeHref ? router.push(closeHref) : router.back());
 
   return (
     <dialog
       ref={dialogRef}
       aria-label={label}
-      className={styles.dialog}
+      className={cx(styles.dialog, size === "wide" && styles.wide)}
       onCancel={(event) => {
         event.preventDefault();
         close();

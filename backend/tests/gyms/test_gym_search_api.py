@@ -10,6 +10,8 @@ from gyms.search import GymSearchCriteria
 from gyms.services import GymSearchService
 
 KYIV = ZoneInfo("Europe/Kyiv")
+# Published gyms need a map point; its value doesn't matter to these tests.
+LOCATION = {"latitude": Decimal("50.75"), "longitude": Decimal("25.33")}
 
 
 @pytest.fixture
@@ -22,11 +24,23 @@ def catalog() -> dict[str, Gym]:
     strength = Amenity.objects.create(name="Силовий зал", slug="strength")
 
     lvivska = Gym.objects.create(
-        chain=ia, district=center, name="Lvivska", slug="lvivska", address="x", is_published=True
+        chain=ia,
+        district=center,
+        name="Lvivska",
+        slug="lvivska",
+        address="x",
+        is_published=True,
+        **LOCATION,
     )
     lvivska.amenities.set([pool, strength])
     koniakina = Gym.objects.create(
-        chain=ia, district=north, name="Koniakina", slug="koniakina", address="x", is_published=True
+        chain=ia,
+        district=north,
+        name="Koniakina",
+        slug="koniakina",
+        address="x",
+        is_published=True,
+        **LOCATION,
     )
     koniakina.amenities.set([strength])
     for day in range(7):
@@ -66,6 +80,7 @@ def test_filter_by_chain(catalog):
         slug="other-gym",
         address="x",
         is_published=True,
+        **LOCATION,
     )
 
     assert search_slugs("?chain=other") == ["other-gym"]

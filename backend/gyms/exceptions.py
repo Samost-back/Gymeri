@@ -8,3 +8,11 @@ class InvalidSchedule(GymsError):
 
 class InvalidFilter(GymsError):
     """The client sent search parameters we can't apply."""
+
+
+class InvalidLocation(GymsError):
+    """Coordinates that can't be a point on the map."""
+
+
+class GymNotPublishable(GymsError):
+    """The gym lacks data the public catalog relies on."""

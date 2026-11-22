@@ -5,6 +5,9 @@ from rest_framework.test import APIClient
 
 from gyms.models import Chain, District, Gym, MembershipPlan
 
+# Published gyms need a map point; its value doesn't matter to these tests.
+LOCATION = {"latitude": Decimal("50.75"), "longitude": Decimal("25.33")}
+
 
 @pytest.fixture
 def api() -> APIClient:
@@ -21,7 +24,13 @@ def districts() -> dict[str, District]:
 
 def make_gym(chain: Chain, district: District, slug: str, published: bool = True) -> Gym:
     return Gym.objects.create(
-        chain=chain, district=district, name=slug, slug=slug, address="x", is_published=published
+        chain=chain,
+        district=district,
+        name=slug,
+        slug=slug,
+        address="x",
+        is_published=published,
+        **LOCATION,
     )
 
 

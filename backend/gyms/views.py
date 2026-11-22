@@ -8,6 +8,7 @@ from .serializers import (
     ChainCardSerializer,
     FilterOptionsSerializer,
     GymListingSerializer,
+    MapPointSerializer,
 )
 from .services import CatalogService, GymSearchService
 
@@ -37,3 +38,9 @@ class GymListView(APIView):
         )
         gyms = GymSearchService().search(criteria)
         return Response(GymListingSerializer(gyms, many=True).data)
+
+
+class GymMapView(APIView):
+    def get(self, request: Request) -> Response:
+        points = CatalogService().list_map_points()
+        return Response(MapPointSerializer(points, many=True).data)

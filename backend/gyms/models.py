@@ -69,8 +69,20 @@ class Gym(TimeStampedModel):
     slug = models.SlugField(max_length=150, unique=True)
     highlight = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        help_text="In Google Maps right-click the building and copy the first number.",
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        null=True,
+        blank=True,
+        help_text="The second number from the same menu.",
+    )
     area_m2 = models.PositiveIntegerField(null=True, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     # Hidden by default so a half-filled gym never reaches the public catalog.
@@ -78,6 +90,24 @@ class Gym(TimeStampedModel):
 
     class Meta:
         ordering = ["name"]
+        # The same rules as GeoPoint and GymPublishingService, kept in the database too,
+        # so data written past the admin (shell, seeds, future APIs) can't break the map.
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(latitude__isnull=True, longitude__isnull=True)
+                | Q(latitude__isnull=False, longitude__isnull=False),
+                name="gym_location_complete",
+            ),
+            models.CheckConstraint(
+                condition=Q(latitude__isnull=True)
+                | Q(latitude__gte=-90, latitude__lte=90, longitude__gte=-180, longitude__lte=180),
+                name="gym_location_in_range",
+            ),
+            models.CheckConstraint(
+                condition=Q(is_published=False) | Q(latitude__isnull=False),
+                name="published_gym_has_location",
+            ),
+        ]
 
     def __str__(self) -> str:
         return self.name
