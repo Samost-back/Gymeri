@@ -41,6 +41,19 @@ class Amenity(models.Model):
         return self.name
 
 
+class Audience(models.Model):
+    """A group a plan is meant for: students, veterans... A plan with none is for everyone."""
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Chain(TimeStampedModel):
     """A brand. A standalone gym is a chain with one location, so every gym has a chain."""
 
@@ -181,6 +194,8 @@ class MembershipPlan(TimeStampedModel):
     # Null means unlimited visits during the period.
     visits_limit = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    # Empty means anyone can buy it; such plans alone set the "from" price.
+    audiences = models.ManyToManyField(Audience, blank=True, related_name="plans")
 
     class Meta:
         ordering = ["chain", "price"]
@@ -235,3 +250,38 @@ class PlanAccessWindow(models.Model):
 
     def __str__(self) -> str:
         return f"{self.plan} {self.get_weekday_display()} {self.starts_at}-{self.ends_at}"
+
+
+class Discount(TimeStampedModel):
+    """A temporary promotion on a plan, valid until `ends_on` inclusive.
+
+    Rules that need the plan's price, like a fixed amount below it, live in the domain
+    Discount classes; the database keeps the ones it can check on its own.
+    """
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", "Percent"
+        FIXED = "fixed", "Fixed amount"
+
+    plan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE, related_name="discounts")
+    kind = models.CharField(max_length=10, choices=Kind.choices)
+    value = models.DecimalField(max_digits=8, decimal_places=2)
+    ends_on = models.DateField()
+
+    class Meta:
+        ordering = ["plan", "ends_on"]
+        constraints = [
+            models.CheckConstraint(condition=Q(value__gt=0), name="discount_value_positive"),
+            # Choices alone only guard forms; an unknown kind would break every price list.
+            models.CheckConstraint(
+                condition=Q(kind__in=["percent", "fixed"]), name="discount_kind_known"
+            ),
+            models.CheckConstraint(
+                condition=Q(kind="fixed") | Q(value__lte=100),
+                name="discount_percent_at_most_100",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        unit = "%" if self.kind == self.Kind.PERCENT else " UAH"
+        return f"{self.plan}: -{self.value}{unit} until {self.ends_on}"

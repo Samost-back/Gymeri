@@ -4,11 +4,14 @@ from django import forms
 from django.contrib import admin
 from django.db.models import Count, QuerySet
 from django.http import HttpRequest
+from django.utils import timezone
 
 from .exceptions import GymsError
 from .models import (
     Amenity,
+    Audience,
     Chain,
+    Discount,
     Gym,
     GymPhoto,
     MembershipPlan,
@@ -16,10 +19,10 @@ from .models import (
     PlanAccessWindow,
     Street,
 )
-from .services import GymPublishingService
+from .services import GymPublishingService, PlanPricingService
 
 
-@admin.register(Street, Amenity)
+@admin.register(Street, Amenity, Audience)
 class DictionaryAdmin(admin.ModelAdmin):
     list_display = ["name", "slug"]
     prepopulated_fields = {"slug": ["name"]}
@@ -95,10 +98,42 @@ class PlanAccessWindowInline(admin.TabularInline):
     max_num = 7
 
 
+class DiscountFormSet(forms.BaseInlineFormSet):
+    def clean(self) -> None:
+        super().clean()
+        # The plan already carries the price from this same save, so a price change and
+        # a new discount are checked together.
+        price = self.instance.price
+        for form in self.forms:
+            data = getattr(form, "cleaned_data", None)
+            if not data or data.get("DELETE") or not form.has_changed() or price is None:
+                continue
+            # A field that failed its own validation already shows an error.
+            if not all(key in data for key in ("kind", "value", "ends_on")):
+                continue
+            try:
+                PlanPricingService().validate_discount(
+                    price=price,
+                    kind=data["kind"],
+                    value=data["value"],
+                    ends_on=data["ends_on"],
+                    today=timezone.localdate(),
+                )
+            except GymsError as error:
+                form.add_error("value", str(error))
+
+
+class DiscountInline(admin.TabularInline):
+    model = Discount
+    formset = DiscountFormSet
+    extra = 0
+
+
 @admin.register(MembershipPlan)
 class MembershipPlanAdmin(admin.ModelAdmin):
     # Separate page because Django can't nest access windows inside the chain page.
     list_display = ["name", "chain", "gym", "price", "duration_days", "is_active"]
-    list_filter = ["chain", "is_active"]
+    list_filter = ["chain", "is_active", "audiences"]
     list_select_related = ["chain", "gym"]
-    inlines = [PlanAccessWindowInline]
+    filter_horizontal = ["audiences"]
+    inlines = [PlanAccessWindowInline, DiscountInline]

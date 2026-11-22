@@ -24,6 +24,14 @@ STREETS = {
     "elektroaparatna": "вул. Електроапаратна",
 }
 
+AUDIENCES = {
+    "students": "Студенти",
+    "pupils": "Школярі",
+    "children": "Діти",
+    "veterans": "Ветерани",
+    "pensioners": "Пенсіонери",
+}
+
 AMENITIES = {
     "strength": "Силовий зал",
     "pool": "Басейн",
@@ -51,7 +59,20 @@ def plan(
         "price": Decimal(price),
         "duration_days": days,
         "access": access or {},
+        "audiences": [],
+        "discounts": [],
     }
+
+
+def for_groups(plan_data: dict, *audiences: str) -> dict:
+    """The plan sold only to these groups, e.g. students; plans without groups are for everyone."""
+    return {**plan_data, "audiences": list(audiences)}
+
+
+def on_sale(plan_data: dict, kind: str, value: str, days_left: int) -> dict:
+    """The plan with a promotion that ends `days_left` days after seeding, so the demo stays
+    current whenever it is loaded."""
+    return {**plan_data, "discounts": [*plan_data["discounts"], (kind, Decimal(value), days_left)]}
 
 
 CHAINS = [
@@ -67,11 +88,15 @@ CHAINS = [
         "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
             plan("Місячний тест-драйв для новачків", "850", 30),
-            plan(
-                "Студентський / шкільний безліміт на місяць",
-                "800",
-                30,
-                access=dict.fromkeys((0, 2, 4), (None, "18:00")),
+            for_groups(
+                plan(
+                    "Студентський / шкільний безліміт на місяць",
+                    "800",
+                    30,
+                    access=dict.fromkeys((0, 2, 4), (None, "18:00")),
+                ),
+                "students",
+                "pupils",
             ),
             plan("Повний безліміт на місяць у всі зали", "1350", 30),
             plan("Безліміт на місяць у всі зали + басейн", "1750", 30),
@@ -81,8 +106,8 @@ CHAINS = [
                 90,
                 access=dict.fromkeys(range(7), ("12:00", "18:00")),
             ),
-            plan("Ветеранський безліміт на 3 місяці", "1500", 90),
-            plan("Річний безліміт", "11800", 365),
+            for_groups(plan("Ветеранський безліміт на 3 місяці", "1500", 90), "veterans"),
+            on_sale(plan("Річний безліміт", "11800", 365), "percent", "10", days_left=21),
             plan("Річний безліміт + басейн", "14600", 365),
         ],
         "gyms": [
@@ -170,7 +195,7 @@ CHAINS = [
                 30,
                 access=dict.fromkeys(range(7), (None, "14:00")),
             ),
-            plan("Безліміт на 3 місяці", "3900", 90),
+            on_sale(plan("Безліміт на 3 місяці", "3900", 90), "fixed", "400", days_left=14),
             plan("Річний безліміт", "12900", 365),
         ],
         "gyms": [
@@ -232,7 +257,7 @@ CHAINS = [
         "website": "https://sportlife.ua/uk/clubs/lutsk/",
         "plans": [
             plan("Гостьовий візит", "350", 1),
-            plan("Безліміт на місяць", "1900", 30),
+            on_sale(plan("Безліміт на місяць", "1900", 30), "percent", "15", days_left=30),
             plan(
                 "Денний абонемент на місяць",
                 "1400",

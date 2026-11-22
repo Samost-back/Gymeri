@@ -1,10 +1,15 @@
+from datetime import timedelta
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from gyms import demo_data
 from gyms.models import (
     Amenity,
+    Audience,
     Chain,
+    Discount,
     Gym,
     MembershipPlan,
     OpeningHours,
@@ -28,6 +33,10 @@ class Command(BaseCommand):
             key: Amenity.objects.update_or_create(slug=key, defaults={"name": name})[0]
             for key, name in demo_data.AMENITIES.items()
         }
+        audiences = {
+            key: Audience.objects.update_or_create(slug=key, defaults={"name": name})[0]
+            for key, name in demo_data.AUDIENCES.items()
+        }
 
         for chain_data in demo_data.CHAINS:
             chain_fields = {**chain_data}
@@ -38,15 +47,17 @@ class Command(BaseCommand):
             )
 
             for plan_data in plans:
-                self._save_plan(chain, plan_data)
+                self._save_plan(chain, plan_data, audiences)
             for gym_data in gyms:
                 self._save_gym(chain, gym_data, streets, amenities)
 
         self.stdout.write(self.style.SUCCESS("Demo data loaded."))
 
-    def _save_plan(self, chain: Chain, plan_data: dict) -> None:
+    def _save_plan(self, chain: Chain, plan_data: dict, audiences: dict[str, Audience]) -> None:
         fields = {**plan_data}
         access = fields.pop("access")
+        audience_keys = fields.pop("audiences")
+        discounts = fields.pop("discounts")
         plan, _ = MembershipPlan.objects.update_or_create(
             chain=chain, name=fields.pop("name"), defaults=fields
         )
@@ -54,6 +65,13 @@ class Command(BaseCommand):
         PlanAccessWindow.objects.bulk_create(
             PlanAccessWindow(plan=plan, weekday=day, starts_at=starts, ends_at=ends)
             for day, (starts, ends) in access.items()
+        )
+        plan.audiences.set(audiences[key] for key in audience_keys)
+        today = timezone.localdate()
+        plan.discounts.all().delete()
+        Discount.objects.bulk_create(
+            Discount(plan=plan, kind=kind, value=value, ends_on=today + timedelta(days=days))
+            for kind, value, days in discounts
         )
 
     def _save_gym(

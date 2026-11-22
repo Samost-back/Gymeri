@@ -1,12 +1,13 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from django.db.models import Count, Prefetch, Q, QuerySet
 from django.utils import timezone
 
-from .exceptions import GymNotPublishable, InvalidFilter
+from .discounts import make_discount
+from .exceptions import GymNotPublishable, InvalidDiscount, InvalidFilter
 from .geo import GeoPoint
 from .models import Amenity, Chain, Gym, MembershipPlan, Street
 from .pricing import PlanPrice, PriceList
@@ -15,13 +16,24 @@ from .search import GymListing, GymSearchCriteria
 
 
 def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
-    """One query for the active plans of all given chains, grouped into a PriceList per chain."""
+    """Active plans of all given chains with their audiences and discounts, grouped into a
+    PriceList per chain; three queries however many chains there are."""
     plans: dict[int, list[PlanPrice]] = defaultdict(list)
-    rows = MembershipPlan.objects.filter(chain__in=chain_ids, is_active=True).values_list(
-        "chain_id", "price", "duration_days", "gym_id"
+    rows = MembershipPlan.objects.filter(chain__in=chain_ids, is_active=True).prefetch_related(
+        "audiences", "discounts"
     )
-    for chain_id, price, duration_days, gym_id in rows:
-        plans[chain_id].append(PlanPrice(price, duration_days, gym_id))
+    for plan in rows:
+        plans[plan.chain_id].append(
+            PlanPrice(
+                plan.price,
+                plan.duration_days,
+                plan.gym_id,
+                audiences=frozenset(audience.slug for audience in plan.audiences.all()),
+                discounts=tuple(
+                    make_discount(d.kind, d.value, d.ends_on) for d in plan.discounts.all()
+                ),
+            )
+        )
     return {chain_id: PriceList(plans[chain_id]) for chain_id in chain_ids}
 
 
@@ -136,7 +148,7 @@ class CatalogService:
             logo_url=chain.logo.url if chain.logo else None,
             locations_count=chain.locations_count,
             streets=sorted({gym.street.name for gym in chain.published_gyms}),
-            price_from=prices.monthly_from(),
+            price_from=prices.monthly_from(timezone.localdate()),
         )
 
 
@@ -148,7 +160,8 @@ class GymSearchService:
         gyms = list(self._filtered_gyms(criteria))
         prices = load_price_lists({gym.chain_id for gym in gyms})
         listings = [
-            self._to_listing(gym, prices[gym.chain_id].monthly_from(gym.pk), now) for gym in gyms
+            self._to_listing(gym, prices[gym.chain_id].monthly_from(now.date(), gym.pk), now)
+            for gym in gyms
         ]
         matching = [listing for listing in listings if criteria.matches_schedule(listing)]
         return criteria.sort.sort(matching)
@@ -215,3 +228,14 @@ class GymPublishingService:
         location = GeoPoint.from_optional(latitude, longitude)
         if is_published and location is None:
             raise GymNotPublishable("A published gym needs a map location.")
+
+
+class PlanPricingService:
+    """Checks a promotion against the plan it lowers before it is saved."""
+
+    def validate_discount(
+        self, *, price: Decimal, kind: str, value: Decimal, ends_on: date, today: date
+    ) -> None:
+        if ends_on < today:
+            raise InvalidDiscount("A new discount can't end in the past.")
+        make_discount(kind, value, ends_on).apply(price)

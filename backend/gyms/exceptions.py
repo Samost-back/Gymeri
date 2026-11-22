@@ -16,3 +16,7 @@ class InvalidLocation(GymsError):
 
 class GymNotPublishable(GymsError):
     """The gym lacks data the public catalog relies on."""
+
+
+class InvalidDiscount(GymsError):
+    """A discount that can't be applied: zero, over 100% or more than the price."""

@@ -1,8 +1,12 @@
 """Price rules in plain Python, kept in one place so cards and search can't disagree."""
 
 from collections.abc import Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date
 from decimal import Decimal
+
+from .discounts import Discount
+from .exceptions import InvalidDiscount
 
 MONTH_DAYS = 30
 
@@ -13,23 +17,57 @@ class PlanPrice:
     duration_days: int
     # None means the plan works in every gym of the chain.
     gym_id: int | None = None
+    # Who may buy it, e.g. {"students"}; empty means everyone.
+    audiences: frozenset[str] = field(default_factory=frozenset)
+    discounts: tuple[Discount, ...] = ()
+
+    @property
+    def is_for_everyone(self) -> bool:
+        return not self.audiences
+
+    def has_discount_on(self, day: date) -> bool:
+        return bool(self._discounted_prices(day))
+
+    def price_on(self, day: date) -> Decimal:
+        """The price a buyer pays that day: the best active discount, or the full price."""
+        return min(self._discounted_prices(day), default=self.price)
+
+    def _discounted_prices(self, day: date) -> list[Decimal]:
+        prices = []
+        for discount in self.discounts:
+            if not discount.is_active(day):
+                continue
+            # The admin checks a discount against the price, but the price may drop later;
+            # a discount that no longer fits is skipped instead of breaking the catalog.
+            try:
+                prices.append(discount.apply(self.price))
+            except InvalidDiscount:
+                continue
+        return prices
 
 
 class PriceList:
-    """Active plans of one chain; answers "from what price" for the chain or one of its gyms."""
+    """Active plans of one chain; answers price questions for the chain or one of its gyms."""
 
     def __init__(self, plans: Iterable[PlanPrice] = ()) -> None:
         self._plans = tuple(plans)
 
-    def monthly_from(self, gym_id: int | None = None) -> Decimal | None:
-        """Cheapest monthly price. For a gym, only chain-wide plans and its own plans count."""
+    def monthly_from(self, day: date, gym_id: int | None = None) -> Decimal | None:
+        """Cheapest monthly price that day. For a gym, only chain-wide plans and its own plans
+        count. Plans for students and other groups don't: "from" must be a price anyone pays."""
         prices = [
-            plan.price
-            for plan in self._plans
-            if plan.duration_days == MONTH_DAYS and self._sold_in(plan, gym_id)
+            plan.price_on(day)
+            for plan in self._sold_in(gym_id)
+            if plan.duration_days == MONTH_DAYS and plan.is_for_everyone
         ]
         return min(prices, default=None)
 
-    @staticmethod
-    def _sold_in(plan: PlanPrice, gym_id: int | None) -> bool:
-        return gym_id is None or plan.gym_id in (None, gym_id)
+    def has_discount(self, day: date, gym_id: int | None = None) -> bool:
+        return any(plan.has_discount_on(day) for plan in self._sold_in(gym_id))
+
+    def audiences(self, gym_id: int | None = None) -> frozenset[str]:
+        """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""
+        return frozenset().union(*(plan.audiences for plan in self._sold_in(gym_id)))
+
+    def _sold_in(self, gym_id: int | None) -> list[PlanPrice]:
+        return [plan for plan in self._plans if gym_id is None or plan.gym_id in (None, gym_id)]
