@@ -55,15 +55,24 @@
   gap: var(--space-md);
 }
 
-/* Looks like an outline button next to "Увійти", but muted: the map page doesn't exist yet. */
-.mapSoon {
+/* Outline button next to "Увійти", quieter than it so login stays the main action. */
+.map {
   composes: labelSm from "@/shared/styles/typography.module.css";
   display: none;
   align-items: center;
   gap: 0.375rem;
   padding: 0.625rem 1rem;
   border: 1px solid var(--color-border-strong);
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.map:hover,
+.mobileMap:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .login {
@@ -125,7 +134,7 @@
   flex: 1;
 }
 
-/* Looks like an outline button, but muted: the map page doesn't exist yet. */
+/* Outline button, quieter than "Увійти" next to it. */
 .mobileMap {
   composes: labelSm from "@/shared/styles/typography.module.css";
   display: flex;
@@ -134,7 +143,10 @@
   gap: 0.375rem;
   padding: 0.75rem;
   border: 1px solid var(--color-border-strong);
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 @media (min-width: 640px) {
@@ -160,7 +172,7 @@
 /* Below 1024px brand, four tabs and the login button don't fit in one row. */
 @media (min-width: 1024px) {
   .nav,
-  .mapSoon {
+  .map {
     display: flex;
   }
 
