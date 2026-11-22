@@ -43,6 +43,7 @@ type GymMapPointDto = {
   name: string;
   chain_name: string;
   website: string;
+  instagram_url: string;
   address: string;
   latitude: number;
   longitude: number;
@@ -101,6 +102,7 @@ export async function getMapPoints(): Promise<GymMapPoint[]> {
     name: point.name,
     chainName: point.chain_name,
     website: point.website,
+    instagramUrl: point.instagram_url,
     address: point.address,
     latitude: point.latitude,
     longitude: point.longitude,

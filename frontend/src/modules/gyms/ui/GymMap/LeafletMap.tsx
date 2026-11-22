@@ -4,9 +4,8 @@ import "leaflet/dist/leaflet.css";
 import { divIcon, latLngBounds, map as createMap, marker, tileLayer } from "leaflet";
 import { useEffect, useRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { isHttpUrl } from "@/shared/lib/url";
 import { Icon } from "@/shared/ui";
-import { googleMapsPlaceUrl } from "../../model/mapLinks";
+import { type ChainLink, chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
 import type { GymMapPoint } from "../../model/types";
 import styles from "./GymMap.module.css";
 import { handleWheelGestures } from "./wheel";
@@ -108,7 +107,14 @@ export default function LeafletMap({ points }: { points: GymMapPoint[] }) {
   return <div ref={containerRef} className={styles.map} />;
 }
 
+// Labels are presentation, so they live here, not in the model.
+const CHAIN_LINK_LABELS: Record<ChainLink["kind"], string> = {
+  website: "Сайт",
+  instagram: "Instagram",
+};
+
 function GymPopup({ point }: { point: GymMapPoint }) {
+  const chainLink = chainLinkOf(point);
   return (
     <div className={styles.popup}>
       <span className={styles.chain}>{point.chainName}</span>
@@ -124,14 +130,14 @@ function GymPopup({ point }: { point: GymMapPoint }) {
           <Icon name="map" size={16} />
           Google Maps
         </a>
-        {isHttpUrl(point.website) && (
+        {chainLink && (
           <a
-            href={point.website}
+            href={chainLink.href}
             className={styles.action}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Сайт
+            {CHAIN_LINK_LABELS[chainLink.kind]}
           </a>
         )}
       </div>
