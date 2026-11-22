@@ -62,8 +62,9 @@ class MapPoint:
     slug: str
     name: str
     chain_name: str
-    # Only chains have a website; empty when the chain has none.
+    # Only chains have these links; each is empty when the chain has none.
     website: str
+    instagram_url: str
     address: str
     location: GeoPoint
 
@@ -110,6 +111,7 @@ class CatalogService:
                 name=gym.name,
                 chain_name=gym.chain.name,
                 website=gym.chain.website,
+                instagram_url=gym.chain.instagram_url,
                 address=gym.address,
                 location=GeoPoint(gym.latitude, gym.longitude),
             )

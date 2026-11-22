@@ -37,6 +37,7 @@ def test_map_lists_only_published_gyms(chain, district):
             "name": "on-map",
             "chain_name": "IA",
             "website": "https://ia.example",
+            "instagram_url": "",
             "address": "x",
             "latitude": 50.745126,
             "longitude": 25.339579,
