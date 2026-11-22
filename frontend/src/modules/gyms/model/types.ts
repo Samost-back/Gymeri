@@ -11,7 +11,9 @@ export type FilterOption = {
 
 export type FilterOptions = {
   streets: FilterOption[];
+  chains: FilterOption[];
   amenities: FilterOption[];
+  audiences: FilterOption[];
 };
 
 export type ChainCard = {
@@ -34,12 +36,17 @@ export type GymListing = {
   address: string;
   highlight: string;
   areaM2: number | null;
-  amenities: string[];
+  amenities: FilterOption[];
+  // Groups with a plan of their own here, e.g. students.
+  audiences: FilterOption[];
+  hasDiscount: boolean;
   hoursSummary: string;
   isOpenNow: boolean;
   isRoundTheClock: boolean;
   priceFrom: number | null;
   photoUrl: string | null;
+  // False when the gym has only some of the requested gym types.
+  isFullMatch: boolean;
 };
 
 export const SORT_OPTIONS = [
@@ -54,6 +61,8 @@ export type GymSearchParams = {
   street?: string;
   chain?: string;
   amenities: string[];
+  audience?: string;
+  discount: boolean;
   openNow: boolean;
   roundTheClock: boolean;
   sort: SortCode;

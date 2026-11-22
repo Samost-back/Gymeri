@@ -32,8 +32,11 @@ AUDIENCES = {
     "pensioners": "Пенсіонери",
 }
 
+# Gym types users filter by; kept short on purpose, a gym usually has two or three.
 AMENITIES = {
-    "strength": "Силовий зал",
+    "strength": "Тренажерний зал",
+    "crossfit": "Кросфіт",
+    "fitness": "Фітнес",
     "pool": "Басейн",
 }
 
@@ -206,7 +209,7 @@ CHAINS = [
                 "building": "3",
                 **location("50.759336", "25.380439"),
                 "phone": "+380670000325",
-                "amenities": ["strength", "pool"],
+                "amenities": ["strength", "crossfit", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("09:00", "20:00"),
@@ -276,7 +279,7 @@ CHAINS = [
                 **location("50.753962", "25.337427"),
                 "phone": "+380332280493",
                 "highlight": "Аквазона · три басейни",
-                "amenities": ["strength", "pool"],
+                "amenities": ["strength", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("08:00", "21:00"),
@@ -297,7 +300,7 @@ CHAINS = [
                 "building": "4",
                 **location("50.739928", "25.378323"),
                 "phone": "+380664669626",
-                "amenities": ["strength", "pool"],
+                "amenities": ["strength", "fitness", "pool"],
                 "is_published": False,
             },
         ],

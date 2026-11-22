@@ -3,6 +3,7 @@ import { toQuery } from "../model/searchParams";
 import type {
   CatalogStats,
   ChainCard,
+  FilterOption,
   FilterOptions,
   GymListing,
   GymMapPoint,
@@ -30,12 +31,15 @@ type GymListingDto = {
   address: string;
   highlight: string;
   area_m2: number | null;
-  amenities: string[];
+  amenities: FilterOption[];
+  audiences: FilterOption[];
+  has_discount: boolean;
   hours_summary: string;
   is_open_now: boolean;
   is_round_the_clock: boolean;
   price_from: string | null;
   photo_url: string | null;
+  is_full_match: boolean;
 };
 
 type GymMapPointDto = {
@@ -87,11 +91,14 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     highlight: gym.highlight,
     areaM2: gym.area_m2,
     amenities: gym.amenities,
+    audiences: gym.audiences,
+    hasDiscount: gym.has_discount,
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,
     isRoundTheClock: gym.is_round_the_clock,
     priceFrom: toPrice(gym.price_from),
     photoUrl: gym.photo_url,
+    isFullMatch: gym.is_full_match,
   }));
 }
 

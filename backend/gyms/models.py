@@ -28,7 +28,7 @@ class Street(models.Model):
 
 
 class Amenity(models.Model):
-    """What a gym offers (free weights, pool...). Icons are a UI concern and live in frontend."""
+    """A gym type users filter by: gym floor, crossfit, pool... Icons live in the frontend."""
 
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)

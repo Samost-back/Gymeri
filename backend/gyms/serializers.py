@@ -25,7 +25,9 @@ class FilterOptionSerializer(serializers.Serializer):
 
 class FilterOptionsSerializer(serializers.Serializer):
     streets = FilterOptionSerializer(many=True)
+    chains = FilterOptionSerializer(many=True)
     amenities = FilterOptionSerializer(many=True)
+    audiences = FilterOptionSerializer(many=True)
 
 
 class GymListingSerializer(serializers.Serializer):
@@ -33,16 +35,20 @@ class GymListingSerializer(serializers.Serializer):
     name = serializers.CharField()
     chain_slug = serializers.CharField()
     chain_name = serializers.CharField()
-    street = serializers.CharField()
+    street = serializers.CharField(source="street.name")
     address = serializers.CharField()
     highlight = serializers.CharField()
     area_m2 = serializers.IntegerField(allow_null=True)
-    amenities = serializers.ListField(child=serializers.CharField())
+    # Objects, not names: the client highlights the types a user filtered by, by slug.
+    amenities = FilterOptionSerializer(many=True)
+    audiences = FilterOptionSerializer(many=True)
+    has_discount = serializers.BooleanField()
     hours_summary = serializers.CharField()
     is_open_now = serializers.BooleanField()
     is_round_the_clock = serializers.BooleanField()
     price_from = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True)
     photo_url = serializers.CharField(allow_null=True)
+    is_full_match = serializers.BooleanField()
 
 
 class MapPointSerializer(serializers.Serializer):

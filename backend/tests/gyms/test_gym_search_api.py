@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from rest_framework.test import APIClient
 
-from gyms.models import Amenity, Chain, Gym, MembershipPlan, OpeningHours, Street
+from gyms.models import Amenity, Audience, Chain, Gym, MembershipPlan, OpeningHours, Street
 from gyms.search import GymSearchCriteria
 from gyms.services import GymSearchService
 
@@ -61,8 +61,13 @@ def search_slugs(query: str) -> list[str]:
 
 
 @pytest.mark.django_db
-def test_gym_must_have_all_requested_amenities(catalog):
-    assert search_slugs("?amenity=strength&amenity=pool") == ["lvivska"]
+def test_gyms_with_all_requested_types_come_before_partial_matches(catalog):
+    response = APIClient().get("/api/v1/gyms/?amenity=pool&amenity=strength")
+
+    assert [(gym["slug"], gym["is_full_match"]) for gym in response.json()] == [
+        ("lvivska", True),
+        ("koniakina", False),
+    ]
 
 
 @pytest.mark.django_db
@@ -85,6 +90,21 @@ def test_filter_by_chain(catalog):
 
     assert search_slugs("?chain=other") == ["other-gym"]
     assert search_slugs("?chain=ia") == ["koniakina", "lvivska"]
+
+
+@pytest.mark.django_db
+def test_filter_by_audience_finds_gyms_with_a_plan_for_that_group(catalog):
+    students = Audience.objects.create(name="Студенти", slug="students")
+    plan = MembershipPlan.objects.create(
+        chain=catalog["lvivska"].chain,
+        gym=catalog["lvivska"],
+        name="Student month",
+        price=Decimal("800"),
+        duration_days=30,
+    )
+    plan.audiences.set([students])
+
+    assert search_slugs("?audience=students") == ["lvivska"]
 
 
 @pytest.mark.django_db
@@ -139,4 +159,6 @@ def test_filter_options_list_only_values_of_published_gyms(catalog):
     options = APIClient().get("/api/v1/catalog/filters/").json()
 
     assert [s["slug"] for s in options["streets"]] == ["koniakina"]
+    assert [c["slug"] for c in options["chains"]] == ["ia"]
     assert [a["slug"] for a in options["amenities"]] == ["strength"]
+    assert options["audiences"] == []

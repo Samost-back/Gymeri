@@ -1,0 +1,54 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.label {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+  letter-spacing: 0.1em;
+}
+
+.wrap {
+  position: relative;
+}
+
+.select {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  width: 100%;
+  padding: 0.625rem 2.25rem 0.625rem var(--space-md);
+  overflow: hidden;
+  appearance: none;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.select:hover,
+.select:focus-visible {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* A set filter reads white, like an active chip, so it is visible at a glance. */
+.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-text-subtle);
+}
