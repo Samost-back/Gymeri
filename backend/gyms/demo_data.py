@@ -1,4 +1,4 @@
-"""Demo dataset for the coursework defence: Inter Atletika gyms in Lutsk plus competitors.
+"""Demo dataset for the coursework defence: Interatletika gyms in Lutsk plus competitors.
 
 Source: interatletika.lutsk.ua and public listings, November 2026.
 Districts are approximate and need checking before the defence.
@@ -27,7 +27,7 @@ AMENITIES = {
 
 
 def standard_hours(sunday: tuple[str, str] | None) -> dict[int, tuple[str, str]]:
-    """Mon-Sat 08:00-21:30 is the usual Inter Atletika schedule; Sunday varies by gym."""
+    """Mon-Sat 08:00-21:30 is the usual Interatletika schedule; Sunday varies by gym."""
     hours = dict.fromkeys(MON_SAT, ("08:00", "21:30"))
     if sunday:
         hours[SUNDAY] = sunday
@@ -52,8 +52,8 @@ def plan(
 
 CHAINS = [
     {
-        "slug": "inter-atletyka",
-        "name": "Inter Atletika",
+        "slug": "interatletika",
+        "name": "Interatletika",
         "short_name": "IA",
         "description": "Мережа тренажерних залів у Луцьку з єдиним абонементом у всі зали.",
         "website": "https://interatletika.lutsk.ua",
@@ -79,8 +79,8 @@ CHAINS = [
         ],
         "gyms": [
             {
-                "slug": "inter-atletyka-yaremchuka",
-                "name": "Inter Atletika на Яремчука",
+                "slug": "interatletika-yaremchuka",
+                "name": "Interatletika на Яремчука",
                 "highlight": "ТЦ «Глобус»",
                 "address": "вул. Назарія Яремчука, 11",
                 **location("50.769619", "25.370824"),
@@ -90,8 +90,8 @@ CHAINS = [
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
-                "slug": "inter-atletyka-koniakina",
-                "name": "Inter Atletika на Конякіна",
+                "slug": "interatletika-koniakina",
+                "name": "Interatletika на Конякіна",
                 "address": "вул. Конякіна, 14",
                 **location("50.774899", "25.361431"),
                 "district": "33",
@@ -100,8 +100,8 @@ CHAINS = [
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
-                "slug": "inter-atletyka-dubnivska",
-                "name": "Inter Atletika на Дубнівській",
+                "slug": "interatletika-dubnivska",
+                "name": "Interatletika на Дубнівській",
                 "address": "вул. Дубнівська, 15",
                 **location("50.741603", "25.359210"),
                 "district": "south",
@@ -110,8 +110,8 @@ CHAINS = [
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
-                "slug": "inter-atletyka-lvivska",
-                "name": "Inter Atletika на Львівській",
+                "slug": "interatletika-lvivska",
+                "name": "Interatletika на Львівській",
                 "highlight": "Спорткомплекс ЛНТУ · басейн",
                 "address": "вул. Львівська, 75",
                 **location("50.725652", "25.297581"),
@@ -124,8 +124,8 @@ CHAINS = [
                 },
             },
             {
-                "slug": "inter-atletyka-voli",
-                "name": "Inter Atletika на Волі",
+                "slug": "interatletika-voli",
+                "name": "Interatletika на Волі",
                 "highlight": "ТЦ «Гранд Волинь»",
                 "address": "просп. Волі, 42",
                 **location("50.745126", "25.339579"),
@@ -136,8 +136,8 @@ CHAINS = [
             },
             {
                 # Hidden until its phone and schedule are confirmed.
-                "slug": "inter-atletyka-sobornosti",
-                "name": "Inter Atletika на Соборності",
+                "slug": "interatletika-sobornosti",
+                "name": "Interatletika на Соборності",
                 "address": "просп. Соборності, 30",
                 **location("50.759921", "25.362440"),
                 "district": "33",
