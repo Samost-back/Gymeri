@@ -48,7 +48,7 @@ export function SiteFooter() {
             </span>
           </div>
 
-          <nav aria-label="Контакти">
+          <address className={styles.contacts}>
             <ul className={styles.contactList}>
               {CONTACT_LINKS.map((link) => (
                 <li key={link.href}>
@@ -63,7 +63,7 @@ export function SiteFooter() {
                 </li>
               ))}
             </ul>
-          </nav>
+          </address>
         </div>
 
         <div className={styles.bottom}>

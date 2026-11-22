@@ -36,6 +36,10 @@
   color: var(--color-text-subtle);
 }
 
+.contacts {
+  font-style: normal;
+}
+
 .contactList {
   display: flex;
   gap: 0.75rem;
@@ -67,13 +71,14 @@
   white-space: nowrap;
 }
 
-/* Same square frame for every icon, so the three rows line up. */
+/* Same square frame for every icon, so the contacts line up.
+   44px on phones, the minimum comfortable touch target. */
 .contactIcon {
   display: grid;
   flex-shrink: 0;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--color-border-strong);
   color: var(--color-text-muted);
   transition:
@@ -109,8 +114,8 @@
 .toTopIcon {
   display: grid;
   place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--color-border-strong);
   transition:
     background-color var(--transition-fast),
@@ -119,11 +124,11 @@
     transform var(--transition-fast);
 }
 
-/* Fills white and lifts a little, hinting at where it goes. */
 .toTop:hover {
   color: var(--color-primary);
 }
 
+/* Fills white and lifts a little, hinting at where it goes. */
 .toTop:hover .toTopIcon {
   background: var(--color-primary);
   border-color: var(--color-primary);
@@ -147,6 +152,13 @@
 
   .bottom {
     padding-block: var(--space-lg);
+  }
+
+  /* Here the whole text row is tappable, so the icons shrink to match it. */
+  .contactIcon,
+  .toTopIcon {
+    width: 2.25rem;
+    height: 2.25rem;
   }
 
   .contactList {
