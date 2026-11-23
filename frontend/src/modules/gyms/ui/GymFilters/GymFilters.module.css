@@ -1,19 +1,152 @@
-/* Three rows that keep their height however many streets or chains the catalog has:
-   single-choice filters are selects, the short fixed lists are chips. */
-.panel {
+/* Phones and tablets: a "Filters" button and the sort side by side; the filters open in a
+   sheet from the bottom. From 1024px the same controls sit inline: selects and sort in one
+   row, gym types and extras as chips in the next. */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+/* Lets the sort select shrink inside its grid column instead of widening the toolbar. */
+.sort {
+  min-width: 0;
+}
+
+/* Same 40px outline as the sort select beside it. */
+.openButton {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  height: 2.5rem;
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+  font-size: 14px;
+}
+
+.badge {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  display: grid;
+  place-items: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 0.25rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* Closed on small screens until the button opens it. */
+.sheet {
+  display: none;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgb(var(--color-shade-rgb) / 0.7);
+}
+
+/* A sheet from the bottom, as tall as its content; the page stays visible above it. */
+.sheetOpen {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 71;
+  display: flex;
+  flex-direction: column;
+  max-height: 88dvh;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-strong);
+  animation: sheet-up 200ms ease-out;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sheetTitle {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.sheetClose {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: transparent;
+  border: 0;
+  color: var(--color-primary);
+}
+
+.sheetBody {
+  overflow-y: auto;
+  padding: var(--space-md);
+}
+
+/* Pinned to the bottom, where the thumb is; the count updates as filters change. */
+.sheetFooter {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.sheetReset,
+.showButton {
+  composes: buttonText from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  padding: 0 var(--space-lg);
+  text-transform: uppercase;
+}
+
+.sheetReset {
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+}
+
+.showButton {
+  flex: 1;
+  background: var(--color-primary);
+  border: 0;
+  color: var(--color-on-primary);
+}
+
+.controls {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  margin-bottom: var(--space-2xl);
-  padding: var(--space-md);
-  background: var(--color-surface-low);
-  border: 1px solid var(--color-border);
 }
 
-.selects {
+.fields {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
 }
 
 .group {
@@ -24,44 +157,98 @@
 
 .groupLabel {
   composes: labelXs from "@/shared/styles/typography.module.css";
-  flex-shrink: 0;
-  width: 8rem;
   color: var(--color-text-subtle);
-  letter-spacing: 0.1em;
 }
 
-.chips {
+.toggles {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
-/* Result count and reset on one side, sort on the other, under a line. */
-.summary {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-border);
+/* A compact chip, sized by its text, with a small checkbox in front. */
+.toggle {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 2.25rem;
+  padding: 0 0.875rem 0 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
-.found {
-  composes: labelSm from "@/shared/styles/typography.module.css";
+.toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.toggleOn {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.checkbox {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 1px solid var(--color-border-strong);
+}
+
+.toggleOn .checkbox {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* Result count, then the filters that are on, each removable with one tap. */
+.results {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-sm) var(--space-lg);
-  color: var(--color-text-muted);
+  gap: var(--space-sm) var(--space-md);
 }
 
-.found strong {
+.count {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+.activeList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  list-style: none;
+}
+
+.activeChip {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 0.5rem 0 0.625rem;
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.activeChip:hover {
+  border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
 .reset {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
+  composes: bodySm from "@/shared/styles/typography.module.css";
   color: var(--color-text-subtle);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -72,34 +259,124 @@
   color: var(--color-primary);
 }
 
-@media (min-width: 640px) {
-  .selects {
+/* Visible only in the sheet; wide screens show the selects alone. */
+.fieldLabel {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  display: none;
+  color: var(--color-text-subtle);
+}
+
+/* In the sheet: a settings list, label on the left and the value on the right of each row,
+   and chips in two equal columns, so nothing wraps unevenly. */
+@media (max-width: 1023px) {
+  .fields {
+    gap: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .fieldRow {
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Laid over the select and ignoring taps, so the whole row opens the list. */
+  .fieldLabel {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 1;
+    display: block;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* Overrides LinkSelect's own frame; .fields keeps this rule ahead of its active state.
+     The left padding keeps the value clear of the label over it. */
+  .fields .fieldRow select {
+    height: 3rem;
+    padding-left: 8rem;
+    border: 0;
+    color: var(--color-text);
+    text-align: right;
+    text-align-last: right;
+  }
+
+  /* The frame is gone here, so a set filter shows by its white value instead. */
+  .fields .fieldRowActive select {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .toggles {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .summary {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .sort {
-    min-width: 13rem;
   }
 }
 
-@media (min-width: 768px) {
-  .panel {
-    padding: var(--space-lg);
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheetOpen {
+    animation: none;
   }
 }
 
 @media (min-width: 1024px) {
-  .selects {
-    grid-template-columns: repeat(3, 1fr);
+  /* One panel. The sort sits in the top-right corner, beside the three selects, so the
+     chips below can use the full width. */
+  .toolbar {
+    position: relative;
+    display: block;
+    padding: var(--space-lg);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-border);
   }
 
-  /* The label sits beside its chips, so the two chip rows line up under each other. */
+  .sort {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    width: 13rem;
+  }
+
+  .openButton,
+  .sheetHeader,
+  .sheetFooter {
+    display: none;
+  }
+
+  .sheet,
+  .sheetOpen {
+    position: static;
+    display: block;
+    background: none;
+  }
+
+  .sheetBody {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .controls {
+    gap: var(--space-lg);
+  }
+
+  /* Leaves room for the sort select on the right of this row. */
+  .fields {
+    grid-template-columns: repeat(3, 1fr);
+    margin-right: calc(13rem + var(--space-sm));
+  }
+
+  /* Gym types and extras in one row, each label beside its chips. */
+  .options {
+    flex-flow: row wrap;
+    gap: var(--space-md) var(--space-2xl);
+  }
+
   .group {
     flex-direction: row;
     align-items: center;

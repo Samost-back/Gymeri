@@ -1,29 +1,20 @@
+/* 40px, thin frame: the same weight as the outline buttons in the header. */
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  position: relative;
   min-width: 0;
 }
 
-.label {
-  composes: labelXs from "@/shared/styles/typography.module.css";
-  color: var(--color-text-subtle);
-  letter-spacing: 0.1em;
-}
-
-.wrap {
-  position: relative;
-}
-
 .select {
-  composes: labelSm from "@/shared/styles/typography.module.css";
+  composes: bodySm from "@/shared/styles/typography.module.css";
   width: 100%;
-  padding: 0.625rem 2.25rem 0.625rem var(--space-md);
+  height: 2.5rem;
+  padding: 0 2.5rem 0 var(--space-md);
   overflow: hidden;
   appearance: none;
-  background: var(--color-bg);
+  background: transparent;
   border: 1px solid var(--color-border-strong);
   color: var(--color-text-muted);
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
@@ -35,20 +26,27 @@
 .select:hover,
 .select:focus-visible {
   border-color: var(--color-primary);
+  color: var(--color-primary);
   outline: none;
 }
 
-/* A set filter reads white, like an active chip, so it is visible at a glance. */
-.active {
+/* The open list is drawn by the OS; this keeps it dark instead of a white system list. */
+.select option {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+/* A set filter: white frame and value, so it reads as on at a glance. */
+.active .select {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
-.icon {
+.arrow {
   position: absolute;
   top: 50%;
   right: 0.75rem;
   transform: translateY(-50%);
-  pointer-events: none;
   color: var(--color-text-subtle);
+  pointer-events: none;
 }

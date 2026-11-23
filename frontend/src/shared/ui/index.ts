@@ -1,5 +1,4 @@
 export { Button, ButtonLink } from "./Button/Button";
-export { Chip } from "./Chip/Chip";
 export { Container } from "./Container/Container";
 export { Icon, iconFontUrl, type IconName } from "./Icon/Icon";
 export { IconList, type IconListItem } from "./IconList/IconList";

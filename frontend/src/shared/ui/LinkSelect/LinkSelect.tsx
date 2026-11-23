@@ -14,43 +14,40 @@ export type LinkSelectOption = {
 
 type LinkSelectProps = {
   id: string;
+  // For screen readers; the options themselves ("Усі вулиці") say what the select is about.
   label: string;
   value: string;
   options: LinkSelectOption[];
-  // Highlights the frame when the choice narrows something, e.g. a filter that is set.
+  // Highlights the field when the choice narrows something, e.g. a filter that is set.
   active?: boolean;
 };
 
-// A native select stays compact however many options there are, and phones open
-// their own picker for it.
+// A native select stays compact however many options there are, and phones open their own
+// picker for it.
 export function LinkSelect({ id, label, value, options, active = false }: LinkSelectProps) {
   const router = useRouter();
 
   return (
-    <div className={styles.field}>
-      <label htmlFor={id} className={styles.label}>
-        {label}
-      </label>
-      <div className={styles.wrap}>
-        <select
-          id={id}
-          className={cx(styles.select, active && styles.active)}
-          value={value}
-          onChange={(event) => {
-            const option = options.find((item) => item.value === event.target.value);
-            if (option) {
-              router.push(option.href, { scroll: false });
-            }
-          }}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <Icon name="expand_more" size={16} className={styles.icon} />
-      </div>
+    <div className={cx(styles.field, active && styles.active)}>
+      <select
+        id={id}
+        aria-label={label}
+        className={styles.select}
+        value={value}
+        onChange={(event) => {
+          const option = options.find((item) => item.value === event.target.value);
+          if (option) {
+            router.push(option.href, { scroll: false });
+          }
+        }}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <Icon name="expand_more" size={18} className={styles.arrow} />
     </div>
   );
 }
