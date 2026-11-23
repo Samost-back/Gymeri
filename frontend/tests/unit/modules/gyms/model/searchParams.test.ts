@@ -9,26 +9,28 @@ import {
 describe("parseSearchParams", () => {
   it("reads every filter from the URL", () => {
     const params = parseSearchParams({
-      district: "center",
+      street: "voli",
       chain: "ia",
-      amenity: ["pool", "strength"],
+      type: ["pool", "strength"],
+      audience: "students",
+      discount: "true",
       open_now: "true",
-      round_the_clock: "true",
       sort: "price",
     });
 
     expect(params).toEqual({
-      district: "center",
+      street: "voli",
       chain: "ia",
-      amenities: ["pool", "strength"],
+      types: ["pool", "strength"],
+      audience: "students",
+      discount: true,
       openNow: true,
-      roundTheClock: true,
       sort: "price",
     });
   });
 
-  it("accepts a single amenity as a plain string", () => {
-    expect(parseSearchParams({ amenity: "pool" }).amenities).toEqual(["pool"]);
+  it("accepts a single gym type as a plain string", () => {
+    expect(parseSearchParams({ type: "pool" }).types).toEqual(["pool"]);
   });
 
   it("falls back to sorting by name for an unknown sort", () => {
@@ -43,11 +45,12 @@ describe("parseSearchParams", () => {
 describe("toQuery", () => {
   it("leaves defaults out, so the backend gets only active filters", () => {
     expect(toQuery(EMPTY_SEARCH)).toEqual({
-      district: undefined,
+      street: undefined,
       chain: undefined,
-      amenity: [],
+      type: [],
+      audience: undefined,
+      discount: undefined,
       open_now: undefined,
-      round_the_clock: undefined,
       sort: undefined,
     });
   });
@@ -58,10 +61,10 @@ describe("gymsHref", () => {
     expect(gymsHref(EMPTY_SEARCH)).toBe("/account");
   });
 
-  it("repeats the amenity key for each selected amenity", () => {
-    const href = gymsHref({ ...EMPTY_SEARCH, district: "center", amenities: ["pool", "sauna"] });
+  it("repeats the type key for each selected gym type", () => {
+    const href = gymsHref({ ...EMPTY_SEARCH, street: "voli", types: ["pool", "sauna"] });
 
-    expect(href).toBe("/account?district=center&amenity=pool&amenity=sauna");
+    expect(href).toBe("/account?street=voli&type=pool&type=sauna");
   });
 
   it("builds a link that parses back to the same filters", () => {

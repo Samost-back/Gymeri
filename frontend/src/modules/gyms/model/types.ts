@@ -1,7 +1,7 @@
 export type CatalogStats = {
   gyms: number;
   chains: number;
-  districts: number;
+  streets: number;
 };
 
 export type FilterOption = {
@@ -10,8 +10,10 @@ export type FilterOption = {
 };
 
 export type FilterOptions = {
-  districts: FilterOption[];
-  amenities: FilterOption[];
+  streets: FilterOption[];
+  chains: FilterOption[];
+  types: FilterOption[];
+  audiences: FilterOption[];
 };
 
 export type ChainCard = {
@@ -21,8 +23,18 @@ export type ChainCard = {
   description: string;
   logoUrl: string | null;
   locationsCount: number;
-  districts: string[];
+  streets: string[];
   priceFrom: number | null;
+};
+
+export type DiscountOffer = {
+  planName: string;
+  kind: "percent" | "fixed";
+  value: number;
+  // ISO date, the last day the price holds.
+  endsOn: string;
+  fullPrice: number;
+  price: number;
 };
 
 export type GymListing = {
@@ -30,16 +42,21 @@ export type GymListing = {
   name: string;
   chainSlug: string;
   chainName: string;
-  district: string;
+  street: string;
   address: string;
   highlight: string;
   areaM2: number | null;
-  amenities: string[];
+  types: FilterOption[];
+  // Groups with a plan of their own here, e.g. students.
+  audiences: FilterOption[];
+  // The promotion with the biggest saving right now.
+  discount: DiscountOffer | null;
   hoursSummary: string;
   isOpenNow: boolean;
-  isRoundTheClock: boolean;
   priceFrom: number | null;
   photoUrl: string | null;
+  // False when the gym has only some of the requested gym types.
+  isFullMatch: boolean;
 };
 
 export const SORT_OPTIONS = [
@@ -51,11 +68,12 @@ export const SORT_OPTIONS = [
 export type SortCode = (typeof SORT_OPTIONS)[number]["code"];
 
 export type GymSearchParams = {
-  district?: string;
+  street?: string;
   chain?: string;
-  amenities: string[];
+  types: string[];
+  audience?: string;
+  discount: boolean;
   openNow: boolean;
-  roundTheClock: boolean;
   sort: SortCode;
 };
 

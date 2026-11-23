@@ -1,8 +1,8 @@
 export { Button, ButtonLink } from "./Button/Button";
-export { Chip } from "./Chip/Chip";
 export { Container } from "./Container/Container";
 export { Icon, iconFontUrl, type IconName } from "./Icon/Icon";
 export { IconList, type IconListItem } from "./IconList/IconList";
+export { LinkSelect, type LinkSelectOption } from "./LinkSelect/LinkSelect";
 export { PageHeader } from "./PageHeader/PageHeader";
 export { PageHero } from "./PageHero/PageHero";
 export { PageMain } from "./PageMain/PageMain";

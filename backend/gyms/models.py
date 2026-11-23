@@ -13,7 +13,10 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-class District(models.Model):
+class Street(models.Model):
+    """A street gyms stand on; picked from a list, so one street never shows up twice."""
+
+    # With the type prefix, as people say it: "вул. Конякіна", "просп. Волі".
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
 
@@ -24,15 +27,27 @@ class District(models.Model):
         return self.name
 
 
-class Amenity(models.Model):
-    """What a gym offers (free weights, pool...). Icons are a UI concern and live in frontend."""
+class GymType(models.Model):
+    """A gym type users filter by: gym floor, crossfit, pool... Icons live in the frontend."""
 
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "amenities"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Audience(models.Model):
+    """A group a plan is meant for: students, veterans... A plan with none is for everyone."""
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
@@ -62,13 +77,14 @@ class Gym(TimeStampedModel):
     """One physical location of a chain."""
 
     chain = models.ForeignKey(Chain, on_delete=models.PROTECT, related_name="gyms")
-    district = models.ForeignKey(District, on_delete=models.PROTECT, related_name="gyms")
-    amenities = models.ManyToManyField(Amenity, blank=True, related_name="gyms")
+    street = models.ForeignKey(Street, on_delete=models.PROTECT, related_name="gyms")
+    types = models.ManyToManyField(GymType, blank=True, related_name="gyms")
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=150, unique=True)
     highlight = models.CharField(max_length=100, blank=True)
-    address = models.CharField(max_length=255)
+    # House number with its letter or block, e.g. "7А".
+    building = models.CharField(max_length=20)
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
@@ -111,6 +127,10 @@ class Gym(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def address(self) -> str:
+        return f"{self.street.name}, {self.building}"
 
 
 class OpeningHours(models.Model):
@@ -173,6 +193,8 @@ class MembershipPlan(TimeStampedModel):
     # Null means unlimited visits during the period.
     visits_limit = models.PositiveSmallIntegerField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    # Empty means anyone can buy it; such plans alone set the "from" price.
+    audiences = models.ManyToManyField(Audience, blank=True, related_name="plans")
 
     class Meta:
         ordering = ["chain", "price"]
@@ -227,3 +249,38 @@ class PlanAccessWindow(models.Model):
 
     def __str__(self) -> str:
         return f"{self.plan} {self.get_weekday_display()} {self.starts_at}-{self.ends_at}"
+
+
+class Discount(TimeStampedModel):
+    """A temporary promotion on a plan, valid until `ends_on` inclusive.
+
+    Rules that need the plan's price, like a fixed amount below it, live in the domain
+    Discount classes; the database keeps the ones it can check on its own.
+    """
+
+    class Kind(models.TextChoices):
+        PERCENT = "percent", "Percent"
+        FIXED = "fixed", "Fixed amount"
+
+    plan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE, related_name="discounts")
+    kind = models.CharField(max_length=10, choices=Kind.choices)
+    value = models.DecimalField(max_digits=8, decimal_places=2)
+    ends_on = models.DateField()
+
+    class Meta:
+        ordering = ["plan", "ends_on"]
+        constraints = [
+            models.CheckConstraint(condition=Q(value__gt=0), name="discount_value_positive"),
+            # Choices alone only guard forms; an unknown kind would break every price list.
+            models.CheckConstraint(
+                condition=Q(kind__in=["percent", "fixed"]), name="discount_kind_known"
+            ),
+            models.CheckConstraint(
+                condition=Q(kind="fixed") | Q(value__lte=100),
+                name="discount_percent_at_most_100",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        unit = "%" if self.kind == self.Kind.PERCENT else " UAH"
+        return f"{self.plan}: -{self.value}{unit} until {self.ends_on}"

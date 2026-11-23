@@ -45,11 +45,6 @@
   font-weight: 700;
 }
 
-.district {
-  composes: labelXs from "@/shared/styles/typography.module.css";
-  color: var(--color-text-subtle);
-}
-
 .name {
   composes: headlineSm from "@/shared/styles/typography.module.css";
   color: var(--color-primary);
@@ -75,6 +70,11 @@
   align-items: center;
   gap: 0.375rem;
   color: var(--color-text-muted);
+}
+
+/* The promo line reads white, so it stands out from the plain facts above it. */
+.offer {
+  color: var(--color-primary);
 }
 
 .detailIcon {

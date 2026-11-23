@@ -117,7 +117,7 @@
   text-transform: uppercase;
 }
 
-.districts {
+.streets {
   composes: labelXs from "@/shared/styles/typography.module.css";
   padding-left: var(--space-sm);
   border-left: 1px solid var(--color-border);

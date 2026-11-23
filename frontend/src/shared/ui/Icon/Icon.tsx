@@ -21,16 +21,16 @@ const ICON_NAMES = [
   "mail",
   "map",
   "menu",
+  "percent",
   "person",
   "pin_drop",
-  "pool",
   "schedule",
+  "school",
   "search",
   "sell",
   "sports",
   "star",
   "storefront",
-  "timer",
   "tune",
 ] as const;
 

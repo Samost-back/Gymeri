@@ -7,9 +7,9 @@ const GYM_SEARCH_PATH = "/account";
 type RawSearchParams = Record<string, string | string[] | undefined>;
 
 export const EMPTY_SEARCH: GymSearchParams = {
-  amenities: [],
+  types: [],
+  discount: false,
   openNow: false,
-  roundTheClock: false,
   sort: "name",
 };
 
@@ -25,22 +25,24 @@ function isSortCode(value: string | undefined): value is SortCode {
 export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
   const sort = first(raw.sort);
   return {
-    district: first(raw.district),
+    street: first(raw.street),
     chain: first(raw.chain),
-    amenities: [raw.amenity ?? []].flat(),
+    types: [raw.type ?? []].flat(),
+    audience: first(raw.audience),
+    discount: first(raw.discount) === "true",
     openNow: first(raw.open_now) === "true",
-    roundTheClock: first(raw.round_the_clock) === "true",
     sort: isSortCode(sort) ? sort : "name",
   };
 }
 
 export function toQuery(params: GymSearchParams): Record<string, QueryValue> {
   return {
-    district: params.district,
+    street: params.street,
     chain: params.chain,
-    amenity: params.amenities,
+    type: params.types,
+    audience: params.audience,
+    discount: params.discount ? "true" : undefined,
     open_now: params.openNow ? "true" : undefined,
-    round_the_clock: params.roundTheClock ? "true" : undefined,
     sort: params.sort === "name" ? undefined : params.sort,
   };
 }

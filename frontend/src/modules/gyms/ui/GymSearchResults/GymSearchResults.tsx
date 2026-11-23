@@ -1,6 +1,7 @@
 import { ApiError } from "@/shared/lib/api";
 import { getFilterOptions, searchGyms } from "../../api/gyms";
 import { parseSearchParams } from "../../model/searchParams";
+import type { GymListing } from "../../model/types";
 import { GymCard } from "../GymCard/GymCard";
 import { GymFilters } from "../GymFilters/GymFilters";
 import styles from "../lists.module.css";
@@ -21,18 +22,31 @@ export async function GymSearchResults({ searchParams }: GymSearchResultsProps) 
       throw error;
     }),
   ]);
+  // The backend already puts full matches first; this only splits them under headings.
+  const fullMatches = gyms?.filter((gym) => gym.isFullMatch) ?? [];
+  const partialMatches = gyms?.filter((gym) => !gym.isFullMatch) ?? [];
+
+  const cards = (list: GymListing[]) => (
+    <div className={styles.list}>
+      {list.map((gym) => (
+        <GymCard key={gym.slug} gym={gym} selectedTypes={params.types} />
+      ))}
+    </div>
+  );
 
   return (
     <>
-      <GymFilters options={options} params={params} showSort />
+      <GymFilters options={options} params={params} resultCount={gyms?.length ?? null} />
       {gyms === null && <p className={styles.empty}>Некоректні параметри фільтра.</p>}
       {gyms?.length === 0 && <p className={styles.empty}>За цими фільтрами залів не знайдено.</p>}
-      {gyms && gyms.length > 0 && (
-        <div className={styles.list}>
-          {gyms.map((gym) => (
-            <GymCard key={gym.slug} gym={gym} />
-          ))}
-        </div>
+      {fullMatches.length > 0 && cards(fullMatches)}
+      {partialMatches.length > 0 && (
+        <section className={styles.partial} aria-labelledby="partial-matches">
+          <h3 id="partial-matches" className={styles.partialTitle}>
+            Мають лише частину обраних типів
+          </h3>
+          {cards(partialMatches)}
+        </section>
       )}
     </>
   );

@@ -3,6 +3,7 @@ import { toQuery } from "../model/searchParams";
 import type {
   CatalogStats,
   ChainCard,
+  FilterOption,
   FilterOptions,
   GymListing,
   GymMapPoint,
@@ -17,7 +18,7 @@ type ChainCardDto = {
   description: string;
   logo_url: string | null;
   locations_count: number;
-  districts: string[];
+  streets: string[];
   price_from: string | null;
 };
 
@@ -26,16 +27,25 @@ type GymListingDto = {
   name: string;
   chain_slug: string;
   chain_name: string;
-  district: string;
+  street: string;
   address: string;
   highlight: string;
   area_m2: number | null;
-  amenities: string[];
+  types: FilterOption[];
+  audiences: FilterOption[];
+  discount: {
+    plan_name: string;
+    kind: "percent" | "fixed";
+    value: string;
+    ends_on: string;
+    full_price: string;
+    price: string;
+  } | null;
   hours_summary: string;
   is_open_now: boolean;
-  is_round_the_clock: boolean;
   price_from: string | null;
   photo_url: string | null;
+  is_full_match: boolean;
 };
 
 type GymMapPointDto = {
@@ -70,7 +80,7 @@ export async function getChains(): Promise<ChainCard[]> {
     description: chain.description,
     logoUrl: chain.logo_url,
     locationsCount: chain.locations_count,
-    districts: chain.districts,
+    streets: chain.streets,
     priceFrom: toPrice(chain.price_from),
   }));
 }
@@ -82,16 +92,25 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     name: gym.name,
     chainSlug: gym.chain_slug,
     chainName: gym.chain_name,
-    district: gym.district,
+    street: gym.street,
     address: gym.address,
     highlight: gym.highlight,
     areaM2: gym.area_m2,
-    amenities: gym.amenities,
+    types: gym.types,
+    audiences: gym.audiences,
+    discount: gym.discount && {
+      planName: gym.discount.plan_name,
+      kind: gym.discount.kind,
+      value: Number(gym.discount.value),
+      endsOn: gym.discount.ends_on,
+      fullPrice: Number(gym.discount.full_price),
+      price: Number(gym.discount.price),
+    },
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,
-    isRoundTheClock: gym.is_round_the_clock,
     priceFrom: toPrice(gym.price_from),
     photoUrl: gym.photo_url,
+    isFullMatch: gym.is_full_match,
   }));
 }
 

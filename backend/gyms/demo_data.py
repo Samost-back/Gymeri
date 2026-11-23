@@ -1,9 +1,8 @@
 """Demo dataset for the coursework defence: Interatletika gyms in Lutsk plus competitors.
 
 Source: interatletika.lutsk.ua and public listings, November 2026.
-Districts are approximate and need checking before the defence.
-Coordinates come from OpenStreetMap building matches. Pysarevskoho Street, Lime Fit Club's
-address, is now Olimpiiska Street, so its point is Olimpiiska, 3.
+Coordinates come from OpenStreetMap building matches. Lime Fit Club's street was renamed
+from Pysarevskoho to Olimpiiska, so it is listed under the new name.
 """
 
 from decimal import Decimal
@@ -11,17 +10,33 @@ from decimal import Decimal
 MON_SAT = range(6)
 SUNDAY = 6
 
-DISTRICTS = {
-    "center": "Центр",
-    "33": "33-й мікрорайон",
-    "40": "40-й мікрорайон",
-    "south": "Південний",
-    "lviv-road": "Львівська / ЛНТУ",
-    "vidrodzhennia": "Відродження",
+STREETS = {
+    "yaremchuka": "вул. Назарія Яремчука",
+    "koniakina": "вул. Конякіна",
+    "dubnivska": "вул. Дубнівська",
+    "lvivska": "вул. Львівська",
+    "voli": "просп. Волі",
+    "sobornosti": "просп. Соборності",
+    "olimpiiska": "вул. Олімпійська",
+    "kovelska": "вул. Ковельська",
+    "lesi-ukrainky": "вул. Лесі Українки",
+    "moiseia": "просп. Василя Мойсея",
+    "elektroaparatna": "вул. Електроапаратна",
 }
 
-AMENITIES = {
-    "strength": "Силовий зал",
+AUDIENCES = {
+    "students": "Студенти",
+    "pupils": "Школярі",
+    "children": "Діти",
+    "veterans": "Ветерани",
+    "pensioners": "Пенсіонери",
+}
+
+# Gym types users filter by; kept short on purpose, a gym usually has two or three.
+GYM_TYPES = {
+    "strength": "Тренажерний зал",
+    "crossfit": "Кросфіт",
+    "fitness": "Фітнес",
     "pool": "Басейн",
 }
 
@@ -47,7 +62,20 @@ def plan(
         "price": Decimal(price),
         "duration_days": days,
         "access": access or {},
+        "audiences": [],
+        "discounts": [],
     }
+
+
+def for_groups(plan_data: dict, *audiences: str) -> dict:
+    """The plan sold only to these groups, e.g. students; plans without groups are for everyone."""
+    return {**plan_data, "audiences": list(audiences)}
+
+
+def on_sale(plan_data: dict, kind: str, value: str, days_left: int) -> dict:
+    """The plan with a promotion that ends `days_left` days after seeding, so the demo stays
+    current whenever it is loaded."""
+    return {**plan_data, "discounts": [*plan_data["discounts"], (kind, Decimal(value), days_left)]}
 
 
 CHAINS = [
@@ -63,11 +91,15 @@ CHAINS = [
         "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
             plan("Місячний тест-драйв для новачків", "850", 30),
-            plan(
-                "Студентський / шкільний безліміт на місяць",
-                "800",
-                30,
-                access=dict.fromkeys((0, 2, 4), (None, "18:00")),
+            for_groups(
+                plan(
+                    "Студентський / шкільний безліміт на місяць",
+                    "800",
+                    30,
+                    access=dict.fromkeys((0, 2, 4), (None, "18:00")),
+                ),
+                "students",
+                "pupils",
             ),
             plan("Повний безліміт на місяць у всі зали", "1350", 30),
             plan("Безліміт на місяць у всі зали + басейн", "1750", 30),
@@ -77,7 +109,7 @@ CHAINS = [
                 90,
                 access=dict.fromkeys(range(7), ("12:00", "18:00")),
             ),
-            plan("Ветеранський безліміт на 3 місяці", "1500", 90),
+            for_groups(plan("Ветеранський безліміт на 3 місяці", "1500", 90), "veterans"),
             plan("Річний безліміт", "11800", 365),
             plan("Річний безліміт + басейн", "14600", 365),
         ],
@@ -86,42 +118,42 @@ CHAINS = [
                 "slug": "interatletika-yaremchuka",
                 "name": "Interatletika на Яремчука",
                 "highlight": "ТЦ «Глобус»",
-                "address": "вул. Назарія Яремчука, 11",
+                "street": "yaremchuka",
+                "building": "11",
                 **location("50.769619", "25.370824"),
-                "district": "40",
                 "phone": "+380990888031",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
                 "slug": "interatletika-koniakina",
                 "name": "Interatletika на Конякіна",
-                "address": "вул. Конякіна, 14",
+                "street": "koniakina",
+                "building": "14",
                 **location("50.774899", "25.361431"),
-                "district": "33",
                 "phone": "+380332719793",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
                 "slug": "interatletika-dubnivska",
                 "name": "Interatletika на Дубнівській",
-                "address": "вул. Дубнівська, 15",
+                "street": "dubnivska",
+                "building": "15",
                 **location("50.741603", "25.359210"),
-                "district": "south",
                 "phone": "+380990888192",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("09:00", "18:00")),
             },
             {
                 "slug": "interatletika-lvivska",
                 "name": "Interatletika на Львівській",
                 "highlight": "Спорткомплекс ЛНТУ · басейн",
-                "address": "вул. Львівська, 75",
+                "street": "lvivska",
+                "building": "75",
                 **location("50.725652", "25.297581"),
-                "district": "lviv-road",
                 "phone": "+380950935260",
-                "amenities": ["strength", "pool"],
+                "types": ["strength", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:30", "21:00")),
                     5: ("07:30", "20:00"),
@@ -131,21 +163,21 @@ CHAINS = [
                 "slug": "interatletika-voli",
                 "name": "Interatletika на Волі",
                 "highlight": "ТЦ «Гранд Волинь»",
-                "address": "просп. Волі, 42",
+                "street": "voli",
+                "building": "42",
                 **location("50.745126", "25.339579"),
-                "district": "center",
                 "phone": "+380994052626",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "hours": standard_hours(sunday=("10:00", "20:00")),
             },
             {
                 # Hidden until its phone and schedule are confirmed.
                 "slug": "interatletika-sobornosti",
                 "name": "Interatletika на Соборності",
-                "address": "просп. Соборності, 30",
+                "street": "sobornosti",
+                "building": "30",
                 **location("50.759921", "25.362440"),
-                "district": "33",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -166,18 +198,18 @@ CHAINS = [
                 30,
                 access=dict.fromkeys(range(7), (None, "14:00")),
             ),
-            plan("Безліміт на 3 місяці", "3900", 90),
+            on_sale(plan("Безліміт на 3 місяці", "3900", 90), "fixed", "400", days_left=14),
             plan("Річний безліміт", "12900", 365),
         ],
         "gyms": [
             {
-                "slug": "lime-fit-club-pysarevskoho",
+                "slug": "lime-fit-club-olimpiiska",
                 "name": "Lime Fit Club",
-                "address": "вул. Писаревського, 3",
+                "street": "olimpiiska",
+                "building": "3",
                 **location("50.759336", "25.380439"),
-                "district": "center",
                 "phone": "+380670000325",
-                "amenities": ["strength", "pool"],
+                "types": ["strength", "crossfit", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("09:00", "20:00"),
@@ -195,11 +227,11 @@ CHAINS = [
             {
                 "slug": "mojo-fitness-kovelska",
                 "name": "MOJO FITNESS",
-                "address": "вул. Ковельська, 16",
+                "street": "kovelska",
+                "building": "16",
                 **location("50.742592", "25.314395"),
-                "district": "center",
                 "phone": "+380633292886",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -211,11 +243,11 @@ CHAINS = [
             {
                 "slug": "gravity-space-lesi-ukrainky",
                 "name": "Gravity Space",
-                "address": "вул. Лесі Українки, 52",
+                "street": "lesi-ukrainky",
+                "building": "52",
                 **location("50.745284", "25.323897"),
-                "district": "center",
                 "phone": "+380967759988",
-                "amenities": ["strength"],
+                "types": ["strength"],
                 "is_published": False,
             },
         ],
@@ -228,7 +260,7 @@ CHAINS = [
         "website": "https://sportlife.ua/uk/clubs/lutsk/",
         "plans": [
             plan("Гостьовий візит", "350", 1),
-            plan("Безліміт на місяць", "1900", 30),
+            on_sale(plan("Безліміт на місяць", "1900", 30), "percent", "15", days_left=30),
             plan(
                 "Денний абонемент на місяць",
                 "1400",
@@ -242,12 +274,12 @@ CHAINS = [
             {
                 "slug": "sport-life-moiseia",
                 "name": "Sport Life",
-                "address": "просп. Василя Мойсея, 7А",
+                "street": "moiseia",
+                "building": "7А",
                 **location("50.753962", "25.337427"),
-                "district": "center",
                 "phone": "+380332280493",
                 "highlight": "Аквазона · три басейни",
-                "amenities": ["strength", "pool"],
+                "types": ["strength", "fitness", "pool"],
                 "hours": {
                     **dict.fromkeys(range(5), ("07:00", "22:00")),
                     5: ("08:00", "21:00"),
@@ -264,11 +296,11 @@ CHAINS = [
             {
                 "slug": "maximus-elektroaparatna",
                 "name": "Maximus",
-                "address": "вул. Електроапаратна, 4",
+                "street": "elektroaparatna",
+                "building": "4",
                 **location("50.739928", "25.378323"),
-                "district": "vidrodzhennia",
                 "phone": "+380664669626",
-                "amenities": ["strength", "pool"],
+                "types": ["strength", "fitness", "pool"],
                 "is_published": False,
             },
         ],
