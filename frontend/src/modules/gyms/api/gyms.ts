@@ -43,7 +43,6 @@ type GymListingDto = {
   } | null;
   hours_summary: string;
   is_open_now: boolean;
-  is_round_the_clock: boolean;
   price_from: string | null;
   photo_url: string | null;
   is_full_match: boolean;
@@ -109,7 +108,6 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     },
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,
-    isRoundTheClock: gym.is_round_the_clock,
     priceFrom: toPrice(gym.price_from),
     photoUrl: gym.photo_url,
     isFullMatch: gym.is_full_match,

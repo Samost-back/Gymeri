@@ -232,7 +232,6 @@ class GymSearchService:
             discount=prices.best_offer(today, gym.pk),
             hours_summary=schedule.summary(),
             is_open_now=schedule.is_open_at(now),
-            is_round_the_clock=schedule.is_round_the_clock(),
             price_from=prices.monthly_from(today, gym.pk),
             photo_url=photos[0].image.url if photos else None,
         )

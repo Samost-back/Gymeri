@@ -37,7 +37,6 @@ class GymListing:
     discount: DiscountOffer | None
     hours_summary: str
     is_open_now: bool
-    is_round_the_clock: bool
     price_from: Decimal | None
     photo_url: str | None
     # False when the gym meets only part of a filter, e.g. one of two requested gym types.
@@ -117,11 +116,6 @@ class OpenNowFilter(GymFilter):
         return gym.is_open_now
 
 
-class RoundTheClockFilter(GymFilter):
-    def accepts(self, gym: GymListing) -> bool:
-        return gym.is_round_the_clock
-
-
 class SortStrategy(ABC):
     """One way to order search results; adding a new order means adding a class."""
 
@@ -171,7 +165,6 @@ class GymSearchCriteria:
     audience: str | None = None
     discount: bool = False
     open_now: bool = False
-    round_the_clock: bool = False
     sort: SortStrategy = SORT_STRATEGIES["name"]
 
     @classmethod
@@ -187,7 +180,6 @@ class GymSearchCriteria:
             audience=params.get("audience") or None,
             discount=cls._parse_flag(params, "discount"),
             open_now=cls._parse_flag(params, "open_now"),
-            round_the_clock=cls._parse_flag(params, "round_the_clock"),
             sort=SORT_STRATEGIES[sort_code],
         )
 
@@ -209,7 +201,6 @@ class GymSearchCriteria:
             AudienceFilter(self.audience) if self.audience else None,
             DiscountFilter() if self.discount else None,
             OpenNowFilter() if self.open_now else None,
-            RoundTheClockFilter() if self.round_the_clock else None,
         ]
         return [candidate for candidate in candidates if candidate]
 

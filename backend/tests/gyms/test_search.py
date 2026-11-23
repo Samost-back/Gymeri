@@ -34,7 +34,6 @@ def listing(
         discount=OFFER if discount else None,
         hours_summary="",
         is_open_now=False,
-        is_round_the_clock=False,
         price_from=Decimal(price) if price else None,
         photo_url=None,
     )

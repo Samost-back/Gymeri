@@ -54,7 +54,6 @@ class GymListingSerializer(serializers.Serializer):
     discount = DiscountOfferSerializer(allow_null=True)
     hours_summary = serializers.CharField()
     is_open_now = serializers.BooleanField()
-    is_round_the_clock = serializers.BooleanField()
     price_from = serializers.DecimalField(max_digits=8, decimal_places=2, allow_null=True)
     photo_url = serializers.CharField(allow_null=True)
     is_full_match = serializers.BooleanField()

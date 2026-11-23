@@ -10,7 +10,6 @@ export const EMPTY_SEARCH: GymSearchParams = {
   types: [],
   discount: false,
   openNow: false,
-  roundTheClock: false,
   sort: "name",
 };
 
@@ -32,7 +31,6 @@ export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
     audience: first(raw.audience),
     discount: first(raw.discount) === "true",
     openNow: first(raw.open_now) === "true",
-    roundTheClock: first(raw.round_the_clock) === "true",
     sort: isSortCode(sort) ? sort : "name",
   };
 }
@@ -45,7 +43,6 @@ export function toQuery(params: GymSearchParams): Record<string, QueryValue> {
     audience: params.audience,
     discount: params.discount ? "true" : undefined,
     open_now: params.openNow ? "true" : undefined,
-    round_the_clock: params.roundTheClock ? "true" : undefined,
     sort: params.sort === "name" ? undefined : params.sort,
   };
 }

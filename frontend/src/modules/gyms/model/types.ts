@@ -53,7 +53,6 @@ export type GymListing = {
   discount: DiscountOffer | null;
   hoursSummary: string;
   isOpenNow: boolean;
-  isRoundTheClock: boolean;
   priceFrom: number | null;
   photoUrl: string | null;
   // False when the gym has only some of the requested gym types.
@@ -75,7 +74,6 @@ export type GymSearchParams = {
   audience?: string;
   discount: boolean;
   openNow: boolean;
-  roundTheClock: boolean;
   sort: SortCode;
 };
 

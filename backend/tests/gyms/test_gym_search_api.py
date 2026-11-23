@@ -108,11 +108,6 @@ def test_filter_by_audience_finds_gyms_with_a_plan_for_that_group(catalog):
 
 
 @pytest.mark.django_db
-def test_round_the_clock_filter_uses_schedule(catalog):
-    assert search_slugs("?round_the_clock=true") == ["koniakina"]
-
-
-@pytest.mark.django_db
 def test_open_now_depends_on_current_time(catalog):
     criteria = GymSearchCriteria(open_now=True)
     monday_night = datetime(2026, 11, 16, 23, 0, tzinfo=KYIV)

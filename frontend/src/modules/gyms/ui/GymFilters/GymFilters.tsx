@@ -48,7 +48,6 @@ function activeFilterCount(params: GymSearchParams): number {
     params.audience,
     params.discount,
     params.openNow,
-    params.roundTheClock,
   ];
   return singles.filter(Boolean).length + params.types.length;
 }
@@ -113,13 +112,6 @@ export function GymFilters({ options, params, resultCount }: GymFiltersProps) {
             active={params.discount}
           >
             Є знижка
-          </Chip>
-          <Chip
-            icon="schedule"
-            href={gymsHref({ ...params, roundTheClock: !params.roundTheClock })}
-            active={params.roundTheClock}
-          >
-            24/7
           </Chip>
           <Chip
             icon="timer"

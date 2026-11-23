@@ -15,7 +15,6 @@ describe("parseSearchParams", () => {
       audience: "students",
       discount: "true",
       open_now: "true",
-      round_the_clock: "true",
       sort: "price",
     });
 
@@ -26,7 +25,6 @@ describe("parseSearchParams", () => {
       audience: "students",
       discount: true,
       openNow: true,
-      roundTheClock: true,
       sort: "price",
     });
   });
@@ -53,7 +51,6 @@ describe("toQuery", () => {
       audience: undefined,
       discount: undefined,
       open_now: undefined,
-      round_the_clock: undefined,
       sort: undefined,
     });
   });
