@@ -9,7 +9,6 @@ import styles from "./SiteHeader.module.css";
 
 // Phones and tablets: the full nav doesn't fit next to the brand below 1024px.
 export function MobileMenu() {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -40,32 +39,40 @@ export function MobileMenu() {
         <Icon name={open ? "close" : "menu"} size={24} />
       </button>
 
-      {open && (
-        <nav id="mobile-menu" className={styles.mobileNav} aria-label="Мобільна навігація">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={isNavLinkActive(pathname, link.href) ? "page" : undefined}
-              className={styles.mobileLink}
-              onClick={close}
-            >
-              {link.label}
-              <Icon name="arrow_forward" size={18} />
-            </Link>
-          ))}
-          <div className={styles.mobileActions}>
-            <Link href="/map" className={styles.mobileMap} onClick={close}>
-              <Icon name="location_on" size={18} />
-              Карта
-            </Link>
-            <ButtonLink href="/login" className={styles.mobileLogin} onClick={close}>
-              <Icon name="login" size={18} />
-              Увійти
-            </ButtonLink>
-          </div>
-        </nav>
-      )}
+      {open && <MobileNav onClose={close} />}
     </>
+  );
+}
+
+// Reads the URL only once the menu is open, so the closed button never waits for it on
+// dynamic routes, where the pathname is known only at request time.
+function MobileNav({ onClose }: { onClose: () => void }) {
+  const pathname = usePathname();
+
+  return (
+    <nav id="mobile-menu" className={styles.mobileNav} aria-label="Мобільна навігація">
+      {NAV_LINKS.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          aria-current={isNavLinkActive(pathname, link.href) ? "page" : undefined}
+          className={styles.mobileLink}
+          onClick={onClose}
+        >
+          {link.label}
+          <Icon name="arrow_forward" size={18} />
+        </Link>
+      ))}
+      <div className={styles.mobileActions}>
+        <Link href="/map" className={styles.mobileMap} onClick={onClose}>
+          <Icon name="location_on" size={18} />
+          Карта
+        </Link>
+        <ButtonLink href="/login" className={styles.mobileLogin} onClick={onClose}>
+          <Icon name="login" size={18} />
+          Увійти
+        </ButtonLink>
+      </div>
+    </nav>
   );
 }

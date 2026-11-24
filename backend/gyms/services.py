@@ -7,20 +7,36 @@ from django.db.models import Count, Prefetch, Q, QuerySet
 from django.utils import timezone
 
 from .discounts import make_discount
-from .exceptions import GymNotPublishable, InvalidDiscount, InvalidFilter
+from .exceptions import GymNotFound, GymNotPublishable, InvalidDiscount, InvalidFilter
 from .geo import GeoPoint
 from .models import Audience, Chain, Gym, GymType, MembershipPlan, Street
-from .pricing import PlanPrice, PriceList
-from .schedule import TimeInterval, WeeklySchedule
+from .pricing import DiscountOffer, PlanPrice, PriceList
+from .schedule import (
+    WEEKDAY_NAMES,
+    AccessWindow,
+    PlanAccess,
+    TimeInterval,
+    WeeklySchedule,
+)
 from .search import GymListing, GymSearchCriteria, Label
 
 
+def load_schedule(gym: Gym) -> WeeklySchedule:
+    """Expects opening_hours prefetched when called for many gyms."""
+    return WeeklySchedule(
+        {
+            hours.weekday: TimeInterval(hours.opens_at, hours.closes_at)
+            for hours in gym.opening_hours.all()
+        }
+    )
+
+
 def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
-    """Active plans of all given chains with their audiences and discounts, grouped into a
-    PriceList per chain; three queries however many chains there are."""
+    """Active plans of all given chains with their audiences, access hours and discounts,
+    grouped into a PriceList per chain; four queries however many chains there are."""
     plans: dict[int, list[PlanPrice]] = defaultdict(list)
     rows = MembershipPlan.objects.filter(chain__in=chain_ids, is_active=True).prefetch_related(
-        "audiences", "discounts"
+        "audiences", "access_windows", "discounts"
     )
     for plan in rows:
         plans[plan.chain_id].append(
@@ -33,6 +49,13 @@ def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
                     make_discount(d.kind, d.value, d.ends_on) for d in plan.discounts.all()
                 ),
                 name=plan.name,
+                visits_limit=plan.visits_limit,
+                access=PlanAccess(
+                    {
+                        window.weekday: AccessWindow(window.starts_at, window.ends_at)
+                        for window in plan.access_windows.all()
+                    }
+                ),
             )
         )
     return {chain_id: PriceList(plans[chain_id]) for chain_id in chain_ids}
@@ -82,6 +105,59 @@ class MapPoint:
     instagram_url: str
     address: str
     location: GeoPoint
+
+
+@dataclass(frozen=True)
+class DayHours:
+    name: str
+    # None when the gym is closed that day.
+    hours: str | None
+    is_today: bool
+
+
+@dataclass(frozen=True)
+class PlanOffer:
+    """A plan as the gym page shows it, with the price a buyer pays today."""
+
+    name: str
+    duration_days: int
+    visits_limit: int | None
+    audiences: tuple[Label, ...]
+    # E.g. "Пн, Ср, Пт до 18:00"; empty when the plan works whenever the gym is open.
+    access_hours: str
+    price: Decimal
+    # The active promotion behind `price`, or None when the full price applies.
+    discount: DiscountOffer | None
+
+
+@dataclass(frozen=True)
+class Photo:
+    url: str
+    alt: str
+
+
+@dataclass(frozen=True)
+class GymProfile:
+    """Everything the public page of one gym shows."""
+
+    slug: str
+    name: str
+    chain_slug: str
+    chain_name: str
+    # Only chains have these links; each is empty when the chain has none.
+    website: str
+    instagram_url: str
+    address: str
+    highlight: str
+    area_m2: int | None
+    phone: str
+    types: tuple[Label, ...]
+    location: GeoPoint
+    photos: tuple[Photo, ...]
+    hours_summary: str
+    is_open_now: bool
+    week: tuple[DayHours, ...]
+    plans: tuple[PlanOffer, ...]
 
 
 class CatalogService:
@@ -143,6 +219,64 @@ class CatalogService:
             )
             for gym in gyms
         ]
+
+    def get_gym(self, slug: str, now: datetime | None = None) -> GymProfile:
+        now = timezone.localtime(now)
+        gym = (
+            self._published_gyms()
+            .select_related("chain", "street")
+            .prefetch_related("types", "opening_hours", "photos")
+            .filter(slug=slug)
+            .first()
+        )
+        if gym is None:
+            raise GymNotFound(f"No published gym: {slug}")
+
+        schedule = load_schedule(gym)
+        prices = load_price_lists({gym.chain_id})[gym.chain_id]
+        audience_names = dict(Audience.objects.values_list("slug", "name"))
+        return GymProfile(
+            slug=gym.slug,
+            name=gym.name,
+            chain_slug=gym.chain.slug,
+            chain_name=gym.chain.name,
+            website=gym.chain.website,
+            instagram_url=gym.chain.instagram_url,
+            address=gym.address,
+            highlight=gym.highlight,
+            area_m2=gym.area_m2,
+            phone=gym.phone,
+            types=tuple(Label(t.slug, t.name) for t in gym.types.all()),
+            location=GeoPoint(gym.latitude, gym.longitude),
+            photos=tuple(Photo(photo.image.url, photo.alt) for photo in gym.photos.all()),
+            hours_summary=schedule.summary(),
+            is_open_now=schedule.is_open_at(now),
+            week=tuple(
+                DayHours(
+                    WEEKDAY_NAMES[day],
+                    str(interval) if interval else None,
+                    is_today=day == now.weekday(),
+                )
+                for day, interval in schedule.week()
+            ),
+            plans=tuple(
+                self._to_offer(plan, audience_names, now.date())
+                for plan in prices.plans_for(gym.pk)
+            ),
+        )
+
+    @staticmethod
+    def _to_offer(plan: PlanPrice, audience_names: dict[str, str], today: date) -> PlanOffer:
+        offer = plan.best_offer_on(today)
+        return PlanOffer(
+            name=plan.name,
+            duration_days=plan.duration_days,
+            visits_limit=plan.visits_limit,
+            audiences=tuple(Label(slug, audience_names[slug]) for slug in sorted(plan.audiences)),
+            access_hours=plan.access.summary(),
+            price=offer.price if offer else plan.price,
+            discount=offer,
+        )
 
     @staticmethod
     def _published_gyms() -> QuerySet[Gym]:
@@ -208,12 +342,7 @@ class GymSearchService:
     def _to_listing(
         gym: Gym, prices: PriceList, audience_names: dict[str, str], now: datetime
     ) -> GymListing:
-        schedule = WeeklySchedule(
-            {
-                hours.weekday: TimeInterval(hours.opens_at, hours.closes_at)
-                for hours in gym.opening_hours.all()
-            }
-        )
+        schedule = load_schedule(gym)
         photos = list(gym.photos.all())
         today = now.date()
         return GymListing(

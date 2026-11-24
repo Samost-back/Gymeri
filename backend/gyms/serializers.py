@@ -59,6 +59,48 @@ class GymListingSerializer(serializers.Serializer):
     is_full_match = serializers.BooleanField()
 
 
+class DayHoursSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    hours = serializers.CharField(allow_null=True)
+    is_today = serializers.BooleanField()
+
+
+class PlanOfferSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    duration_days = serializers.IntegerField()
+    visits_limit = serializers.IntegerField(allow_null=True)
+    audiences = FilterOptionSerializer(many=True)
+    access_hours = serializers.CharField(allow_blank=True)
+    price = serializers.DecimalField(max_digits=8, decimal_places=2)
+    discount = DiscountOfferSerializer(allow_null=True)
+
+
+class PhotoSerializer(serializers.Serializer):
+    url = serializers.CharField()
+    alt = serializers.CharField()
+
+
+class GymProfileSerializer(serializers.Serializer):
+    slug = serializers.CharField()
+    name = serializers.CharField()
+    chain_slug = serializers.CharField()
+    chain_name = serializers.CharField()
+    website = serializers.CharField()
+    instagram_url = serializers.CharField()
+    address = serializers.CharField()
+    highlight = serializers.CharField()
+    area_m2 = serializers.IntegerField(allow_null=True)
+    phone = serializers.CharField()
+    types = FilterOptionSerializer(many=True)
+    latitude = serializers.FloatField(source="location.latitude")
+    longitude = serializers.FloatField(source="location.longitude")
+    photos = PhotoSerializer(many=True)
+    hours_summary = serializers.CharField()
+    is_open_now = serializers.BooleanField()
+    week = DayHoursSerializer(many=True)
+    plans = PlanOfferSerializer(many=True)
+
+
 class MapPointSerializer(serializers.Serializer):
     slug = serializers.CharField()
     name = serializers.CharField()

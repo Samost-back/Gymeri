@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { cx } from "@/shared/lib/classNames";
 import { formatArea, formatPrice } from "@/shared/lib/format";
 import { Icon, Tag } from "@/shared/ui";
@@ -33,7 +34,11 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
           )}
         </div>
 
-        <h3 className={styles.name}>{gym.name}</h3>
+        <h3 className={styles.name}>
+          <Link href={`/gyms/${gym.slug}`} className={styles.link}>
+            {gym.name}
+          </Link>
+        </h3>
         {gym.highlight && <p className={styles.highlight}>{gym.highlight}</p>}
 
         <div className={styles.details}>

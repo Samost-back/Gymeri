@@ -20,3 +20,7 @@ class GymNotPublishable(GymsError):
 
 class InvalidDiscount(GymsError):
     """A discount that can't be applied: zero, over 100% or more than the price."""
+
+
+class GymNotFound(GymsError):
+    """No published gym with this slug; drafts look the same as missing gyms to visitors."""

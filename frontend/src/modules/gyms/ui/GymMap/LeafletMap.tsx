@@ -118,7 +118,11 @@ function GymPopup({ point }: { point: GymMapPoint }) {
   return (
     <div className={styles.popup}>
       <span className={styles.chain}>{point.chainName}</span>
-      <strong className={styles.name}>{point.name}</strong>
+      {/* A plain link: the popup renders in its own React root, which has no Next router
+          for <Link>; the gym page simply loads in full. */}
+      <a href={`/gyms/${point.slug}`} className={styles.name}>
+        {point.name}
+      </a>
       <span className={styles.address}>{point.address}</span>
       <div className={styles.actions}>
         <a

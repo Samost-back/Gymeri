@@ -1,6 +1,13 @@
 from django.urls import path
 
-from .views import CatalogStatsView, ChainListView, FilterOptionsView, GymListView, GymMapView
+from .views import (
+    CatalogStatsView,
+    ChainListView,
+    FilterOptionsView,
+    GymDetailView,
+    GymListView,
+    GymMapView,
+)
 
 urlpatterns = [
     path("catalog/stats/", CatalogStatsView.as_view(), name="catalog-stats"),
@@ -8,4 +15,6 @@ urlpatterns = [
     path("chains/", ChainListView.as_view(), name="chain-list"),
     path("gyms/", GymListView.as_view(), name="gym-list"),
     path("gyms/map/", GymMapView.as_view(), name="gym-map"),
+    # After "map/", so that word never reads as a gym slug.
+    path("gyms/<slug:slug>/", GymDetailView.as_view(), name="gym-detail"),
 ]

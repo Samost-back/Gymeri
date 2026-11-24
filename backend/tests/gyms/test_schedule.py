@@ -80,3 +80,12 @@ def test_round_the_clock_needs_all_seven_full_days():
 )
 def test_summary_merges_equal_neighbouring_days(days, expected):
     assert WeeklySchedule(days).summary() == expected
+
+
+def test_week_lists_every_day_with_closed_ones_empty():
+    monday = interval("08:00", "21:30")
+
+    week = WeeklySchedule({0: monday}).week()
+
+    assert week[0] == (0, monday)
+    assert week[1:] == [(day, None) for day in range(1, 7)]

@@ -1,0 +1,174 @@
+/* Gym page: the profile with its plan and schedule blocks. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.photos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgb(var(--color-shade-rgb) / 0.35);
+}
+
+/* The same treatment as the catalog cards, so photos of different gyms look like one set. */
+.photo img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.25);
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-border);
+}
+
+.planMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.planTerm {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.planName {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+/* Grows to push the price down, so prices line up across cards of different height. */
+.planDetails {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm);
+  border-block: 1px solid var(--color-border);
+}
+
+.detail {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--color-text-muted);
+}
+
+.detailIcon {
+  color: var(--color-text-subtle);
+}
+
+.planPrice {
+  composes: headlineMd from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  color: var(--color-primary);
+}
+
+.fullPrice {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+/* Same gap above as between the plan cards, so the link reads as part of the section. */
+.sectionFooter {
+  margin-top: var(--space-lg);
+}
+
+.columns {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+}
+
+.day {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.today {
+  background: var(--color-surface-low);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.dayName {
+  font-family: var(--font-mono);
+}
+
+.types {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.label {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.empty {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  padding: var(--space-xl);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .photos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .plans {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .columns {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .plans {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

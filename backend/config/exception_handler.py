@@ -2,11 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 
-from gyms.exceptions import InvalidFilter
+from gyms.exceptions import GymNotFound, InvalidFilter
 
 # The single place where domain errors become HTTP responses; services stay HTTP-agnostic.
 DOMAIN_ERROR_STATUSES: dict[type[Exception], int] = {
     InvalidFilter: status.HTTP_400_BAD_REQUEST,
+    GymNotFound: status.HTTP_404_NOT_FOUND,
 }
 
 

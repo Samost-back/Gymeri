@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ButtonLink, Container, Icon } from "@/shared/ui";
 import { MobileMenu } from "./MobileMenu";
 import styles from "./SiteHeader.module.css";
-import { SiteNav } from "./SiteNav";
+import { NavLinks, SiteNav } from "./SiteNav";
 
 export function SiteHeader() {
   return (
@@ -12,7 +13,9 @@ export function SiteHeader() {
           GYMERI · LUTSK
         </Link>
 
-        <SiteNav />
+        <Suspense fallback={<NavLinks pathname={null} />}>
+          <SiteNav />
+        </Suspense>
 
         <div className={styles.actions}>
           <Link href="/map" className={styles.map}>

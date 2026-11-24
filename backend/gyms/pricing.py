@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from .discounts import Discount
 from .exceptions import InvalidDiscount
+from .schedule import PlanAccess
 
 MONTH_DAYS = 30
 
@@ -35,6 +36,9 @@ class PlanPrice:
     audiences: frozenset[str] = field(default_factory=frozenset)
     discounts: tuple[Discount, ...] = ()
     name: str = ""
+    # None means unlimited visits during the period.
+    visits_limit: int | None = None
+    access: PlanAccess = field(default_factory=lambda: PlanAccess({}))
 
     @property
     def is_for_everyone(self) -> bool:
@@ -86,6 +90,14 @@ class PriceList:
     def audiences(self, gym_id: int | None = None) -> frozenset[str]:
         """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""
         return frozenset().union(*(plan.audiences for plan in self._sold_in(gym_id)))
+
+    def plans_for(self, gym_id: int) -> list[PlanPrice]:
+        """Plans sold in this gym: ones anyone can buy before those for special groups, then
+        shorter terms first and cheaper first within a term."""
+        return sorted(
+            self._sold_in(gym_id),
+            key=lambda plan: (not plan.is_for_everyone, plan.duration_days, plan.price),
+        )
 
     def _sold_in(self, gym_id: int | None) -> list[PlanPrice]:
         return [plan for plan in self._plans if gym_id is None or plan.gym_id in (None, gym_id)]

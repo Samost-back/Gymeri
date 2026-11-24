@@ -8,6 +8,7 @@ from .serializers import (
     ChainCardSerializer,
     FilterOptionsSerializer,
     GymListingSerializer,
+    GymProfileSerializer,
     MapPointSerializer,
 )
 from .services import CatalogService, GymSearchService
@@ -38,6 +39,12 @@ class GymListView(APIView):
         )
         gyms = GymSearchService().search(criteria)
         return Response(GymListingSerializer(gyms, many=True).data)
+
+
+class GymDetailView(APIView):
+    def get(self, request: Request, slug: str) -> Response:
+        gym = CatalogService().get_gym(slug)
+        return Response(GymProfileSerializer(gym).data)
 
 
 class GymMapView(APIView):
