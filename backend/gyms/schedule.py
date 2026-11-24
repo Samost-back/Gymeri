@@ -71,6 +71,10 @@ class WeeklySchedule:
             interval.is_full_day for interval in self.days.values()
         )
 
+    def week(self) -> list[tuple[int, TimeInterval | None]]:
+        """All seven weekdays from Monday, with None for the days the gym is closed."""
+        return [(day, self.days.get(day)) for day in range(DAYS_IN_WEEK)]
+
     def summary(self) -> str:
         """Human-readable hours with equal neighbouring days merged: "Пн–Сб 08:00–21:30"."""
         if not self.days:
