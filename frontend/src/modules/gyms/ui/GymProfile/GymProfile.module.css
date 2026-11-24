@@ -92,6 +92,11 @@
   color: var(--color-text-subtle);
 }
 
+/* Same gap above as between the plan cards, so the link reads as part of the section. */
+.sectionFooter {
+  margin-top: var(--space-lg);
+}
+
 .columns {
   display: grid;
   gap: var(--space-xl);

@@ -13,6 +13,7 @@ import {
 } from "@/shared/ui";
 import { getGym } from "../../api/gyms";
 import { type ChainLink, chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
+import { EMPTY_SEARCH, gymsHref } from "../../model/searchParams";
 import type { GymProfile as GymProfileData } from "../../model/types";
 import styles from "./GymProfile.module.css";
 import { PlanCard } from "./PlanCard";
@@ -113,6 +114,15 @@ export async function GymProfile({ slug }: GymProfileProps) {
           ) : (
             <p className={styles.empty}>Мережа ще не опублікувала ціни для цього залу.</p>
           )}
+          <div className={styles.sectionFooter}>
+            <ButtonLink
+              href={gymsHref({ ...EMPTY_SEARCH, chain: gym.chainSlug })}
+              variant="outline"
+            >
+              Усі зали мережі
+              <Icon name="arrow_forward" size={18} />
+            </ButtonLink>
+          </div>
         </section>
 
         <section>
