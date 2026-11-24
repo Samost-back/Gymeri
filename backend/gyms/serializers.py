@@ -70,6 +70,7 @@ class PlanOfferSerializer(serializers.Serializer):
     duration_days = serializers.IntegerField()
     visits_limit = serializers.IntegerField(allow_null=True)
     audiences = FilterOptionSerializer(many=True)
+    access_hours = serializers.CharField(allow_blank=True)
     price = serializers.DecimalField(max_digits=8, decimal_places=2)
     discount = DiscountOfferSerializer(allow_null=True)
 
@@ -86,7 +87,6 @@ class GymProfileSerializer(serializers.Serializer):
     chain_name = serializers.CharField()
     website = serializers.CharField()
     instagram_url = serializers.CharField()
-    facebook_url = serializers.CharField()
     address = serializers.CharField()
     highlight = serializers.CharField()
     area_m2 = serializers.IntegerField(allow_null=True)

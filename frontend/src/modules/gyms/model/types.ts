@@ -103,6 +103,8 @@ export type PlanOffer = {
   visitsLimit: number | null;
   // Who may buy it; empty means everyone.
   audiences: FilterOption[];
+  // E.g. "Пн, Ср, Пт до 18:00"; empty when the plan works whenever the gym is open.
+  accessHours: string;
   // What a buyer pays today, with the discount already applied.
   price: number;
   discount: DiscountOffer | null;
@@ -121,7 +123,6 @@ export type GymProfile = {
   // The chain's links; each is empty when the chain has none.
   website: string;
   instagramUrl: string;
-  facebookUrl: string;
   address: string;
   highlight: string;
   areaM2: number | null;

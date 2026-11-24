@@ -11,7 +11,13 @@ from .exceptions import GymNotFound, GymNotPublishable, InvalidDiscount, Invalid
 from .geo import GeoPoint
 from .models import Audience, Chain, Gym, GymType, MembershipPlan, Street
 from .pricing import DiscountOffer, PlanPrice, PriceList
-from .schedule import WEEKDAY_NAMES, TimeInterval, WeeklySchedule
+from .schedule import (
+    WEEKDAY_NAMES,
+    AccessWindow,
+    PlanAccess,
+    TimeInterval,
+    WeeklySchedule,
+)
 from .search import GymListing, GymSearchCriteria, Label
 
 
@@ -26,11 +32,11 @@ def load_schedule(gym: Gym) -> WeeklySchedule:
 
 
 def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
-    """Active plans of all given chains with their audiences and discounts, grouped into a
-    PriceList per chain; three queries however many chains there are."""
+    """Active plans of all given chains with their audiences, access hours and discounts,
+    grouped into a PriceList per chain; four queries however many chains there are."""
     plans: dict[int, list[PlanPrice]] = defaultdict(list)
     rows = MembershipPlan.objects.filter(chain__in=chain_ids, is_active=True).prefetch_related(
-        "audiences", "discounts"
+        "audiences", "access_windows", "discounts"
     )
     for plan in rows:
         plans[plan.chain_id].append(
@@ -44,6 +50,12 @@ def load_price_lists(chain_ids: set[int]) -> dict[int, PriceList]:
                 ),
                 name=plan.name,
                 visits_limit=plan.visits_limit,
+                access=PlanAccess(
+                    {
+                        window.weekday: AccessWindow(window.starts_at, window.ends_at)
+                        for window in plan.access_windows.all()
+                    }
+                ),
             )
         )
     return {chain_id: PriceList(plans[chain_id]) for chain_id in chain_ids}
@@ -111,6 +123,8 @@ class PlanOffer:
     duration_days: int
     visits_limit: int | None
     audiences: tuple[Label, ...]
+    # E.g. "Пн, Ср, Пт до 18:00"; empty when the plan works whenever the gym is open.
+    access_hours: str
     price: Decimal
     # The active promotion behind `price`, or None when the full price applies.
     discount: DiscountOffer | None
@@ -133,7 +147,6 @@ class GymProfile:
     # Only chains have these links; each is empty when the chain has none.
     website: str
     instagram_url: str
-    facebook_url: str
     address: str
     highlight: str
     area_m2: int | None
@@ -229,7 +242,6 @@ class CatalogService:
             chain_name=gym.chain.name,
             website=gym.chain.website,
             instagram_url=gym.chain.instagram_url,
-            facebook_url=gym.chain.facebook_url,
             address=gym.address,
             highlight=gym.highlight,
             area_m2=gym.area_m2,
@@ -261,6 +273,7 @@ class CatalogService:
             duration_days=plan.duration_days,
             visits_limit=plan.visits_limit,
             audiences=tuple(Label(slug, audience_names[slug]) for slug in sorted(plan.audiences)),
+            access_hours=plan.access.summary(),
             price=offer.price if offer else plan.price,
             discount=offer,
         )

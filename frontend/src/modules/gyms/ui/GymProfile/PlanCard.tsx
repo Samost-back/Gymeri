@@ -34,6 +34,12 @@ export function PlanCard({ plan }: { plan: PlanOffer }) {
             Лише для: {plan.audiences.map((audience) => audience.name.toLowerCase()).join(", ")}
           </p>
         )}
+        {plan.accessHours && (
+          <p className={styles.detail}>
+            <Icon name="schedule" size={16} className={styles.detailIcon} />
+            Години: {plan.accessHours}
+          </p>
+        )}
         {endsOn && (
           <p className={styles.detail}>
             <Icon name="event" size={16} className={styles.detailIcon} />

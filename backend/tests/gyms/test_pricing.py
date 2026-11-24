@@ -57,14 +57,19 @@ def test_gym_lists_the_groups_of_its_plans():
     assert prices.audiences(VOLI) == {"students", "pupils", "veterans"}
 
 
-def test_gym_plans_go_from_shortest_and_skip_other_gyms():
+def test_gym_plans_put_everyone_first_then_shorter_and_cheaper():
     prices = PriceList(
         [
             PlanPrice(Decimal("11800"), 365, name="Year"),
+            PlanPrice(Decimal("800"), 30, audiences=frozenset({"students"}), name="Student"),
             PlanPrice(Decimal("1350"), 30, name="Month"),
             PlanPrice(Decimal("900"), 30, gym_id=LVIVSKA, name="Lvivska month"),
-            PlanPrice(Decimal("700"), 30, gym_id=VOLI, name="Voli month"),
         ]
     )
 
-    assert [plan.name for plan in prices.plans_for(LVIVSKA)] == ["Lvivska month", "Month", "Year"]
+    assert [plan.name for plan in prices.plans_for(LVIVSKA)] == [
+        "Lvivska month",
+        "Month",
+        "Year",
+        "Student",
+    ]

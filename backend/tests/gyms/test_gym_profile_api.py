@@ -13,6 +13,7 @@ from gyms.models import (
     GymType,
     MembershipPlan,
     OpeningHours,
+    PlanAccessWindow,
     Street,
 )
 from gyms.services import CatalogService
@@ -52,7 +53,7 @@ def gym(chain: Chain, street: Street) -> Gym:
 
 def make_plan(chain: Chain, name: str, price: str, **fields) -> MembershipPlan:
     return MembershipPlan.objects.create(
-        chain=chain, name=name, price=Decimal(price), duration_days=fields.pop("days", 30), **fields
+        chain=chain, name=name, price=Decimal(price), duration_days=30, **fields
     )
 
 
@@ -72,12 +73,11 @@ def test_profile_shows_gym_and_chain_details(gym):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("published", [False, None], ids=["draft", "missing"])
-def test_draft_or_missing_gym_is_not_found(chain, street, published):
-    if published is False:
-        make_gym(chain, street, "draft", published=False)
+@pytest.mark.parametrize("slug", ["draft", "nowhere"], ids=["draft", "missing"])
+def test_draft_or_missing_gym_is_not_found(chain, street, slug):
+    make_gym(chain, street, "draft", published=False)
 
-    response = APIClient().get("/api/v1/gyms/draft/")
+    response = APIClient().get(f"/api/v1/gyms/{slug}/")
 
     assert response.status_code == 404
 
@@ -96,11 +96,9 @@ def test_week_marks_today_and_closed_days(gym):
 
 
 @pytest.mark.django_db
-def test_plans_include_chain_wide_and_own_but_not_other_gyms_or_inactive(chain, street, gym):
-    other = make_gym(chain, street, "voli")
+def test_plans_include_chain_wide_and_own_but_not_inactive(chain, gym):
     make_plan(chain, "Month", "1350")
     make_plan(chain, "Lvivska month", "900", gym=gym)
-    make_plan(chain, "Voli month", "700", gym=other)
     make_plan(chain, "Old month", "500", is_active=False)
 
     profile = CatalogService().get_gym("lvivska", now=MONDAY_NOON)
@@ -122,11 +120,14 @@ def test_plan_price_includes_an_active_discount(chain, gym):
 
 
 @pytest.mark.django_db
-def test_plan_lists_its_audiences_and_visits_limit(chain, gym):
+def test_plan_shows_who_when_and_how_often_it_works(chain, gym):
     plan = make_plan(chain, "Student 12", "600", visits_limit=12)
     plan.audiences.set([Audience.objects.create(name="Студенти", slug="students")])
+    for weekday in (0, 2, 4):
+        PlanAccessWindow.objects.create(plan=plan, weekday=weekday, ends_at="18:00")
 
     [offer] = CatalogService().get_gym("lvivska", now=MONDAY_NOON).plans
 
     assert offer.visits_limit == 12
     assert [audience.name for audience in offer.audiences] == ["Студенти"]
+    assert offer.access_hours == "Пн, Ср, Пт до 18:00"

@@ -70,7 +70,6 @@ type GymProfileDto = {
   chain_name: string;
   website: string;
   instagram_url: string;
-  facebook_url: string;
   address: string;
   highlight: string;
   area_m2: number | null;
@@ -87,6 +86,7 @@ type GymProfileDto = {
     duration_days: number;
     visits_limit: number | null;
     audiences: FilterOption[];
+    access_hours: string;
     price: string;
     discount: DiscountOfferDto | null;
   }[];
@@ -185,7 +185,6 @@ export async function getGym(slug: string): Promise<GymProfile | null> {
     chainName: gym.chain_name,
     website: gym.website,
     instagramUrl: gym.instagram_url,
-    facebookUrl: gym.facebook_url,
     address: gym.address,
     highlight: gym.highlight,
     areaM2: gym.area_m2,
@@ -202,6 +201,7 @@ export async function getGym(slug: string): Promise<GymProfile | null> {
       durationDays: plan.duration_days,
       visitsLimit: plan.visits_limit,
       audiences: plan.audiences,
+      accessHours: plan.access_hours,
       price: Number(plan.price),
       discount: toDiscount(plan.discount),
     })),
