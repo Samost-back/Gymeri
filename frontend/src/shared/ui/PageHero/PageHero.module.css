@@ -18,6 +18,12 @@
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 1;
+  /* Titles may be data, e.g. a gym name: narrow phones get a smaller size, so a long word
+     like "Interatletika" still fits whole. "anywhere" is the fallback for even longer words:
+     it also lowers their minimum width, so they wrap instead of stretching the grid. */
+  font-size: clamp(2rem, 11vw, 3rem);
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .titleAccent {
