@@ -13,7 +13,7 @@ describe("parseSearchParams", () => {
       chain: "ia",
       type: ["pool", "strength"],
       audience: "students",
-      discount: "true",
+      promo: "true",
       open_now: "true",
       sort: "price",
     });
@@ -23,7 +23,7 @@ describe("parseSearchParams", () => {
       chain: "ia",
       types: ["pool", "strength"],
       audience: "students",
-      discount: true,
+      promo: true,
       openNow: true,
       sort: "price",
     });
@@ -49,7 +49,7 @@ describe("toQuery", () => {
       chain: undefined,
       type: [],
       audience: undefined,
-      discount: undefined,
+      promo: undefined,
       open_now: undefined,
       sort: undefined,
     });

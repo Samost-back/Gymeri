@@ -8,7 +8,6 @@ from gyms import demo_data
 from gyms.models import (
     Audience,
     Chain,
-    Discount,
     Gym,
     GymType,
     MembershipPlan,
@@ -57,7 +56,10 @@ class Command(BaseCommand):
         fields = {**plan_data}
         access = fields.pop("access")
         audience_keys = fields.pop("audiences")
-        discounts = fields.pop("discounts")
+        days_left = fields.pop("promo_days_left")
+        fields["promo_ends_on"] = (
+            timezone.localdate() + timedelta(days=days_left) if days_left is not None else None
+        )
         plan, _ = MembershipPlan.objects.update_or_create(
             chain=chain, name=fields.pop("name"), defaults=fields
         )
@@ -67,12 +69,6 @@ class Command(BaseCommand):
             for day, (starts, ends) in access.items()
         )
         plan.audiences.set(audiences[key] for key in audience_keys)
-        today = timezone.localdate()
-        plan.discounts.all().delete()
-        Discount.objects.bulk_create(
-            Discount(plan=plan, kind=kind, value=value, ends_on=today + timedelta(days=days))
-            for kind, value, days in discounts
-        )
 
     def _save_gym(
         self,

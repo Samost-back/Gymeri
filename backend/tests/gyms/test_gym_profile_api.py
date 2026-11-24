@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
@@ -8,7 +8,6 @@ from rest_framework.test import APIClient
 from gyms.models import (
     Audience,
     Chain,
-    Discount,
     Gym,
     GymType,
     MembershipPlan,
@@ -107,16 +106,15 @@ def test_plans_include_chain_wide_and_own_but_not_inactive(chain, gym):
 
 
 @pytest.mark.django_db
-def test_plan_price_includes_an_active_discount(chain, gym):
-    plan = make_plan(chain, "Month", "1000")
-    Discount.objects.create(
-        plan=plan, kind="percent", value=Decimal("20"), ends_on=date(2026, 11, 30)
-    )
+def test_promo_shows_until_its_last_day(chain, gym):
+    make_plan(chain, "3 months for 1500", "1500", is_promo=True, promo_ends_on=date(2026, 11, 16))
 
     [offer] = CatalogService().get_gym("lvivska", now=MONDAY_NOON).plans
+    next_day = CatalogService().get_gym("lvivska", now=MONDAY_NOON + timedelta(days=1)).plans
 
-    assert offer.price == Decimal("800")
-    assert offer.discount.full_price == Decimal("1000")
+    assert offer.is_promo
+    assert offer.promo_ends_on == date(2026, 11, 16)
+    assert next_day == ()
 
 
 @pytest.mark.django_db

@@ -81,15 +81,7 @@
 
 .planPrice {
   composes: headlineMd from "@/shared/styles/typography.module.css";
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-sm);
   color: var(--color-primary);
-}
-
-.fullPrice {
-  composes: bodySm from "@/shared/styles/typography.module.css";
-  color: var(--color-text-subtle);
 }
 
 /* Same gap above as between the plan cards, so the link reads as part of the section. */

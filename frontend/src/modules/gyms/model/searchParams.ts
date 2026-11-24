@@ -8,7 +8,7 @@ type RawSearchParams = Record<string, string | string[] | undefined>;
 
 export const EMPTY_SEARCH: GymSearchParams = {
   types: [],
-  discount: false,
+  promo: false,
   openNow: false,
   sort: "name",
 };
@@ -29,7 +29,7 @@ export function parseSearchParams(raw: RawSearchParams): GymSearchParams {
     chain: first(raw.chain),
     types: [raw.type ?? []].flat(),
     audience: first(raw.audience),
-    discount: first(raw.discount) === "true",
+    promo: first(raw.promo) === "true",
     openNow: first(raw.open_now) === "true",
     sort: isSortCode(sort) ? sort : "name",
   };
@@ -41,7 +41,7 @@ export function toQuery(params: GymSearchParams): Record<string, QueryValue> {
     chain: params.chain,
     type: params.types,
     audience: params.audience,
-    discount: params.discount ? "true" : undefined,
+    promo: params.promo ? "true" : undefined,
     open_now: params.openNow ? "true" : undefined,
     sort: params.sort === "name" ? undefined : params.sort,
   };

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal
 
 from .exceptions import InvalidFilter
-from .pricing import DiscountOffer
+from .pricing import PlanPrice
 
 
 @dataclass(frozen=True)
@@ -33,8 +33,8 @@ class GymListing:
     types: tuple[Label, ...]
     # Groups with a plan of their own in this gym, e.g. students.
     audiences: tuple[Label, ...]
-    # The promotion with the biggest saving right now, or None.
-    discount: DiscountOffer | None
+    # The promo plan with the lowest price per month on sale right now, or None.
+    promo: PlanPrice | None
     hours_summary: str
     is_open_now: bool
     price_from: Decimal | None
@@ -106,9 +106,9 @@ class AudienceFilter(GymFilter):
         return gym.has_audience(self.slug)
 
 
-class DiscountFilter(GymFilter):
+class PromoFilter(GymFilter):
     def accepts(self, gym: GymListing) -> bool:
-        return gym.discount is not None
+        return gym.promo is not None
 
 
 class OpenNowFilter(GymFilter):
@@ -163,7 +163,7 @@ class GymSearchCriteria:
     chain: str | None = None
     types: frozenset[str] = field(default_factory=frozenset)
     audience: str | None = None
-    discount: bool = False
+    promo: bool = False
     open_now: bool = False
     sort: SortStrategy = SORT_STRATEGIES["name"]
 
@@ -178,7 +178,7 @@ class GymSearchCriteria:
             chain=params.get("chain") or None,
             types=frozenset(types),
             audience=params.get("audience") or None,
-            discount=cls._parse_flag(params, "discount"),
+            promo=cls._parse_flag(params, "promo"),
             open_now=cls._parse_flag(params, "open_now"),
             sort=SORT_STRATEGIES[sort_code],
         )
@@ -199,7 +199,7 @@ class GymSearchCriteria:
             ChainFilter(self.chain) if self.chain else None,
             GymTypeFilter(self.types) if self.types else None,
             AudienceFilter(self.audience) if self.audience else None,
-            DiscountFilter() if self.discount else None,
+            PromoFilter() if self.promo else None,
             OpenNowFilter() if self.open_now else None,
         ]
         return [candidate for candidate in candidates if candidate]

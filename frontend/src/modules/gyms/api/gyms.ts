@@ -3,7 +3,6 @@ import { toQuery } from "../model/searchParams";
 import type {
   CatalogStats,
   ChainCard,
-  DiscountOffer,
   FilterOption,
   FilterOptions,
   GymListing,
@@ -24,15 +23,6 @@ type ChainCardDto = {
   price_from: string | null;
 };
 
-type DiscountOfferDto = {
-  plan_name: string;
-  kind: "percent" | "fixed";
-  value: string;
-  ends_on: string;
-  full_price: string;
-  price: string;
-};
-
 type GymListingDto = {
   slug: string;
   name: string;
@@ -44,7 +34,11 @@ type GymListingDto = {
   area_m2: number | null;
   types: FilterOption[];
   audiences: FilterOption[];
-  discount: DiscountOfferDto | null;
+  promo: {
+    plan_name: string;
+    price: string;
+    ends_on: string | null;
+  } | null;
   hours_summary: string;
   is_open_now: boolean;
   price_from: string | null;
@@ -88,25 +82,13 @@ type GymProfileDto = {
     audiences: FilterOption[];
     access_hours: string;
     price: string;
-    discount: DiscountOfferDto | null;
+    is_promo: boolean;
+    promo_ends_on: string | null;
   }[];
 };
 
 function toPrice(value: string | null): number | null {
   return value === null ? null : Number(value);
-}
-
-function toDiscount(offer: DiscountOfferDto | null): DiscountOffer | null {
-  return (
-    offer && {
-      planName: offer.plan_name,
-      kind: offer.kind,
-      value: Number(offer.value),
-      endsOn: offer.ends_on,
-      fullPrice: Number(offer.full_price),
-      price: Number(offer.price),
-    }
-  );
 }
 
 export function getCatalogStats(): Promise<CatalogStats> {
@@ -144,7 +126,11 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
     areaM2: gym.area_m2,
     types: gym.types,
     audiences: gym.audiences,
-    discount: toDiscount(gym.discount),
+    promo: gym.promo && {
+      planName: gym.promo.plan_name,
+      price: Number(gym.promo.price),
+      endsOn: gym.promo.ends_on,
+    },
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,
     priceFrom: toPrice(gym.price_from),
@@ -203,7 +189,8 @@ export async function getGym(slug: string): Promise<GymProfile | null> {
       audiences: plan.audiences,
       accessHours: plan.access_hours,
       price: Number(plan.price),
-      discount: toDiscount(plan.discount),
+      isPromo: plan.is_promo,
+      promoEndsOn: plan.promo_ends_on,
     })),
   };
 }

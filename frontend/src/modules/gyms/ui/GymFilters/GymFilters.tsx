@@ -69,10 +69,10 @@ function activeFilters(options: FilterOptions, params: GymSearchParams): ActiveF
       label: nameOf(options.types, slug),
       removeHref: gymsHref({ ...params, types: toggle(params.types, slug) }),
     })),
-    params.discount && {
-      key: "discount",
-      label: "Є знижка",
-      removeHref: gymsHref({ ...params, discount: false }),
+    params.promo && {
+      key: "promo",
+      label: "Є акція",
+      removeHref: gymsHref({ ...params, promo: false }),
     },
     params.openNow && {
       key: "open-now",
@@ -183,10 +183,10 @@ export function GymFilters({ options, params, resultCount }: GymFiltersProps) {
                 </span>
                 <div className={styles.toggles}>
                   <ToggleLink
-                    href={gymsHref({ ...params, discount: !params.discount })}
-                    on={params.discount}
+                    href={gymsHref({ ...params, promo: !params.promo })}
+                    on={params.promo}
                   >
-                    Є знижка
+                    Є акція
                   </ToggleLink>
                   <ToggleLink
                     href={gymsHref({ ...params, openNow: !params.openNow })}

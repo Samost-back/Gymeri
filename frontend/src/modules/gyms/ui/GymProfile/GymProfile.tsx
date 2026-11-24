@@ -103,7 +103,7 @@ export async function GymProfile({ slug }: GymProfileProps) {
         <section>
           <PageHeader
             title="Абонементи"
-            description="Ціни на сьогодні з урахуванням акцій. Абонементи мережі діють у всіх її залах."
+            description="Абонементи мережі діють у всіх її залах. Акційні продаються до вказаної дати."
           />
           {gym.plans.length > 0 ? (
             <div className={styles.plans}>

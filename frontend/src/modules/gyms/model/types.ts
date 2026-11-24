@@ -27,14 +27,12 @@ export type ChainCard = {
   priceFrom: number | null;
 };
 
-export type DiscountOffer = {
+// A promo plan of its own, e.g. "3 місяці за ціною двох", not a discount on another plan.
+export type Promo = {
   planName: string;
-  kind: "percent" | "fixed";
-  value: number;
-  // ISO date, the last day the price holds.
-  endsOn: string;
-  fullPrice: number;
   price: number;
+  // ISO date, the last day it is sold; null while the chain keeps it on.
+  endsOn: string | null;
 };
 
 export type GymListing = {
@@ -49,8 +47,8 @@ export type GymListing = {
   types: FilterOption[];
   // Groups with a plan of their own here, e.g. students.
   audiences: FilterOption[];
-  // The promotion with the biggest saving right now.
-  discount: DiscountOffer | null;
+  // The promo with the lowest price per month on sale right now.
+  promo: Promo | null;
   hoursSummary: string;
   isOpenNow: boolean;
   priceFrom: number | null;
@@ -72,7 +70,7 @@ export type GymSearchParams = {
   chain?: string;
   types: string[];
   audience?: string;
-  discount: boolean;
+  promo: boolean;
   openNow: boolean;
   sort: SortCode;
 };
@@ -105,9 +103,10 @@ export type PlanOffer = {
   audiences: FilterOption[];
   // E.g. "Пн, Ср, Пт до 18:00"; empty when the plan works whenever the gym is open.
   accessHours: string;
-  // What a buyer pays today, with the discount already applied.
   price: number;
-  discount: DiscountOffer | null;
+  isPromo: boolean;
+  // ISO date, the last day a promo is sold; null for regular plans and open-ended promos.
+  promoEndsOn: string | null;
 };
 
 export type GymPhoto = {

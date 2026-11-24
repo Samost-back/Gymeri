@@ -48,8 +48,9 @@ def test_plan_with_unlimited_visits_is_valid(gym):
         {"price": Decimal("-1.00")},
         {"duration_days": 0},
         {"visits_limit": 0},
+        {"promo_ends_on": "2026-12-31"},
     ],
-    ids=["negative price", "zero duration", "zero visits"],
+    ids=["negative price", "zero duration", "zero visits", "promo end without promo"],
 )
 def test_invalid_plan_is_rejected_by_database(gym, overrides):
     with pytest.raises(IntegrityError):

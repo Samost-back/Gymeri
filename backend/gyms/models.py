@@ -180,6 +180,8 @@ class MembershipPlan(TimeStampedModel):
 
     Chains set most prices network-wide, so a plan belongs to a chain; an empty gym means
     the plan works in every gym of the chain, a filled one means it is sold only there.
+    Gyms run promotions as plans of their own ("3 months for 1500"), not as discounts on
+    other plans, so a promo is just a flagged plan.
     """
 
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE, related_name="membership_plans")
@@ -195,6 +197,10 @@ class MembershipPlan(TimeStampedModel):
     is_active = models.BooleanField(default=True)
     # Empty means anyone can buy it; such plans alone set the "from" price.
     audiences = models.ManyToManyField(Audience, blank=True, related_name="plans")
+    is_promo = models.BooleanField(default=False)
+    # The last day a promo is sold; empty means until the chain removes it. An expired promo
+    # drops out of the catalog on its own, so nobody has to remember to switch it off.
+    promo_ends_on = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ["chain", "price"]
@@ -206,6 +212,10 @@ class MembershipPlan(TimeStampedModel):
                 name="plan_visits_limit_positive",
             ),
             models.UniqueConstraint(fields=["chain", "name"], name="unique_chain_plan_name"),
+            models.CheckConstraint(
+                condition=Q(promo_ends_on__isnull=True) | Q(is_promo=True),
+                name="plan_promo_end_needs_promo",
+            ),
         ]
 
     def __str__(self) -> str:
@@ -249,38 +259,3 @@ class PlanAccessWindow(models.Model):
 
     def __str__(self) -> str:
         return f"{self.plan} {self.get_weekday_display()} {self.starts_at}-{self.ends_at}"
-
-
-class Discount(TimeStampedModel):
-    """A temporary promotion on a plan, valid until `ends_on` inclusive.
-
-    Rules that need the plan's price, like a fixed amount below it, live in the domain
-    Discount classes; the database keeps the ones it can check on its own.
-    """
-
-    class Kind(models.TextChoices):
-        PERCENT = "percent", "Percent"
-        FIXED = "fixed", "Fixed amount"
-
-    plan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE, related_name="discounts")
-    kind = models.CharField(max_length=10, choices=Kind.choices)
-    value = models.DecimalField(max_digits=8, decimal_places=2)
-    ends_on = models.DateField()
-
-    class Meta:
-        ordering = ["plan", "ends_on"]
-        constraints = [
-            models.CheckConstraint(condition=Q(value__gt=0), name="discount_value_positive"),
-            # Choices alone only guard forms; an unknown kind would break every price list.
-            models.CheckConstraint(
-                condition=Q(kind__in=["percent", "fixed"]), name="discount_kind_known"
-            ),
-            models.CheckConstraint(
-                condition=Q(kind="fixed") | Q(value__lte=100),
-                name="discount_percent_at_most_100",
-            ),
-        ]
-
-    def __str__(self) -> str:
-        unit = "%" if self.kind == self.Kind.PERCENT else " UAH"
-        return f"{self.plan}: -{self.value}{unit} until {self.ends_on}"

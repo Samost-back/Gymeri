@@ -5,7 +5,7 @@ import { formatArea, formatPrice } from "@/shared/lib/format";
 import { Icon, Tag } from "@/shared/ui";
 import type { GymListing } from "../../model/types";
 import styles from "./GymCard.module.css";
-import { discountAmount, discountText } from "./discountLabels";
+import { promoText } from "./promoLabels";
 
 type GymCardProps = {
   gym: GymListing;
@@ -26,10 +26,10 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
         <div className={styles.meta}>
           <span className={styles.chain}>{gym.chainName}</span>
           {gym.isOpenNow && <Tag variant="solid">Відкрито зараз</Tag>}
-          {gym.discount && (
+          {gym.promo && (
             <Tag variant="solid">
-              <Icon name="percent" size={14} />
-              {discountAmount(gym.discount)}
+              <Icon name="sell" size={14} />
+              Акція
             </Tag>
           )}
         </div>
@@ -59,10 +59,10 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
               {gym.audiences.map((audience) => audience.name.toLowerCase()).join(", ")}
             </p>
           )}
-          {gym.discount && (
+          {gym.promo && (
             <p className={cx(styles.detail, styles.offer)}>
-              <Icon name="percent" size={16} className={styles.detailIcon} />
-              Акція {discountText(gym.discount)}
+              <Icon name="sell" size={16} className={styles.detailIcon} />
+              Акція {promoText(gym.promo)}
             </p>
           )}
         </div>

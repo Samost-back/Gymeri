@@ -1,22 +1,20 @@
 import { formatDateParts, formatPrice } from "@/shared/lib/format";
 import { Icon, Tag } from "@/shared/ui";
 import type { PlanOffer } from "../../model/types";
-import { discountAmount } from "../GymCard/discountLabels";
 import styles from "./GymProfile.module.css";
 import { planTerm, planVisits } from "./planLabels";
 
 export function PlanCard({ plan }: { plan: PlanOffer }) {
-  const { discount } = plan;
-  const endsOn = discount && formatDateParts(discount.endsOn);
+  const endsOn = plan.promoEndsOn && formatDateParts(plan.promoEndsOn);
 
   return (
     <article className={styles.plan}>
       <div className={styles.planMeta}>
         <span className={styles.planTerm}>{planTerm(plan.durationDays)}</span>
-        {discount && (
+        {plan.isPromo && (
           <Tag variant="solid">
-            <Icon name="percent" size={14} />
-            {discountAmount(discount)}
+            <Icon name="sell" size={14} />
+            Акція
           </Tag>
         )}
       </div>
@@ -48,10 +46,7 @@ export function PlanCard({ plan }: { plan: PlanOffer }) {
         )}
       </div>
 
-      <p className={styles.planPrice}>
-        {discount && <s className={styles.fullPrice}>{formatPrice(discount.fullPrice)}</s>}
-        {formatPrice(plan.price)}
-      </p>
+      <p className={styles.planPrice}>{formatPrice(plan.price)}</p>
     </article>
   );
 }
