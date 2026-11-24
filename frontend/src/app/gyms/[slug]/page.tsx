@@ -13,6 +13,9 @@ export async function generateMetadata({ params }: PageProps<"/gyms/[slug]">): P
   };
 }
 
+// The profile loads inside Suspense, so an unknown gym shows the not-found page with status
+// 200 and a noindex tag: the status is sent before the gym is looked up. A real 404 would need
+// the lookup to block the whole page, header included.
 export default function GymPage({ params }: PageProps<"/gyms/[slug]">) {
   return (
     <Suspense>
