@@ -162,6 +162,12 @@
 
 .name {
   composes: headlineSm from "@/shared/styles/typography.module.css";
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Two classes, so it beats Leaflet's own blue for links inside the map. */
+.map .name {
   color: var(--color-primary);
 }
 

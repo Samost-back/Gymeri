@@ -88,3 +88,50 @@ export type GymMapPoint = {
   latitude: number;
   longitude: number;
 };
+
+export type DayHours = {
+  name: string;
+  // Null when the gym is closed that day.
+  hours: string | null;
+  isToday: boolean;
+};
+
+export type PlanOffer = {
+  name: string;
+  durationDays: number;
+  // Null means unlimited visits during the term.
+  visitsLimit: number | null;
+  // Who may buy it; empty means everyone.
+  audiences: FilterOption[];
+  // What a buyer pays today, with the discount already applied.
+  price: number;
+  discount: DiscountOffer | null;
+};
+
+export type GymPhoto = {
+  url: string;
+  alt: string;
+};
+
+export type GymProfile = {
+  slug: string;
+  name: string;
+  chainSlug: string;
+  chainName: string;
+  // The chain's links; each is empty when the chain has none.
+  website: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  address: string;
+  highlight: string;
+  areaM2: number | null;
+  phone: string;
+  types: FilterOption[];
+  latitude: number;
+  longitude: number;
+  photos: GymPhoto[];
+  hoursSummary: string;
+  isOpenNow: boolean;
+  week: DayHours[];
+  plans: PlanOffer[];
+};
