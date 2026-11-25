@@ -21,8 +21,10 @@ ps:
 migrate:
 	$(BACKEND) python manage.py migrate
 
+# Gyms first: the demo client picks one of them and buys its memberships there.
 seed:
 	$(BACKEND) python manage.py seed_demo
+	$(BACKEND) python manage.py seed_demo_client
 
 makemigrations:
 	$(BACKEND) python manage.py makemigrations
