@@ -19,6 +19,8 @@
   --color-primary: #ffffff;
   --color-primary-hover: #e4e1e5;
   --color-on-primary: #0e0e0e;
+  /* Form errors; light enough to read on the dark background. */
+  --color-error: #ff8a80;
 
   --font-sans: var(--font-onest), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;

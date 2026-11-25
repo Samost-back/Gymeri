@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ButtonLink, Icon } from "@/shared/ui";
+import { type ReactNode, useEffect, useState } from "react";
+import { Icon } from "@/shared/ui";
 import { NAV_LINKS, isNavLinkActive } from "./navLinks";
 import styles from "./SiteHeader.module.css";
 
 // Phones and tablets: the full nav doesn't fit next to the brand below 1024px.
-export function MobileMenu() {
+export function MobileMenu({ account }: { account: ReactNode }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -39,14 +39,14 @@ export function MobileMenu() {
         <Icon name={open ? "close" : "menu"} size={24} />
       </button>
 
-      {open && <MobileNav onClose={close} />}
+      {open && <MobileNav account={account} onClose={close} />}
     </>
   );
 }
 
 // Reads the URL only once the menu is open, so the closed button never waits for it on
 // dynamic routes, where the pathname is known only at request time.
-function MobileNav({ onClose }: { onClose: () => void }) {
+function MobileNav({ account, onClose }: { account: ReactNode; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -68,10 +68,10 @@ function MobileNav({ onClose }: { onClose: () => void }) {
           <Icon name="location_on" size={18} />
           Карта
         </Link>
-        <ButtonLink href="/login" className={styles.mobileLogin} onClick={onClose}>
-          <Icon name="login" size={18} />
-          Увійти
-        </ButtonLink>
+        {/* Any click on the sign-in control (a link or "Вийти") is done with the menu. */}
+        <div className={styles.mobileLogin} onClick={onClose}>
+          {account}
+        </div>
       </div>
     </nav>
   );
