@@ -93,7 +93,7 @@ CHAINS = [
         "website": "",
         "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
-            promo(for_groups(plan("Місячний тест-драйв для новачків", "850", 30), "newcomers")),
+            promo(for_groups(plan("Пробний", "850", 30), "newcomers")),
             for_groups(
                 plan(
                     "Студентський / шкільний безліміт на місяць",
