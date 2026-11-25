@@ -60,6 +60,7 @@ CI/CD:  GitHub ──► GitHub Actions (lint, tests) ──► deploy to Vercel
 |---|---|
 | `accounts` | Реєстрація, вхід, ролі |
 | `gyms` | Зали, мережі, варіанти цін |
+| `memberships` | Обраний зал клієнта, його абонементи й візити |
 | `trainers` | Профілі тренерів і спеціалізації |
 | `leads` | Заявки клієнтів тренерам |
 | `exercises` | Довідник вправ |
