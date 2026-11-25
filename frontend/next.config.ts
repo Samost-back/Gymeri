@@ -17,9 +17,11 @@ const nextConfig: NextConfig = {
   // redirect "/api/v1/auth/login/" to the slashless form, and a redirected POST loses its body.
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL;
-    // Fail the start or build instead of quietly proxying to a backend that isn't there.
+    // No proxy rather than a guessed address. Tools like `next typegen` in CI load this config
+    // without backend settings, so throwing here would break them. A running site without
+    // BACKEND_URL still fails loudly: the catalog pages throw in apiGet.
     if (!backendUrl) {
-      throw new Error("BACKEND_URL is not set");
+      return [];
     }
     return [{ source: "/api/:path*", destination: `${backendUrl}/api/:path*/` }];
   },
