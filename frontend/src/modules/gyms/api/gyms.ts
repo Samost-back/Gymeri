@@ -38,6 +38,7 @@ type GymListingDto = {
     plan_name: string;
     price: string;
     ends_on: string | null;
+    audiences: FilterOption[];
   } | null;
   hours_summary: string;
   is_open_now: boolean;
@@ -130,6 +131,7 @@ export async function searchGyms(params: GymSearchParams): Promise<GymListing[]>
       planName: gym.promo.plan_name,
       price: Number(gym.promo.price),
       endsOn: gym.promo.ends_on,
+      audiences: gym.promo.audiences,
     },
     hoursSummary: gym.hours_summary,
     isOpenNow: gym.is_open_now,

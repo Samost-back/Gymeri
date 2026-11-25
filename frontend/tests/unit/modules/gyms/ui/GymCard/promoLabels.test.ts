@@ -3,7 +3,12 @@ import type { Promo } from "@/modules/gyms/model/types";
 import { promoText } from "@/modules/gyms/ui/GymCard/promoLabels";
 import { formatPrice } from "@/shared/lib/format";
 
-const promo: Promo = { planName: "3 місяці за ціною двох", price: 3000, endsOn: "2026-12-09" };
+const promo: Promo = {
+  planName: "3 місяці за ціною двох",
+  price: 3000,
+  endsOn: "2026-12-09",
+  audiences: [],
+};
 // Intl separates thousands with a no-break space, so the expected price comes from the same formatter.
 const price = formatPrice(3000);
 
@@ -14,5 +19,16 @@ describe("promoText", () => {
 
   it("leaves out the date of a promo without an end", () => {
     expect(promoText({ ...promo, endsOn: null })).toBe(`«3 місяці за ціною двох» — ${price}`);
+  });
+
+  it("says who may buy a promo meant for a group", () => {
+    const trial: Promo = {
+      ...promo,
+      planName: "Пробний",
+      endsOn: null,
+      audiences: [{ slug: "newcomers", name: "Новачки" }],
+    };
+
+    expect(promoText(trial)).toBe(`«Пробний» — ${price} · лише для: новачки`);
   });
 });

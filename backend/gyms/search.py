@@ -4,10 +4,10 @@ interchangeable sort strategies."""
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, replace
+from datetime import date
 from decimal import Decimal
 
 from .exceptions import InvalidFilter
-from .pricing import PlanPrice
 
 
 @dataclass(frozen=True)
@@ -16,6 +16,18 @@ class Label:
 
     slug: str
     name: str
+
+
+@dataclass(frozen=True)
+class Promo:
+    """A promo plan as a card shows it."""
+
+    plan_name: str
+    price: Decimal
+    # The last day it is sold; None while the chain keeps it on.
+    ends_on: date | None
+    # Who may buy it, e.g. newcomers for a trial; empty means everyone.
+    audiences: tuple[Label, ...]
 
 
 @dataclass(frozen=True)
@@ -33,8 +45,8 @@ class GymListing:
     types: tuple[Label, ...]
     # Groups with a plan of their own in this gym, e.g. students.
     audiences: tuple[Label, ...]
-    # The promo plan with the lowest price per month on sale right now, or None.
-    promo: PlanPrice | None
+    # The promo worth showing right now (see PriceList.best_promo), or None.
+    promo: Promo | None
     hours_summary: str
     is_open_now: bool
     price_from: Decimal | None

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
-from .exceptions import InvalidPromo
+from .exceptions import InvalidPlan, InvalidPromo
 from .schedule import PlanAccess
 
 MONTH_DAYS = 30
@@ -30,6 +30,9 @@ class PlanPrice:
     promo_ends_on: date | None = None
 
     def __post_init__(self) -> None:
+        # The database checks this too, but monthly_price divides by it, so the class guards itself.
+        if self.duration_days <= 0:
+            raise InvalidPlan(f"A plan must last at least a day, got {self.duration_days}.")
         if self.promo_ends_on is not None and not self.is_promo:
             raise InvalidPromo("Only a promo plan can have an end date.")
 
@@ -70,9 +73,12 @@ class PriceList:
         return min(prices, default=None)
 
     def best_promo(self, day: date, gym_id: int | None = None) -> PlanPrice | None:
-        """The promo worth showing on a card: the lowest price per month among those sold."""
+        """The promo worth showing on a card: one anyone can buy before one for a group, such
+        as a newcomer trial that most visitors can't get; then the lowest price per month."""
         promos = [plan for plan in self._sold_in(day, gym_id) if plan.is_promo]
-        return min(promos, key=lambda plan: plan.monthly_price, default=None)
+        return min(
+            promos, key=lambda plan: (not plan.is_for_everyone, plan.monthly_price), default=None
+        )
 
     def audiences(self, day: date, gym_id: int | None = None) -> frozenset[str]:
         """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""
@@ -80,10 +86,15 @@ class PriceList:
 
     def plans_for(self, day: date, gym_id: int) -> list[PlanPrice]:
         """Plans sold in this gym that day: ones anyone can buy before those for special
-        groups, then shorter terms first and cheaper first within a term."""
+        groups, promos first within each, then shorter terms and cheaper ones first."""
         return sorted(
             self._sold_in(day, gym_id),
-            key=lambda plan: (not plan.is_for_everyone, plan.duration_days, plan.price),
+            key=lambda plan: (
+                not plan.is_for_everyone,
+                not plan.is_promo,
+                plan.duration_days,
+                plan.price,
+            ),
         )
 
     def _sold_in(self, day: date, gym_id: int | None) -> list[PlanPrice]:

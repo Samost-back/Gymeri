@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from gyms.exceptions import InvalidPromo
+from gyms.exceptions import InvalidPlan, InvalidPromo
 from gyms.pricing import PlanPrice, PriceList
 from gyms.services import PlanPromoService
 
@@ -15,9 +15,14 @@ def promo(price: str, days: int = 30, **fields) -> PlanPrice:
     return PlanPrice(Decimal(price), days, is_promo=True, **fields)
 
 
-def test_regular_plan_cannot_have_a_promo_end_date():
-    with pytest.raises(InvalidPromo):
-        PlanPrice(Decimal("1000"), 30, promo_ends_on=TODAY)
+@pytest.mark.parametrize(
+    "fields",
+    [{"duration_days": 0}, {"promo_ends_on": TODAY}],
+    ids=["zero days", "end date without promo"],
+)
+def test_plan_that_cant_exist_is_rejected(fields):
+    with pytest.raises(InvalidPlan):
+        PlanPrice(Decimal("1000"), **({"duration_days": 30} | fields))
 
 
 @pytest.mark.parametrize(("ends_on", "sold"), [(TODAY, True), (YESTERDAY, False), (None, True)])
@@ -40,6 +45,14 @@ def test_card_shows_the_promo_with_the_lowest_price_per_month():
     assert prices.best_promo(TODAY) == three_months
 
 
+def test_card_prefers_a_promo_anyone_can_buy_over_a_cheaper_group_one():
+    for_everyone = promo("1500", days=90, name="3 months")
+    trial = promo("500", audiences=frozenset({"newcomers"}), name="Trial")
+
+    assert PriceList([trial, for_everyone]).best_promo(TODAY) == for_everyone
+    assert PriceList([trial]).best_promo(TODAY) == trial
+
+
 def test_ended_promo_neither_shows_nor_lists_its_group():
     trial = promo("500", audiences=frozenset({"newcomers"}), promo_ends_on=YESTERDAY)
     prices = PriceList([trial])
@@ -53,6 +66,6 @@ def test_ended_promo_neither_shows_nor_lists_its_group():
     [(False, TODAY), (True, YESTERDAY)],
     ids=["end date without promo", "ends in the past"],
 )
-def test_admin_rejects_promo_dates_that_make_no_sense(is_promo, ends_on):
+def test_service_rejects_promo_dates_that_make_no_sense(is_promo, ends_on):
     with pytest.raises(InvalidPromo):
         PlanPromoService().validate(is_promo=is_promo, promo_ends_on=ends_on, today=TODAY)

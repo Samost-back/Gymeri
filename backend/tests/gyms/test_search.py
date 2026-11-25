@@ -3,10 +3,9 @@ from decimal import Decimal
 import pytest
 
 from gyms.exceptions import InvalidFilter
-from gyms.pricing import PlanPrice
-from gyms.search import GymListing, GymSearchCriteria, Label, SortByArea, SortByPrice
+from gyms.search import GymListing, GymSearchCriteria, Label, Promo, SortByArea, SortByPrice
 
-PROMO = PlanPrice(Decimal("1500"), 90, name="3 months", is_promo=True)
+PROMO = Promo("3 months", Decimal("1500"), ends_on=None, audiences=())
 
 
 def listing(

@@ -18,7 +18,11 @@ class GymNotPublishable(GymsError):
     """The gym lacks data the public catalog relies on."""
 
 
-class InvalidPromo(GymsError):
+class InvalidPlan(GymsError):
+    """A plan that can't exist, e.g. one that lasts zero days."""
+
+
+class InvalidPromo(InvalidPlan):
     """Promo dates that make no sense: an end date on a regular plan or one in the past."""
 
 

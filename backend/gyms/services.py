@@ -17,7 +17,7 @@ from .schedule import (
     TimeInterval,
     WeeklySchedule,
 )
-from .search import GymListing, GymSearchCriteria, Label
+from .search import GymListing, GymSearchCriteria, Label, Promo
 
 
 def load_schedule(gym: Gym) -> WeeklySchedule:
@@ -363,11 +363,22 @@ class GymSearchService:
                 Label(slug, audience_names[slug])
                 for slug in sorted(prices.audiences(today, gym.pk))
             ),
-            promo=prices.best_promo(today, gym.pk),
+            promo=GymSearchService._to_promo(prices.best_promo(today, gym.pk), audience_names),
             hours_summary=schedule.summary(),
             is_open_now=schedule.is_open_at(now),
             price_from=prices.monthly_from(today, gym.pk),
             photo_url=photos[0].image.url if photos else None,
+        )
+
+    @staticmethod
+    def _to_promo(plan: PlanPrice | None, audience_names: dict[str, str]) -> Promo | None:
+        if plan is None:
+            return None
+        return Promo(
+            plan_name=plan.name,
+            price=plan.price,
+            ends_on=plan.promo_ends_on,
+            audiences=tuple(Label(slug, audience_names[slug]) for slug in sorted(plan.audiences)),
         )
 
 

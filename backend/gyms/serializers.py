@@ -31,9 +31,10 @@ class FilterOptionsSerializer(serializers.Serializer):
 
 
 class PromoSerializer(serializers.Serializer):
-    plan_name = serializers.CharField(source="name")
+    plan_name = serializers.CharField()
     price = serializers.DecimalField(max_digits=8, decimal_places=2)
-    ends_on = serializers.DateField(source="promo_ends_on", allow_null=True)
+    ends_on = serializers.DateField(allow_null=True)
+    audiences = FilterOptionSerializer(many=True)
 
 
 class GymListingSerializer(serializers.Serializer):

@@ -33,6 +33,8 @@ export type Promo = {
   price: number;
   // ISO date, the last day it is sold; null while the chain keeps it on.
   endsOn: string | null;
+  // Who may buy it, e.g. newcomers for a trial; empty means everyone.
+  audiences: FilterOption[];
 };
 
 export type GymListing = {
