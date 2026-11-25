@@ -14,6 +14,12 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
+# Prod only: the session and CSRF cookies travel over HTTPS only, so they can't leak on a plain
+# HTTP request. Off in dev (DEBUG), where the site runs on http://localhost and a secure cookie
+# would never come back, so nobody could sign in.
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -94,4 +100,16 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ],
     "EXCEPTION_HANDLER": "config.exception_handler.exception_handler",
+    # Sign-in limits: "auth" per client on login and register, "login_email" per account.
+    # Counters live in the default cache, which is per process: with several workers each one
+    # counts on its own, so the real limit is a multiple of these. A shared cache fixes that.
+    "DEFAULT_THROTTLE_RATES": {
+        "auth": "20/minute",
+        "login_email": "20/hour",
+    },
+    # How many proxies in front of Django add their client's address to X-Forwarded-For.
+    # 0 (dev): use only the connection address; the header comes from the client and anyone
+    # could fake it to dodge the limits. In prod set it to the real proxy count, or every user
+    # shares the proxy's address and one limit.
+    "NUM_PROXIES": int(os.environ.get("DJANGO_NUM_PROXIES", "0")),
 }
