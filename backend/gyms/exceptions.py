@@ -18,8 +18,12 @@ class GymNotPublishable(GymsError):
     """The gym lacks data the public catalog relies on."""
 
 
-class InvalidDiscount(GymsError):
-    """A discount that can't be applied: zero, over 100% or more than the price."""
+class InvalidPlan(GymsError):
+    """A plan that can't exist, e.g. one that lasts zero days."""
+
+
+class InvalidPromo(InvalidPlan):
+    """Promo dates that make no sense: an end date on a regular plan or one in the past."""
 
 
 class GymNotFound(GymsError):

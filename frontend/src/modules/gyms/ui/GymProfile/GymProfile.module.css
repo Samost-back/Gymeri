@@ -5,6 +5,35 @@
   gap: var(--space-sm);
 }
 
+/* Phones: the main action takes the whole row and the other two share the next one evenly,
+   instead of wrapping into rows of different widths. A lone second button takes a row too. */
+@media (max-width: 767px) {
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Small tablets would stretch the buttons across the whole screen. */
+    max-width: 28rem;
+  }
+
+  .actions > :first-child,
+  .actions > :last-child:nth-child(2) {
+    grid-column: 1 / -1;
+  }
+
+  /* Less side padding, so «Подзвонити» with its icon fits half of a 375px screen. The
+     element selector outweighs the button's own padding whatever order the CSS loads in. */
+  .actions > a {
+    padding-inline: 1rem;
+  }
+}
+
+/* The narrowest phones have no room for two buttons in a row. */
+@media (max-width: 359px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .photos {
   display: grid;
   grid-template-columns: 1fr;
@@ -81,15 +110,7 @@
 
 .planPrice {
   composes: headlineMd from "@/shared/styles/typography.module.css";
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-sm);
   color: var(--color-primary);
-}
-
-.fullPrice {
-  composes: bodySm from "@/shared/styles/typography.module.css";
-  color: var(--color-text-subtle);
 }
 
 /* Same gap above as between the plan cards, so the link reads as part of the section. */

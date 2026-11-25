@@ -21,7 +21,6 @@ const ICON_NAMES = [
   "mail",
   "map",
   "menu",
-  "percent",
   "person",
   "pin_drop",
   "schedule",

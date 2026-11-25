@@ -3,27 +3,13 @@
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
-from .discounts import Discount
-from .exceptions import InvalidDiscount
+from .exceptions import InvalidPlan, InvalidPromo
 from .schedule import PlanAccess
 
 MONTH_DAYS = 30
-
-
-@dataclass(frozen=True)
-class DiscountOffer:
-    """A promotion as a buyer sees it: which plan, how much off, the price before and after."""
-
-    plan_name: str
-    discount: Discount
-    full_price: Decimal
-    price: Decimal
-
-    @property
-    def saving(self) -> Decimal:
-        return self.full_price - self.price
+HRYVNIA = Decimal("1")
 
 
 @dataclass(frozen=True)
@@ -34,70 +20,86 @@ class PlanPrice:
     gym_id: int | None = None
     # Who may buy it, e.g. {"students"}; empty means everyone.
     audiences: frozenset[str] = field(default_factory=frozenset)
-    discounts: tuple[Discount, ...] = ()
     name: str = ""
     # None means unlimited visits during the period.
     visits_limit: int | None = None
     access: PlanAccess = field(default_factory=lambda: PlanAccess({}))
+    # A promo is a plan of its own, e.g. "3 months for 1500"; gyms rarely discount plans.
+    is_promo: bool = False
+    # The last day a promo is sold; None means until the chain removes it.
+    promo_ends_on: date | None = None
+
+    def __post_init__(self) -> None:
+        # The database checks this too, but monthly_price divides by it, so the class guards itself.
+        if self.duration_days <= 0:
+            raise InvalidPlan(f"A plan must last at least a day, got {self.duration_days}.")
+        if self.promo_ends_on is not None and not self.is_promo:
+            raise InvalidPromo("Only a promo plan can have an end date.")
 
     @property
     def is_for_everyone(self) -> bool:
         return not self.audiences
 
-    def best_offer_on(self, day: date) -> DiscountOffer | None:
-        """The active discount that saves the most that day, or None."""
-        offers = []
-        for discount in self.discounts:
-            if not discount.is_active(day):
-                continue
-            # The admin checks a discount against the price, but the price may drop later;
-            # a discount that no longer fits is skipped instead of breaking the catalog.
-            try:
-                offers.append(
-                    DiscountOffer(self.name, discount, self.price, discount.apply(self.price))
-                )
-            except InvalidDiscount:
-                continue
-        return max(offers, key=lambda offer: offer.saving, default=None)
+    @property
+    def monthly_price(self) -> Decimal:
+        """The price spread over 30 days, so "3 months for 1500" compares with a month for 900."""
+        return (self.price * MONTH_DAYS / self.duration_days).quantize(
+            HRYVNIA, rounding=ROUND_HALF_UP
+        )
 
-    def price_on(self, day: date) -> Decimal:
-        """The price a buyer pays that day: with the best active discount, or the full price."""
-        offer = self.best_offer_on(day)
-        return offer.price if offer else self.price
+    def is_sold_on(self, day: date) -> bool:
+        """Regular plans are always sold; a promo only until its last day, that day included."""
+        return self.promo_ends_on is None or day <= self.promo_ends_on
 
 
 class PriceList:
-    """Active plans of one chain; answers price questions for the chain or one of its gyms."""
+    """Active plans of one chain; answers price questions for the chain or one of its gyms.
+
+    Every question takes the day, because a promo that ended yesterday is no longer sold.
+    """
 
     def __init__(self, plans: Iterable[PlanPrice] = ()) -> None:
         self._plans = tuple(plans)
 
     def monthly_from(self, day: date, gym_id: int | None = None) -> Decimal | None:
-        """Cheapest monthly price that day. For a gym, only chain-wide plans and its own plans
-        count. Plans for students and other groups don't: "from" must be a price anyone pays."""
+        """Cheapest monthly plan that day, promos included. For a gym, only chain-wide plans
+        and its own plans count. Plans for students and other groups don't: "from" must be a
+        price anyone pays."""
         prices = [
-            plan.price_on(day)
-            for plan in self._sold_in(gym_id)
+            plan.price
+            for plan in self._sold_in(day, gym_id)
             if plan.duration_days == MONTH_DAYS and plan.is_for_everyone
         ]
         return min(prices, default=None)
 
-    def best_offer(self, day: date, gym_id: int | None = None) -> DiscountOffer | None:
-        """The promotion worth showing on a card: the biggest saving among the gym's plans."""
-        offers = [offer for plan in self._sold_in(gym_id) if (offer := plan.best_offer_on(day))]
-        return max(offers, key=lambda offer: offer.saving, default=None)
-
-    def audiences(self, gym_id: int | None = None) -> frozenset[str]:
-        """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""
-        return frozenset().union(*(plan.audiences for plan in self._sold_in(gym_id)))
-
-    def plans_for(self, gym_id: int) -> list[PlanPrice]:
-        """Plans sold in this gym: ones anyone can buy before those for special groups, then
-        shorter terms first and cheaper first within a term."""
-        return sorted(
-            self._sold_in(gym_id),
-            key=lambda plan: (not plan.is_for_everyone, plan.duration_days, plan.price),
+    def best_promo(self, day: date, gym_id: int | None = None) -> PlanPrice | None:
+        """The promo worth showing on a card: one anyone can buy before one for a group, such
+        as a newcomer trial that most visitors can't get; then the lowest price per month."""
+        promos = [plan for plan in self._sold_in(day, gym_id) if plan.is_promo]
+        return min(
+            promos, key=lambda plan: (not plan.is_for_everyone, plan.monthly_price), default=None
         )
 
-    def _sold_in(self, gym_id: int | None) -> list[PlanPrice]:
-        return [plan for plan in self._plans if gym_id is None or plan.gym_id in (None, gym_id)]
+    def audiences(self, day: date, gym_id: int | None = None) -> frozenset[str]:
+        """Groups with a plan of their own, e.g. a gym with a student plan lists "students"."""
+        return frozenset().union(*(plan.audiences for plan in self._sold_in(day, gym_id)))
+
+    def plans_for(self, day: date, gym_id: int) -> list[PlanPrice]:
+        """Plans sold in this gym that day: ones anyone can buy before those for special
+        groups, promos first within each, then shorter terms and cheaper ones first."""
+        return sorted(
+            self._sold_in(day, gym_id),
+            key=lambda plan: (
+                not plan.is_for_everyone,
+                not plan.is_promo,
+                plan.duration_days,
+                plan.price,
+            ),
+        )
+
+    def _sold_in(self, day: date, gym_id: int | None) -> list[PlanPrice]:
+        return [
+            plan
+            for plan in self._plans
+            if plan.is_sold_on(day) and (gym_id is None or plan.gym_id in (None, gym_id))
+        ]

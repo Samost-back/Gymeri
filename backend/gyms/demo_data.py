@@ -30,6 +30,8 @@ AUDIENCES = {
     "children": "Діти",
     "veterans": "Ветерани",
     "pensioners": "Пенсіонери",
+    # Trial plans are sold only to people who haven't trained in the gym before.
+    "newcomers": "Новачки",
 }
 
 # Gym types users filter by; kept short on purpose, a gym usually has two or three.
@@ -63,7 +65,8 @@ def plan(
         "duration_days": days,
         "access": access or {},
         "audiences": [],
-        "discounts": [],
+        "is_promo": False,
+        "promo_days_left": None,
     }
 
 
@@ -72,10 +75,10 @@ def for_groups(plan_data: dict, *audiences: str) -> dict:
     return {**plan_data, "audiences": list(audiences)}
 
 
-def on_sale(plan_data: dict, kind: str, value: str, days_left: int) -> dict:
-    """The plan with a promotion that ends `days_left` days after seeding, so the demo stays
-    current whenever it is loaded."""
-    return {**plan_data, "discounts": [*plan_data["discounts"], (kind, Decimal(value), days_left)]}
+def promo(plan_data: dict, days_left: int | None = None) -> dict:
+    """The plan as a promo. It ends `days_left` days after seeding, so the demo stays current
+    whenever it is loaded; None keeps it on sale until removed."""
+    return {**plan_data, "is_promo": True, "promo_days_left": days_left}
 
 
 CHAINS = [
@@ -90,7 +93,7 @@ CHAINS = [
         "website": "",
         "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
-            plan("Місячний тест-драйв для новачків", "850", 30),
+            promo(for_groups(plan("Пробний", "850", 30), "newcomers")),
             for_groups(
                 plan(
                     "Студентський / шкільний безліміт на місяць",
@@ -198,7 +201,8 @@ CHAINS = [
                 30,
                 access=dict.fromkeys(range(7), (None, "14:00")),
             ),
-            on_sale(plan("Безліміт на 3 місяці", "3900", 90), "fixed", "400", days_left=14),
+            plan("Безліміт на 3 місяці", "3900", 90),
+            promo(plan("3 місяці за ціною двох", "3000", 90), days_left=14),
             plan("Річний безліміт", "12900", 365),
         ],
         "gyms": [
@@ -260,7 +264,8 @@ CHAINS = [
         "website": "https://sportlife.ua/uk/clubs/lutsk/",
         "plans": [
             plan("Гостьовий візит", "350", 1),
-            on_sale(plan("Безліміт на місяць", "1900", 30), "percent", "15", days_left=30),
+            plan("Безліміт на місяць", "1900", 30),
+            promo(plan("Акційний безліміт на місяць", "1500", 30), days_left=30),
             plan(
                 "Денний абонемент на місяць",
                 "1400",

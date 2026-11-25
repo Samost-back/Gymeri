@@ -5,8 +5,9 @@ import { divIcon, latLngBounds, map as createMap, marker, tileLayer } from "leaf
 import { useEffect, useRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { Icon } from "@/shared/ui";
-import { type ChainLink, chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
+import { chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
 import type { GymMapPoint } from "../../model/types";
+import { CHAIN_LINK_LABELS } from "../chainLinkLabels";
 import styles from "./GymMap.module.css";
 import { handleWheelGestures } from "./wheel";
 
@@ -106,12 +107,6 @@ export default function LeafletMap({ points }: { points: GymMapPoint[] }) {
 
   return <div ref={containerRef} className={styles.map} />;
 }
-
-// Labels are presentation, so they live here, not in the model.
-const CHAIN_LINK_LABELS: Record<ChainLink["kind"], string> = {
-  website: "Сайт",
-  instagram: "Instagram",
-};
 
 function GymPopup({ point }: { point: GymMapPoint }) {
   const chainLink = chainLinkOf(point);

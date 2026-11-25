@@ -1,16 +1,11 @@
-from datetime import date
 from decimal import Decimal
 
 import pytest
 
-from gyms.discounts import PercentDiscount
 from gyms.exceptions import InvalidFilter
-from gyms.pricing import DiscountOffer
-from gyms.search import GymListing, GymSearchCriteria, Label, SortByArea, SortByPrice
+from gyms.search import GymListing, GymSearchCriteria, Label, Promo, SortByArea, SortByPrice
 
-OFFER = DiscountOffer(
-    "Month", PercentDiscount(date(2026, 12, 31), Decimal("10")), Decimal("1000"), Decimal("900")
-)
+PROMO = Promo("3 months", Decimal("1500"), ends_on=None, audiences=())
 
 
 def listing(
@@ -18,7 +13,7 @@ def listing(
     price: str | None = None,
     area: int | None = None,
     types: tuple[str, ...] = (),
-    discount: bool = False,
+    promo: bool = False,
 ) -> GymListing:
     return GymListing(
         slug=name,
@@ -31,7 +26,7 @@ def listing(
         area_m2=area,
         types=tuple(Label(slug, slug) for slug in types),
         audiences=(),
-        discount=OFFER if discount else None,
+        promo=PROMO if promo else None,
         hours_summary="",
         is_open_now=False,
         price_from=Decimal(price) if price else None,
@@ -48,7 +43,7 @@ def test_criteria_default_to_sort_by_name_without_filters():
 
 @pytest.mark.parametrize(
     "params",
-    [{"sort": "rating"}, {"discount": "yes"}],
+    [{"sort": "rating"}, {"promo": "yes"}],
     ids=["unknown sort", "bad flag"],
 )
 def test_invalid_query_is_rejected(params):
@@ -86,7 +81,7 @@ def test_full_type_matches_go_first_and_keep_the_sort_order():
     ]
 
 
-def test_discount_filter_keeps_only_gyms_on_sale():
-    gyms = [listing("A", discount=True), listing("B")]
+def test_promo_filter_keeps_only_gyms_with_a_promo():
+    gyms = [listing("A", promo=True), listing("B")]
 
-    assert [gym.name for gym in GymSearchCriteria(discount=True).apply(gyms)] == ["A"]
+    assert [gym.name for gym in GymSearchCriteria(promo=True).apply(gyms)] == ["A"]

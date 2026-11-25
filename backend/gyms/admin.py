@@ -10,7 +10,6 @@ from .exceptions import GymsError
 from .models import (
     Audience,
     Chain,
-    Discount,
     Gym,
     GymPhoto,
     GymType,
@@ -19,7 +18,7 @@ from .models import (
     PlanAccessWindow,
     Street,
 )
-from .services import GymPublishingService, PlanPricingService
+from .services import GymPublishingService, PlanPromoService
 
 
 @admin.register(Street, GymType, Audience)
@@ -28,9 +27,39 @@ class DictionaryAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ["name"]}
 
 
+class PlanAdminForm(forms.ModelForm):
+    """Shared by the chain page and the plan page, so a promo is checked wherever it's edited."""
+
+    def clean(self) -> dict[str, Any]:
+        data = super().clean()
+        # Only on change: an old promo that has ended must stay editable, e.g. to switch it off.
+        if not {"is_promo", "promo_ends_on"} & set(self.changed_data):
+            return data
+        try:
+            PlanPromoService().validate(
+                is_promo=data.get("is_promo", False),
+                promo_ends_on=data.get("promo_ends_on"),
+                today=timezone.localdate(),
+            )
+        except GymsError as error:
+            # On the field, so Django skips the matching database constraint and its raw name.
+            raise forms.ValidationError({"promo_ends_on": str(error)}) from error
+        return data
+
+
 class ChainPlanInline(admin.TabularInline):
     model = MembershipPlan
-    fields = ["name", "price", "duration_days", "visits_limit", "gym", "is_active"]
+    form = PlanAdminForm
+    fields = [
+        "name",
+        "price",
+        "duration_days",
+        "visits_limit",
+        "gym",
+        "is_promo",
+        "promo_ends_on",
+        "is_active",
+    ]
     extra = 0
     show_change_link = True
 
@@ -98,42 +127,12 @@ class PlanAccessWindowInline(admin.TabularInline):
     max_num = 7
 
 
-class DiscountFormSet(forms.BaseInlineFormSet):
-    def clean(self) -> None:
-        super().clean()
-        # The plan already carries the price from this same save, so a price change and
-        # a new discount are checked together.
-        price = self.instance.price
-        for form in self.forms:
-            data = getattr(form, "cleaned_data", None)
-            if not data or data.get("DELETE") or not form.has_changed() or price is None:
-                continue
-            # A field that failed its own validation already shows an error.
-            if not all(key in data for key in ("kind", "value", "ends_on")):
-                continue
-            try:
-                PlanPricingService().validate_discount(
-                    price=price,
-                    kind=data["kind"],
-                    value=data["value"],
-                    ends_on=data["ends_on"],
-                    today=timezone.localdate(),
-                )
-            except GymsError as error:
-                form.add_error("value", str(error))
-
-
-class DiscountInline(admin.TabularInline):
-    model = Discount
-    formset = DiscountFormSet
-    extra = 0
-
-
 @admin.register(MembershipPlan)
 class MembershipPlanAdmin(admin.ModelAdmin):
     # Separate page because Django can't nest access windows inside the chain page.
-    list_display = ["name", "chain", "gym", "price", "duration_days", "is_active"]
-    list_filter = ["chain", "is_active", "audiences"]
+    form = PlanAdminForm
+    list_display = ["name", "chain", "gym", "price", "duration_days", "is_promo", "is_active"]
+    list_filter = ["chain", "is_active", "is_promo", "audiences"]
     list_select_related = ["chain", "gym"]
     filter_horizontal = ["audiences"]
-    inlines = [PlanAccessWindowInline, DiscountInline]
+    inlines = [PlanAccessWindowInline]

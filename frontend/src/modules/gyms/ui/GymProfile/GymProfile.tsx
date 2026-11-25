@@ -12,17 +12,13 @@ import {
   Tag,
 } from "@/shared/ui";
 import { getGym } from "../../api/gyms";
-import { type ChainLink, chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
+import { chainLinkOf, googleMapsPlaceUrl } from "../../model/mapLinks";
 import { EMPTY_SEARCH, gymsHref } from "../../model/searchParams";
 import type { GymProfile as GymProfileData } from "../../model/types";
+import { CHAIN_LINK_LABELS } from "../chainLinkLabels";
 import styles from "./GymProfile.module.css";
 import { PlanCard } from "./PlanCard";
 import { WeekHours } from "./WeekHours";
-
-const CHAIN_LINK_LABELS: Record<ChainLink["kind"], string> = {
-  website: "Сайт мережі",
-  instagram: "Instagram мережі",
-};
 
 function facts(gym: GymProfileData): IconListItem[] {
   const items: IconListItem[] = [
@@ -103,7 +99,7 @@ export async function GymProfile({ slug }: GymProfileProps) {
         <section>
           <PageHeader
             title="Абонементи"
-            description="Ціни на сьогодні з урахуванням акцій. Абонементи мережі діють у всіх її залах."
+            description="Абонементи мережі діють у всіх її залах. Акційні продаються до вказаної дати."
           />
           {gym.plans.length > 0 ? (
             <div className={styles.plans}>
