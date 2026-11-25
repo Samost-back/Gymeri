@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { AccountButton } from "@/modules/accounts";
 import { GymSearchResults } from "@/modules/gyms";
-import { ButtonLink, Icon, PageHeader, PageHero, PageMain } from "@/shared/ui";
+import { PageHeader, PageHero, PageMain } from "@/shared/ui";
 
 export const metadata: Metadata = {
   title: "Мій кабінет — пошук залів і абонементи · Gymeri",
@@ -15,12 +16,7 @@ export default function AccountPage({ searchParams }: PageProps<"/account">) {
         title="Мої абонементи"
         accent="під контролем."
         lead="Додайте абонементи своїх залів: кабінет рахуватиме дні й тренування, що лишились, і нагадає, коли час продовжити."
-        action={
-          <ButtonLink href="/login">
-            <Icon name="login" size={18} />
-            Увійти
-          </ButtonLink>
-        }
+        action={<AccountButton />}
         photoFocus="30% center"
         compact
       />

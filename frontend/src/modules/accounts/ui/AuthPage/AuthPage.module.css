@@ -7,7 +7,7 @@
   padding: var(--space-2xl) var(--space-md);
 }
 
-/* Same panel as the login modal, so both entry points look alike. */
+/* Same panel as the sign-in modal, so both entry points look alike. */
 .panel {
   position: relative;
   width: 100%;
@@ -17,7 +17,7 @@
   border: 1px solid var(--color-border-strong);
 }
 
-/* Same close button as in the login modal. */
+/* Same close button as in the sign-in modal. */
 .close {
   position: absolute;
   top: var(--space-md);

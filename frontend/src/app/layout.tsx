@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Onest } from "next/font/google";
+import { AccountButton } from "@/modules/accounts";
 import { SiteFooter, SiteHeader } from "@/shared/layout";
 import { iconFontUrl } from "@/shared/ui";
 import "./globals.css";
@@ -28,7 +29,7 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
         <link rel="stylesheet" href={iconFontUrl} />
       </head>
       <body>
-        <SiteHeader />
+        <SiteHeader account={<AccountButton />} />
         {children}
         {modal}
         <SiteFooter />

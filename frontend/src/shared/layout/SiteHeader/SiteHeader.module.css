@@ -77,6 +77,9 @@
 
 .login {
   display: none;
+}
+
+.login > * {
   padding-block: 0.625rem;
   text-transform: none;
 }
@@ -131,6 +134,14 @@
 }
 
 .mobileActions > * {
+  flex: 1;
+}
+
+.mobileLogin {
+  display: flex;
+}
+
+.mobileLogin > * {
   flex: 1;
 }
 

@@ -111,6 +111,13 @@
   text-align: center;
 }
 
-.footerSoon {
-  color: var(--color-text-muted);
+.error {
+  composes: notice;
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.footerLink {
+  color: var(--color-primary);
+  text-decoration: underline;
 }

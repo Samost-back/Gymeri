@@ -1,11 +1,16 @@
 import Link from "next/link";
-import { Suspense } from "react";
-import { ButtonLink, Container, Icon } from "@/shared/ui";
+import { type ReactNode, Suspense } from "react";
+import { Container, Icon } from "@/shared/ui";
 import { MobileMenu } from "./MobileMenu";
 import styles from "./SiteHeader.module.css";
 import { NavLinks, SiteNav } from "./SiteNav";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  // The sign-in control comes from the app: shared code knows nothing about accounts.
+  account: ReactNode;
+};
+
+export function SiteHeader({ account }: SiteHeaderProps) {
   return (
     <header className={styles.header}>
       <Container className={styles.inner}>
@@ -22,10 +27,8 @@ export function SiteHeader() {
             <Icon name="location_on" size={16} />
             Карта
           </Link>
-          <ButtonLink href="/login" className={styles.login}>
-            Увійти
-          </ButtonLink>
-          <MobileMenu />
+          <div className={styles.login}>{account}</div>
+          <MobileMenu account={account} />
         </div>
       </Container>
     </header>
