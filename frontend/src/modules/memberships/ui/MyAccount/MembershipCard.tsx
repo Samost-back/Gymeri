@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ClientApiError } from "@/shared/lib/clientApi";
 import { formatPrice } from "@/shared/lib/format";
-import { Button, Icon, Tag } from "@/shared/ui";
+import { Button, ConfirmDialog, Icon, Tag } from "@/shared/ui";
 import { cancelVisitToday, deleteMembership, markVisitToday } from "../../api/memberships";
 import { removeCard, replaceCard } from "../../model/accountState";
 import { STATUS_LABELS, daysLeftText, formatPeriod, periodProgress } from "../../model/labels";
@@ -15,6 +15,7 @@ const IN_USE = new Set(["active", "ending_soon"]);
 export function MembershipCardView({ card }: { card: MembershipCard }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
   const countsVisits = card.visitsLimit !== null;
 
   async function run(action: () => Promise<void>) {
@@ -35,12 +36,11 @@ export function MembershipCardView({ card }: { card: MembershipCard }) {
     );
 
   const remove = () => {
-    if (window.confirm(`Видалити абонемент «${card.name}»?`)) {
-      run(async () => {
-        await deleteMembership(card.id);
-        removeCard(card.id);
-      });
-    }
+    setConfirmingDelete(false);
+    run(async () => {
+      await deleteMembership(card.id);
+      removeCard(card.id);
+    });
   };
 
   return (
@@ -99,10 +99,23 @@ export function MembershipCardView({ card }: { card: MembershipCard }) {
             {card.visitedToday ? "Скасувати сьогоднішній візит" : "Відмітити візит сьогодні"}
           </Button>
         )}
-        <button type="button" className={styles.textLink} disabled={pending} onClick={remove}>
+        <button
+          type="button"
+          className={styles.textLink}
+          disabled={pending}
+          onClick={() => setConfirmingDelete(true)}
+        >
           Видалити
         </button>
       </div>
+      <ConfirmDialog
+        open={confirmingDelete}
+        title={`Видалити «${card.name}»?`}
+        message="Абонемент і відмічені візити зникнуть з кабінету назавжди."
+        confirmLabel="Видалити"
+        onConfirm={remove}
+        onCancel={() => setConfirmingDelete(false)}
+      />
     </article>
   );
 }

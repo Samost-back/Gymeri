@@ -11,3 +11,7 @@ const session = createStore<User | null | undefined>(undefined);
 
 export const setSessionUser = session.set;
 export const useSessionUser = session.use;
+
+// Whether the sign-out window is open. The window sits once in the layout, not inside the
+// button: on phones the button is in the menu, which closes on the click.
+export const signOutPrompt = createStore(false);

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSessionUser } from "@/modules/accounts";
 import { ClientApiError } from "@/shared/lib/clientApi";
-import { Button, Icon } from "@/shared/ui";
+import { Button, ConfirmDialog, Icon } from "@/shared/ui";
 import { clearGym, getAccount } from "../../api/memberships";
 import { accountStore } from "../../model/accountState";
 import { MembershipCardView } from "./MembershipCard";
@@ -11,14 +11,15 @@ import { MembershipForm } from "./MembershipForm";
 import styles from "./MyAccount.module.css";
 import { MyGymCard } from "./MyGymCard";
 
-// The signed-in part of the account page. It appears once the client has chosen a gym (in the
-// catalog search below, on its card), so a fresh account shows only the search and no empty
-// sections; a guest sees nothing here.
+// The signed-in part of the account page: the chosen gym and the memberships. A fresh account
+// has neither, so it shows nothing here and the page starts with the catalog search, where
+// the gym is chosen on its card; a guest sees nothing here either.
 export function MyAccount() {
   const user = useSessionUser();
   const account = accountStore.use();
   const [formOpen, setFormOpen] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [confirmingRemoval, setConfirmingRemoval] = useState(false);
   // Kept with the user it happened to, so a later sign-in doesn't show someone else's error.
   const [loadError, setLoadError] = useState<{ userId: number; message: string } | null>(null);
 
@@ -53,9 +54,7 @@ export function MyAccount() {
   const { gym, memberships } = account;
 
   async function removeGym() {
-    if (!window.confirm("Прибрати зал з кабінету? Абонементи залишаться.")) {
-      return;
-    }
+    setConfirmingRemoval(false);
     setActionError(null);
     try {
       accountStore.set(await clearGym());
@@ -79,7 +78,11 @@ export function MyAccount() {
               <a href="#find-gym" className={styles.textLink}>
                 Змінити
               </a>
-              <button type="button" className={styles.textLink} onClick={removeGym}>
+              <button
+                type="button"
+                className={styles.textLink}
+                onClick={() => setConfirmingRemoval(true)}
+              >
                 Прибрати
               </button>
             </div>
@@ -90,6 +93,14 @@ export function MyAccount() {
               {actionError}
             </p>
           )}
+          <ConfirmDialog
+            open={confirmingRemoval}
+            title="Прибрати зал з кабінету?"
+            message="Абонементи залишаться, але нові можна буде додати лише до обраного залу."
+            confirmLabel="Прибрати"
+            onConfirm={removeGym}
+            onCancel={() => setConfirmingRemoval(false)}
+          />
         </div>
       )}
 

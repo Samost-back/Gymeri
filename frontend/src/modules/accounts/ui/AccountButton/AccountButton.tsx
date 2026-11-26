@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 import { Button, ButtonLink, Icon } from "@/shared/ui";
-import { fetchMe, logout } from "../../api/auth";
-import { setSessionUser, useSessionUser } from "../../model/session";
+import { fetchMe } from "../../api/auth";
+import { setSessionUser, signOutPrompt, useSessionUser } from "../../model/session";
 
 type AccountButtonProps = { className?: string };
 
@@ -28,16 +28,12 @@ export function AccountButton({ className }: AccountButtonProps) {
 
   if (user) {
     return (
+      // Asks first, in SignOutDialog: on phones the button sits right under the menu.
       <Button
         variant="outline"
         className={className}
         title={user.email}
-        onClick={() =>
-          logout()
-            .then(() => setSessionUser(null))
-            // The session is still alive, so the button stays and the user can try again.
-            .catch(() => undefined)
-        }
+        onClick={() => signOutPrompt.set(true)}
       >
         <Icon name="logout" size={18} />
         Вийти

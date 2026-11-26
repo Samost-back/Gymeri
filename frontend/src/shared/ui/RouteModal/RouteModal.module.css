@@ -1,22 +1,8 @@
 .dialog {
-  width: calc(100% - 2 * var(--space-md));
+  composes: dialog from "@/shared/styles/dialog.module.css";
   max-width: 28rem;
   max-height: calc(100dvh - 2 * var(--space-md));
-  margin: auto;
-  padding: 0;
   overflow: auto;
-  background: transparent;
-  border: 0;
-  color: var(--color-text);
-}
-
-.dialog::backdrop {
-  background: rgb(var(--color-bg-rgb) / 0.75);
-  backdrop-filter: blur(6px);
-}
-
-.dialog[open] {
-  animation: rise 200ms ease-out;
 }
 
 .panel {
@@ -81,18 +67,5 @@
 @media (min-width: 768px) {
   .wide {
     height: calc(100dvh - 2 * var(--space-md));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .dialog[open] {
-    animation: none;
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
   }
 }

@@ -1,0 +1,31 @@
+.dialog {
+  composes: dialog from "@/shared/styles/dialog.module.css";
+  max-width: 24rem;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+}
+
+.title {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+.message {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
