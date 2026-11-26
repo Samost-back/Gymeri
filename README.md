@@ -128,6 +128,7 @@ cp backend/.env.example backend/.env                  # fill in secrets
 cp frontend/.env.local.example frontend/.env.local
 make up                 # start PostgreSQL, backend and frontend
 make migrate
+make seed                # demo gyms and a demo client (DEBUG only)
 docker compose exec backend python manage.py createsuperuser
 ```
 
@@ -136,6 +137,7 @@ docker compose exec backend python manage.py createsuperuser
 - Frontend: `http://localhost:3000`
 - Backend API: `http://localhost:8000/api/v1/`
 - Django admin: `http://localhost:8000/admin/`, через неї ведеться каталог залів і тренерів.
+- Демо-клієнт для «Мого кабінету»: `demo@gymeri.local` / `Demo-pass-2026` (створює `make seed`).
 
 ### Щоденна робота
 
