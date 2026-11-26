@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AccountButton } from "@/modules/accounts";
 import { GymSearchResults } from "@/modules/gyms";
+import {
+  AccountAction,
+  ChooseGymButton,
+  MyAccount,
+  UntilGymChosen,
+} from "@/modules/memberships";
 import { PageHeader, PageHero, PageMain } from "@/shared/ui";
 
 export const metadata: Metadata = {
@@ -12,22 +17,28 @@ export const metadata: Metadata = {
 export default function AccountPage({ searchParams }: PageProps<"/account">) {
   return (
     <>
-      <PageHero
-        title="Мої абонементи"
-        accent="під контролем."
-        lead="Додайте абонементи своїх залів: кабінет рахуватиме дні й тренування, що лишились, і нагадає, коли час продовжити."
-        action={<AccountButton />}
-        photoFocus="30% center"
-        compact
-      />
-      <PageMain>
-        <section>
+      <UntilGymChosen>
+        <PageHero
+          title="Мої абонементи"
+          accent="під контролем."
+          lead="Додайте абонементи своїх залів: кабінет рахуватиме дні й тренування, що лишились, і покаже, коли час продовжити."
+          action={<AccountAction />}
+          photoFocus="30% center"
+          compact
+        />
+      </UntilGymChosen>
+      <PageMain spacing="sections">
+        <MyAccount />
+        <section id="find-gym">
           <PageHeader
             title="Знайти зал"
             description="Конкретні локації з графіком, цінами та опціями. Змініть фільтри, щоб звузити вибір."
           />
           <Suspense>
-            <GymSearchResults searchParams={searchParams} />
+            <GymSearchResults
+              searchParams={searchParams}
+              cardAction={(gymSlug) => <ChooseGymButton gymSlug={gymSlug} />}
+            />
           </Suspense>
         </section>
       </PageMain>

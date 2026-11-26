@@ -52,7 +52,7 @@
   text-transform: uppercase;
 }
 
-/* Stretched over the whole card, so a tap anywhere opens the gym; the card has no other links. */
+/* Stretched over the whole card, so a tap anywhere opens the gym; only .action sits above it. */
 .link::after {
   content: "";
   position: absolute;
@@ -115,6 +115,14 @@
 .price {
   composes: headlineSm from "@/shared/styles/typography.module.css";
   color: var(--color-primary);
+}
+
+/* Above the stretched link, so its button gets the tap instead of opening the gym. */
+.action {
+  position: relative;
+  z-index: 1;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
 }
 
 @media (min-width: 1024px) {

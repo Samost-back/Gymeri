@@ -1,0 +1,32 @@
+/* What every window on the site shares (RouteModal, ConfirmDialog): centred, the blurred
+   backdrop and the short rise on opening. Each composes this and adds its own size. */
+.dialog {
+  width: calc(100% - 2 * var(--space-md));
+  margin: auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--color-text);
+}
+
+.dialog::backdrop {
+  background: rgb(var(--color-bg-rgb) / 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.dialog[open] {
+  animation: rise 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open] {
+    animation: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

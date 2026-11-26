@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ApiError } from "@/shared/lib/api";
 import { getFilterOptions, searchGyms } from "../../api/gyms";
 import { parseSearchParams } from "../../model/searchParams";
@@ -8,9 +9,11 @@ import styles from "../lists.module.css";
 
 type GymSearchResultsProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
+  // Added to every card by the page; the catalog itself knows nothing about accounts.
+  cardAction?: (gymSlug: string) => ReactNode;
 };
 
-export async function GymSearchResults({ searchParams }: GymSearchResultsProps) {
+export async function GymSearchResults({ searchParams, cardAction }: GymSearchResultsProps) {
   const params = parseSearchParams(await searchParams);
   const [options, gyms] = await Promise.all([
     getFilterOptions(),
@@ -29,7 +32,12 @@ export async function GymSearchResults({ searchParams }: GymSearchResultsProps) 
   const cards = (list: GymListing[]) => (
     <div className={styles.list}>
       {list.map((gym) => (
-        <GymCard key={gym.slug} gym={gym} selectedTypes={params.types} />
+        <GymCard
+          key={gym.slug}
+          gym={gym}
+          selectedTypes={params.types}
+          action={cardAction?.(gym.slug)}
+        />
       ))}
     </div>
   );

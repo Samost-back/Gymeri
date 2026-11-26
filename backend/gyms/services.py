@@ -269,6 +269,14 @@ class CatalogService:
             ),
         )
 
+    def get_gym_id(self, slug: str) -> int:
+        """The id other apps store to point at a published gym, so they don't query gyms'
+        models themselves."""
+        gym_id = self._published_gyms().filter(slug=slug).values_list("pk", flat=True).first()
+        if gym_id is None:
+            raise GymNotFound(f"No published gym: {slug}")
+        return gym_id
+
     @staticmethod
     def _to_offer(plan: PlanPrice, audience_names: dict[str, str]) -> PlanOffer:
         return PlanOffer(

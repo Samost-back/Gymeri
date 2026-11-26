@@ -22,13 +22,13 @@ describe("promoText", () => {
   });
 
   it("says who may buy a promo meant for a group", () => {
-    const trial: Promo = {
+    const forStudents: Promo = {
       ...promo,
-      planName: "Пробний",
+      planName: "Студентський місяць",
       endsOn: null,
-      audiences: [{ slug: "newcomers", name: "Новачки" }],
+      audiences: [{ slug: "students", name: "Студенти" }],
     };
 
-    expect(promoText(trial)).toBe(`«Пробний» — ${price} · лише для: новачки`);
+    expect(promoText(forStudents)).toBe(`«Студентський місяць» — ${price} · лише для: студенти`);
   });
 });

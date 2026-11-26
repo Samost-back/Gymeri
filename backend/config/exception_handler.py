@@ -5,6 +5,13 @@ from rest_framework.views import exception_handler as drf_exception_handler
 
 from accounts.exceptions import EmailTaken, InvalidCredentials, NotSignedIn, WeakPassword
 from gyms.exceptions import GymNotFound, InvalidFilter
+from memberships.exceptions import (
+    GymNotAvailable,
+    InvalidTerms,
+    MembershipNotFound,
+    NoHomeGym,
+    VisitNotAllowed,
+)
 
 # The single place where domain errors become HTTP responses; services stay HTTP-agnostic.
 DOMAIN_ERROR_STATUSES: dict[type[Exception], int] = {
@@ -14,6 +21,11 @@ DOMAIN_ERROR_STATUSES: dict[type[Exception], int] = {
     InvalidCredentials: status.HTTP_401_UNAUTHORIZED,
     NotSignedIn: status.HTTP_401_UNAUTHORIZED,
     EmailTaken: status.HTTP_409_CONFLICT,
+    InvalidTerms: status.HTTP_400_BAD_REQUEST,
+    GymNotAvailable: status.HTTP_400_BAD_REQUEST,
+    VisitNotAllowed: status.HTTP_409_CONFLICT,
+    NoHomeGym: status.HTTP_409_CONFLICT,
+    MembershipNotFound: status.HTTP_404_NOT_FOUND,
 }
 
 

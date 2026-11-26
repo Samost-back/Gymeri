@@ -2,7 +2,7 @@ import { formatDateParts, formatPrice } from "@/shared/lib/format";
 import type { Promo } from "../../model/types";
 
 // Plan, price, the last day if set and who may buy it, if not everyone:
-// "«Пробний» — 500 грн до 9 грудня 2026 · лише для: новачки".
+// "«Студентський місяць» — 500 грн до 9 грудня 2026 · лише для: студенти".
 export function promoText(promo: Promo): string {
   let text = `«${promo.planName}» — ${formatPrice(promo.price)}`;
   if (promo.endsOn !== null) {

@@ -1,0 +1,273 @@
+/* The client's own gym and memberships: a white frame on a darker ground, so the panel stands
+   apart from the catalog cards in the search below. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* A small label with its action on the right, instead of a page-size heading per block. */
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headActions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.blockTitle {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+}
+
+.smallButton {
+  padding: 0.5rem 0.75rem;
+}
+
+.muted {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.error {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  color: var(--color-error);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.chain {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.detail {
+  composes: bodySm from "@/shared/styles/typography.module.css";
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.textLink {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.textLink:hover {
+  color: var(--color-primary);
+}
+
+/* My gym */
+
+.gym {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.gymThumb {
+  position: relative;
+  flex: none;
+  width: 5.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+/* Same treatment as the catalog photos, so the account reads as part of the site. */
+.gymThumb img {
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.25);
+}
+
+.gymBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.gymName {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+/* Membership form */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  composes: labelXs from "@/shared/styles/typography.module.css";
+  color: var(--color-text-subtle);
+}
+
+.input {
+  composes: bodyMd from "@/shared/styles/typography.module.css";
+  width: 100%;
+  min-width: 0;
+  height: 3rem;
+  padding-inline: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-primary);
+  color-scheme: dark;
+}
+
+/* iOS Safari gives a date input its own minimum width and ignores width: 100%, so on a phone
+   the field ran past the screen; without the native look it sizes like the other inputs. */
+.input[type="date"] {
+  appearance: none;
+}
+
+.input::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* Membership cards */
+
+.cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+/* Spent memberships stay for the record but step back. */
+.card[data-status="expired"],
+.card[data-status="used_up"] {
+  opacity: 0.6;
+}
+
+.cardName {
+  composes: headlineSm from "@/shared/styles/typography.module.css";
+  color: var(--color-primary);
+}
+
+.progressBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding-block: var(--space-sm);
+  border-block: 1px solid var(--color-border);
+}
+
+.progressRow {
+  composes: labelSm from "@/shared/styles/typography.module.css";
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  color: var(--color-primary);
+}
+
+.progress {
+  height: 0.375rem;
+  background: var(--color-border);
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+}
+
+/* Two equal halves: side by side they always fit a phone, where their natural widths didn't. */
+.formActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.formActions > * {
+  padding-inline: var(--space-sm);
+}
+
+@media (min-width: 640px) {
+  /* minmax(0, …): a long value can't push its column wider than half. */
+  .fieldRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .panel {
+    padding: var(--space-lg);
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .card {
+    padding: var(--space-lg);
+  }
+}
