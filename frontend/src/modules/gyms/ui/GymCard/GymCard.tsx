@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { cx } from "@/shared/lib/classNames";
 import { formatArea, formatPrice } from "@/shared/lib/format";
 import { Icon, Tag } from "@/shared/ui";
@@ -11,9 +12,11 @@ type GymCardProps = {
   gym: GymListing;
   // Gym types the user filtered by; the card shows which of them this gym has.
   selectedTypes?: string[];
+  // A control the page adds under the card, e.g. choosing the gym in the account.
+  action?: ReactNode;
 };
 
-export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
+export function GymCard({ gym, selectedTypes = [], action }: GymCardProps) {
   return (
     <article className={styles.card}>
       {gym.photoUrl && (
@@ -84,6 +87,7 @@ export function GymCard({ gym, selectedTypes = [] }: GymCardProps) {
             <span className={styles.price}>від {formatPrice(gym.priceFrom)}/міс</span>
           )}
         </div>
+        {action && <div className={styles.action}>{action}</div>}
       </div>
     </article>
   );

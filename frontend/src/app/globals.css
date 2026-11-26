@@ -10,6 +10,8 @@
 
 html {
   color-scheme: dark;
+  /* In-page links (#find-gym) stop below the sticky header instead of under it. */
+  scroll-padding-top: var(--header-height);
 }
 
 body {

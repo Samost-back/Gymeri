@@ -20,3 +20,11 @@ type ButtonLinkProps = ComponentProps<typeof Link> & { variant?: Variant };
 export function ButtonLink({ variant = "primary", className, ...props }: ButtonLinkProps) {
   return <Link className={classes(variant, className)} {...props} />;
 }
+
+type ButtonAnchorProps = ComponentProps<"a"> & { variant?: Variant };
+
+// A plain link for jumps within the page (href="#..."). Next's Link ignores a click whose URL,
+// hash included, is already the current one, so a second jump to the same place did nothing.
+export function ButtonAnchor({ variant = "primary", className, ...props }: ButtonAnchorProps) {
+  return <a className={classes(variant, className)} {...props} />;
+}
