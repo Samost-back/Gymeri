@@ -1,27 +1,13 @@
-import { useSyncExternalStore } from "react";
+"use client";
+
+// Browser state behind a React hook: server components may import the module's index, and
+// this directive keeps the hook out of the server bundle, where Next refuses it.
+import { createStore } from "@/shared/lib/store";
 import type { User } from "./types";
 
-// undefined: not asked yet; null: asked, nobody is signed in.
-type SessionState = User | null | undefined;
+// undefined: not asked yet; null: asked, nobody is signed in. Shared, so the header and the
+// forms agree on who is signed in without reloading.
+const session = createStore<User | null | undefined>(undefined);
 
-let current: SessionState;
-const listeners = new Set<() => void>();
-
-// One shared value, so the header and the forms agree on who is signed in without reloading.
-export function setSessionUser(user: User | null): void {
-  current = user;
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-export function useSessionUser(): SessionState {
-  return useSyncExternalStore(
-    subscribe,
-    () => current,
-    () => undefined,
-  );
-}
+export const setSessionUser = session.set;
+export const useSessionUser = session.use;

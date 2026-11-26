@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
+import { ClientApiError } from "@/shared/lib/clientApi";
 import { Button, Icon, Tag } from "@/shared/ui";
-import { AuthError, login, register } from "../../api/auth";
+import { login, register } from "../../api/auth";
 import { setSessionUser } from "../../model/session";
 import styles from "./AuthForm.module.css";
 
@@ -53,7 +54,7 @@ function AuthForm({ mode }: AuthFormProps) {
       // replace: "back" from the account must not reopen a form the user already filled in.
       router.replace("/account");
     } catch (caught) {
-      setError(caught instanceof AuthError ? caught.message : "Щось пішло не так.");
+      setError(caught instanceof ClientApiError ? caught.message : "Щось пішло не так.");
       setPending(false);
     }
   }
