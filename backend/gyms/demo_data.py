@@ -93,7 +93,9 @@ CHAINS = [
         "website": "",
         "instagram_url": "https://www.instagram.com/interatletika.lutsk/",
         "plans": [
-            promo(for_groups(plan("Пробний", "850", 30), "newcomers")),
+            # A regular plan, not a promo: sold in all five gyms, it put the promo badge on every
+            # Interatletika card, and a badge on almost every card says nothing.
+            for_groups(plan("Пробний", "850", 30), "newcomers"),
             for_groups(
                 plan(
                     "Студентський / шкільний безліміт на місяць",
