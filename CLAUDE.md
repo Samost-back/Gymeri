@@ -11,7 +11,7 @@
 
 Архітектура й хостинг: `README.md`.
 
-
+## Команди
 Точка входу це Makefile. Локальна розробка йде через Docker: `make up` піднімає весь проєкт (PostgreSQL, backend, frontend), `make down` зупиняє.
 
 ```
